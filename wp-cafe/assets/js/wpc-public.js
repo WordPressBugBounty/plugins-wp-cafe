@@ -683,7 +683,7 @@ function remove_block(obj) {
  */
 function wpc_add_to_cart($) {
 
-    $('body').on('submit', 'form.cart', function (evt) {
+    $('body').off('submit', 'form.cart').on('submit', 'form.cart', function (evt) {
         evt.preventDefault();
         var $this = $(this);
         $this.find('.button').removeClass('added').addClass('loading');

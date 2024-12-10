@@ -258,8 +258,8 @@ class Hooks{
         $time_start         = get_post_meta( $reservation_id, 'wpc_from_time', true );
         $time_end           = get_post_meta( $reservation_id, 'wpc_to_time', true );
         $reservation_invoice= ( isset($invoice) || $invoice !="" ) ? $invoice : get_post_meta( $reservation_id, 'wpc_reservation_invoice', true);
-        $schedule_1         = $time_start !=="" ? esc_html__(' Start time ', 'wpcafe') . date_i18n($wpc_time_format, strtotime( $time_start ) ) : " ";
-        $schedule_2         = $time_end !=="" ? esc_html__(' End time ', 'wpcafe'). date_i18n($wpc_time_format, strtotime( $time_end ) ) : " ";
+         $schedule_1         = $time_start !=="" ? esc_html__(' Start time ', 'wpcafe') . Wpc_Utilities::get_formatted_time( $time_start ) : " ";
+        $schedule_2         = $time_end !=="" ? esc_html__(' End time ', 'wpcafe'). Wpc_Utilities::get_formatted_time( $time_end ) : " ";
         $separator          = ( $time_start !=="" && $time_end !=="" ) ? " : " : "";
 
         //pro active tag list check

@@ -156,11 +156,11 @@ class Wpc_Reservation_Report {
             }
             
             if ( $wpc_from_time !=="" ) {
-                $wpc_from_time = date_i18n($wpc_time_format, strtotime( $wpc_from_time ) );
+                $wpc_from_time = Wpc_Utilities::get_formatted_time( $wpc_from_time );
             }
             
             if ( $wpc_to_time !=="" ) {
-                $wpc_to_time = " - " . date_i18n($wpc_time_format, strtotime( $wpc_to_time ) );
+                $wpc_to_time = " - " . Wpc_Utilities::get_formatted_time( $wpc_to_time );
             }
 
             echo wp_kses( $wpc_booking_date . "<br>" . $wpc_from_time. $wpc_to_time, Wpc_Utilities::wpc_kses_allowed_tags() );

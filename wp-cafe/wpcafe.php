@@ -8,7 +8,7 @@
  * Plugin Name:        WP Cafe
  * Plugin URI:         https://product.themewinter.com/wpcafe
  * Description:        WordPress Restaurant solution plugin to launch Restaurant Websites.
- * Version:            2.2.30
+ * Version:            2.2.31
  * Author:             Themewinter
  * Author URI:         http://themewinter.com/
  * License:            GPL-2.0+
@@ -29,7 +29,7 @@ final class Wpcafe {
 	 * @var string The plugin version.
 	 */
 	static function version() {
-		return '2.2.30';
+		return '2.2.31';
 	}
 
 	/**
