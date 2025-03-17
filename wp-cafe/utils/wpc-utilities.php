@@ -1557,4 +1557,22 @@ class Wpc_Utilities {
 		    return $dateString;
 		}
 	}
+
+	public static function wpc_product_exist_in_cart(){
+		$cart = WC()->cart->get_cart();
+        $has_wpc_product = false;
+        
+        foreach ($cart as $cart_item_key => $cart_item) {
+            if (isset($cart_item['product_id']) && is_a($cart_item['data'], 'WC_Product')) {
+                $wpc_product = $cart_item['data']->get_meta('_wpc_product', true);
+                
+                if ($wpc_product) {
+                    $has_wpc_product = true;
+                    break;
+                }
+            }
+        }
+
+        return $has_wpc_product;
+	}
 }

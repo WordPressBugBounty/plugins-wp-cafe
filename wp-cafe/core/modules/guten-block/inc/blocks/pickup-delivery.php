@@ -3,6 +3,8 @@ namespace WpCafe\Core\Modules\Guten_Block\Inc\Blocks;
 
 defined( "ABSPATH" ) || exit;
 
+use WpCafe\Utils\Wpc_Utilities as Wpc_Utilities;
+
 class Pickup_Delivery {
     
     use \WpCafe\Traits\Wpc_Singleton;
@@ -40,6 +42,11 @@ class Pickup_Delivery {
         $settings  = \WpCafe\Core\Base\Wpc_Settings_Field::instance()->get_settings_option();
 
         if( ! in_array($settings['wpc_pro_allow_order_for'], $allowed_options)){
+            return;
+        }
+
+        // if there's no wpcafe product in the cart, don't show the pickup/delivery form
+        if( ! Wpc_Utilities::wpc_product_exist_in_cart()){
             return;
         }
 

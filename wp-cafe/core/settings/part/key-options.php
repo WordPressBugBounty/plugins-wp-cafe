@@ -31,7 +31,7 @@
                         <?php esc_html_e( 'Selected current timezone is ', 'wpcafe' ); ?>
                         <code><?php echo esc_html($timezone_str); ?></code><?php echo '.'; ?>
                         <?php echo esc_html__('Universal time is ', 'wpcafe'); ?>
-                        <code><?php echo esc_html( date_i18n( $timezone_format, false, true ) ); ?></code>
+                        <code><?php echo wp_date(WPCAFE_DEFAULT_DATE_FORMAT. ' ' .WPCAFE_DEFAULT_TIME_FORMAT ); ?></code>
                      </p>
                      <a href="<?php echo esc_url( admin_url( 'options-general.php#timezone_string' ) ); ?>" target="_blank" class="wpc-btn-text">
                         <?php esc_html_e( 'Update Date & Time Format', 'wpcafe' ); ?>

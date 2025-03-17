@@ -75,6 +75,11 @@ class Hook{
 		add_action( 'woocommerce_widget_shopping_cart_before_buttons', [ $this, 'before_minicart_buttons_add_extra_content' ], 9, 1 );
 		// ajax add to cart
 		add_action('woocommerce_before_single_product', [ $this,'add_woocommerce_template_loop_add_to_cart']);
+
+        // add custom meta for WPCafe product items to check if Cafe product is added to cart or not
+        // this will help to conditionally show pickup/delivery/location options in checkout and cart page 
+        add_filter( 'product_type_options', array( $this, 'add_wpc_product_type_in_wc_product_meta' ) );
+        add_action( 'save_post_product', array( $this, 'save_wpc_product_meta' ) );
     }
 	
 	/**
@@ -752,6 +757,15 @@ class Hook{
          
         $location_alignment = "center";
 
+        $allowed_file_names = [
+            'style-1'
+        ];
+        if( in_array($style, $allowed_file_names)){
+            $style = esc_html($style);
+        }else{
+            $style = $allowed_file_names[0];
+        }
+
         $products = wc_get_products([]);
 
         if ( file_exists( \WpCafe::plugin_dir() . "core/shortcodes/views/food-menu/location-select.php" ) ) {
@@ -801,17 +815,34 @@ class Hook{
      */
     public function wpc_location_checkout_block(){
         $checkout = WC()->checkout;
-	ob_start();
+        ob_start();
         ?>
-        <div id="wpc_location_field">
-            <div class="location_heading"><?php echo esc_html__('Food Order Location', 'wpcafe');?></div>
-            <div class="wpc_location_name"></div>
-            <input type="hidden" name="wpc_location_name" class="wpc_location_name" />
-        </div> 
+            <div id="wpc_location_field">
+                <div class="location_heading"><?php echo esc_html__('Food Order Location', 'wpcafe');?></div>
+                <div class="wpc_location_name"></div>
+                <input type="hidden" name="wpc_location_name" class="wpc_location_name" />
+            </div> 
         <?php
 
-	return ob_get_clean();
+	   return ob_get_clean();
 
+    }
+
+    function add_wpc_product_type_in_wc_product_meta($types) {
+        $types['wpc_product'] = array(
+            'id'            => '_wpc_product',
+            'wrapper_class' => 'show_if_simple',
+            'label'         => __( 'WPC Product', 'wpcafe' ),
+            'description'   => __( 'This checkmark ensure that you will sell WPCafe Menu item via this product.', 'wpcafe' ),
+            'default'       => 'yes'
+        );
+
+        return $types;
+    }
+
+    public function save_wpc_product_meta( $post_ID ) {
+        $is_wpc_product = isset($_POST['_wpc_product']) ? 'yes' : 'no';
+        update_post_meta( $post_ID, '_wpc_product', sanitize_text_field($is_wpc_product) );
     }
 
 }

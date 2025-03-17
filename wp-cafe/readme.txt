@@ -2,8 +2,8 @@
 Contributors: themewinter, ataurr, rezakhan995, abrasel600
 Tags: food menu, food ordering, food delivery, restaurant reservations, restaurant menu
 Requires at least: 5.2
-Tested up to: 6.7
-Stable tag: 2.2.31
+Tested up to: 6.7.2
+Stable tag: 2.2.32
 Requires PHP: 7.4
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
@@ -395,6 +395,12 @@ You can enable/disable notifications both for admin and client. You can set mess
 
 
 == Changelog ==
+
+= 2.2.32 ( March 9, 2025 ) =
+
+Fix 			: Checkout conflict fix with third party plugin
+Fix 			: Local Timezone setting improvement
+Fix 			: Patch LFI security for Food Menu shortcode
 
 = 2.2.31 ( December 8, 2024 ) =
 

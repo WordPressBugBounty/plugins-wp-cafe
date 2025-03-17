@@ -1,0 +1,17 @@
+/**
+ * #.# Editor Styles
+ *
+ * CSS for just Backend enqueued after style.scss
+ * which makes it higher in priority.
+ */
+
+.wp-block-wpc-food-menu-tab{
+  border: 1px solid #ccc;
+  padding: 10px;
+  a{
+	pointer-events: none;
+  }
+}
+.multiple_select_control select{
+  min-height: 100px !important;
+}
