@@ -32,22 +32,28 @@ class Wpc_Ajax_Action {
 	/**
 	 * Reservation form submit check
 	 */
-	public function wpc_check_for_submission() {
+	public function wpc_check_for_submission($wpc_reservation = [], $order_id = null) {
 		// Process a booking request
+		if(empty($wpc_reservation)){
+			if ( ! wp_verify_nonce( $_REQUEST['_wpc_nonce'], 'wpc_check_for_submission_nonce' ) ) {
+				wp_send_json_error( [
+					'message' => esc_html__( 'Nonce verification failed!', 'wpcafe' )
+				] );
+			}
 
-		if ( ! wp_verify_nonce( $_REQUEST['_wpc_nonce'], 'wpc_check_for_submission_nonce' ) ) {
-            wp_send_json_error( [
-                'message' => esc_html__( 'Nonce verification failed!', 'wpcafe' )
-            ] );
-        }
-
+		}
 
 		$settings = \WpCafe\Core\Base\Wpc_Settings_Field::instance()->get_settings_option();
 		
-		if ( "wpc_reservation" == sanitize_text_field( $_POST['wpc_action'] ) ) {
+		if (!empty($wpc_reservation) || "wpc_reservation" == sanitize_text_field( $_POST['wpc_action'] )   ) {
 
-				//check for valid nonce
-				$post_arr = filter_input_array( INPUT_POST, FILTER_SANITIZE_SPECIAL_CHARS );
+			 	if(empty($wpc_reservation)){
+
+				 //check for valid nonce
+				 $post_arr = filter_input_array( INPUT_POST, FILTER_SANITIZE_SPECIAL_CHARS );
+				} else {
+					$post_arr = $wpc_reservation;
+				}
 
 				//store our post vars into variables for later use
 				//now would be a good time to run some basic error checking/validation
@@ -63,7 +69,12 @@ class Wpc_Ajax_Action {
 				$meta_array['wpc_to_time']           = $wpc_to_time           = isset( $post_arr['wpc_to_time'] ) ? sanitize_text_field( $post_arr['wpc_to_time'] ) : "";
 				$meta_array['wpc_booking_date']      = $wpc_date              = isset( $post_arr['wpc_booking_date'] ) ? $post_arr['wpc_booking_date'] : "";
 				$meta_array['wpc_branch']            = $wpc_branch            = isset( $post_arr['wpc_branch'] ) ? $post_arr['wpc_branch'] : "";
-
+ 
+				if(!empty($order_id)){
+					$meta_array['wpc_woo_order_id'] = $order_id ;
+					$meta_array['wpc_woo_order_url'] = admin_url("post.php?post={$order_id}&action=edit");
+				}
+				
 				// Get first and last name from the title (wpc_name)
 				$full_name   = explode(' ', $title);
 				$last_name   = end($full_name);
@@ -189,7 +200,7 @@ class Wpc_Ajax_Action {
 										$default_guest                       = isset( $settings['wpc_default_guest_no'] ) ? intval( $settings['wpc_default_guest_no'] ) : 1;
 										$meta_array['wpc_reservation_state'] = ( (int)$default_guest !== 0 && (int)$wpc_total_guest  <= (int) $default_guest ) ? 'confirmed' : 'pending';
 								}
-
+								
 								//we now use $pid (post id) to help add out post meta data
 								foreach ( $meta_array as $key => $value ) {
 										add_post_meta( $pid, $key, $value, true );
@@ -260,20 +271,28 @@ class Wpc_Ajax_Action {
 
 										}
 
-										wp_send_json_success( $response );
+										if(empty($wpc_reservation)){
+											wp_send_json_success( $response );
+										}
 										
 										
 								} else {
 										$response = [ 'status_code' => 400 , 'message' => [ esc_html__('Booking placement was failed, please try again!' ,'wpcafe' ) ] , 'data' => ['form_type' => 'wpc_reservation_field_missing'] ];
-										wp_send_json_error( $response );
+										if(empty($wpc_reservation)){
+											wp_send_json_error( $response );
+										}
 								}
 						} else {
 								$response = [ 'status_code' => 400 , 'message' => [ esc_html__('Please enter all required fields!' ,'wpcafe' )  ] , 'data' => ['form_type' => 'wpc_reservation_field_missing'] ];
-								wp_send_json_error( $response );
+								if(empty($wpc_reservation)){
+									wp_send_json_error( $response );
+								}
 						}
 				} else {
 						$response = [ 'status_code' => 400 , 'message' => [ $table_based_error_msg ] , 'data' => ['form_type' => 'wpc_reservation_field_missing'] ];
-						wp_send_json_error( $response );
+						if(empty($wpc_reservation)){
+							wp_send_json_error( $response );
+						}
 				}
 		}
 

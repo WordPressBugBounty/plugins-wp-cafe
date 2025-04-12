@@ -146,6 +146,10 @@ function reserv_time_picker( data , format = "h:i A" ) {
         else if(wpc_date_format =="d.m.Y"){
             change_date_format = "D.M.Y";
         }
+        // handle custom format => "j. F Y"
+         else if(wpc_date_format =="j. F Y"){
+            change_date_format = "MMMM Do , YYYY";
+        }
 
         var date = moment(get_date, change_date_format );
         result_date = date.format('YYYY-MM-DD');
@@ -747,9 +751,9 @@ function get_time_range_based_on_date( $ , param_obj , obj ) {
 
         $('.wpc_check_booking_date').attr('data-wpc_check_booking_date',wpc_new_selected_date);
 
-        if ( param_obj.wpc_booking_form_data.wpc_today ==  wpc_new_selected_date  && obj.booking_form_type =="frontend" && obj.reserve_status.status == "closed") {
+        if ( param_obj.wpc_booking_form_data.wpc_today ==  wpc_new_selected_date  && obj.booking_form_type =="frontend" && obj.reserve_status?.status == "closed") {
             // Show message that there is no schedule
-            param_obj.wpc_error_message.css('display','block').html( obj.reserve_status.message );
+            param_obj.wpc_error_message.css('display','block').html( obj.reserve_status?.message );
 
             return;
         }
@@ -1067,9 +1071,19 @@ function check_time_range_validation( start_time , end_time , selected_day , tim
     
     return {flag : flag , end_time : end };
 }
+/**
+ * Convert minutes to HH:mm format
+ */
+
+function minutesToTimeFormat(minutes) {
+    const hours = Math.floor(Number(minutes) / 60);
+    const mins = Number(minutes) % 60;
+    return `${hours.toString().padStart(2, '0')}:${mins.toString().padStart(2, '0')}`;
+}
 
 /**
  * All reservation action
+ * This function calls when interacting with reservation form
  */
  function reservation_form_actions( $ , obj ) {
     // declare class 
@@ -1154,6 +1168,7 @@ function check_time_range_validation( start_time , end_time , selected_day , tim
 
     [from_time,to_time].map((item,index)=>{
         (item).on('focus',function(e){
+              // on changing we get the date here
             var get_date = $('#wpc_booking_date').val();
             get_date = changing_format(get_date, wpc_date_format );
             if ( get_date !=="" ) {
@@ -1209,31 +1224,23 @@ function check_time_range_validation( start_time , end_time , selected_day , tim
 					var wpc_booking_select_date = changing_format(get_date, wpc_date_format );
 					check_seat_capacity( $ , wpc_ajax_url , wpc_booking_select_date , input_value , $("#wpc_to_time").val(), type );
 				}
-
+                //  Dynamic time in minutes (10 minutes / 30 minutes)
                 var wpc_late_bookings = wpc_booking_form_data.wpc_late_bookings;
                 // late bookings
                 if ( wpc_end_time !== 'undefined') {
                     wpc_end_time    = convert24_format(wpc_end_time);
                     selected_time   = convert24_format(selected_time); 
                 }
-
-                if (typeof wpc_late_bookings !== 'undefinded' && wpc_late_bookings == '15') {
-                    var last_booking_time = time_diff(wpc_end_time, "00:14");
+                // if not undefined and dynamic time is set then use it and set the time diff accordingly~
+                if (wpc_late_bookings !== 'undefined') {
+                    // Convert late booking minutes to HH:mm format
+                    const formattedTime = minutesToTimeFormat(wpc_late_bookings - 1);
+                    var last_booking_time = time_diff(wpc_end_time, formattedTime);                    
                     if (selected_time !== '' && selected_time !== 'undefined') {
-                        wpc_check_late_booking( $ , selected_time, last_booking_time, 15 , from_time , wpc_end_time , wpc_time_format , $("#wpc_to_time") );
+                        wpc_check_late_booking($, selected_time, last_booking_time, wpc_late_bookings, from_time, wpc_end_time, wpc_time_format, $("#wpc_to_time"));
                     }
-                } else if (typeof wpc_late_bookings !== 'undefinded' && wpc_late_bookings == '30') {
-
-                    var last_booking_time = time_diff(wpc_end_time, "00:29");
-                    if (selected_time !== '' && selected_time !== 'undefined') {
-                        wpc_check_late_booking( $ ,selected_time, last_booking_time, 30 , from_time , wpc_end_time, wpc_time_format, $("#wpc_to_time")  );
-                    }
-                } else if (wpc_late_bookings != 'undefinded' && wpc_late_bookings == '45' ) {
-                    var last_booking_time = time_diff(wpc_end_time, "00:44");
-                    if ( selected_time !== '' && selected_time !== 'undefined' ) {
-                        wpc_check_late_booking($, selected_time, last_booking_time, 45 , from_time , wpc_end_time , wpc_time_format, $("#wpc_to_time")   );
-                    }
-                } else {
+                }
+                else {
                     from_time.removeClass("wpc_booking_error");
                     button_disable( $ , '.reservation_form_submit', ".wpc_booking_error" , "wpc_reservation_form_disabled" , ".wpc_reservation_table" );
                 }
@@ -1452,7 +1459,7 @@ function check_seat_capacity($,...res) {
 			$key_div.removeClass("loading");
 			if ( response?.data?.data ) {
 				wpc_party.empty();
-				if ( response.data.data.status == "closed" ) {
+				if ( response.data.data?.status == "closed" ) {
 					$(".wpc_success_message").css('display','none').html("");
 					$('.wpc_error_message').css('display','block').html( response.data.data.message );
 					$("#wpc_from_time").val("");

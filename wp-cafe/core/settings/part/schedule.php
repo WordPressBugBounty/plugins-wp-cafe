@@ -597,7 +597,13 @@ $reserv_time_interval = !empty( $settings['reserv_time_interval'] ) ? $settings[
                             <?php }
                         ?>
                     </select>
-                    <input type="number" name="wpc_early_bookings_value" value="<?php echo ( !empty( $settings['wpc_early_bookings_value'] ) ) ? esc_attr( Wpc_Utilities::wpc_render( $settings['wpc_early_bookings_value'] ) ) : ''; ?>"  min="0" class="wpc-settings-input <?php echo ( empty( $settings['wpc_early_bookings'] ) || $settings['wpc_early_bookings'] == 'any_time') ? 'wpc-display-none' : ''; ?>" required <?php echo ( empty($settings['wpc_early_bookings'] ) || $settings['wpc_early_bookings'] == 'any_time') ? 'disabled="disabled"' : ''; ?>>
+                    <input type="number" name="wpc_early_bookings_value"
+                     value="<?php echo ( !empty( $settings['wpc_early_bookings_value'] ) ) ? esc_attr( Wpc_Utilities::wpc_render( $settings['wpc_early_bookings_value'] ) ) : ''; ?>"
+                     min="0" 
+                     class="wpc-settings-input <?php echo ( empty( $settings['wpc_early_bookings'] ) || $settings['wpc_early_bookings'] == 'any_time') ? 'wpc-display-none' : ''; ?>"
+                      
+                     required
+                    <?php echo ( empty($settings['wpc_early_bookings'] ) || $settings['wpc_early_bookings'] == 'any_time') ? 'disabled="disabled"' : ''; ?>>
                 </div>
             </div>
             <div class="wpc-label-item">
@@ -606,20 +612,30 @@ $reserv_time_interval = !empty( $settings['reserv_time_interval'] ) ? $settings[
                     <div class="wpc-desc"> <?php esc_html_e('Set final time for late reservation. User can not place reservation after the defined time', 'wpcafe'); ?> </div>
                 </div>
                 <div class="wpc-meta">
-                    <select id="wpc_late_bookings" class="wpc-settings-input" name="wpc_late_bookings">
+                    <select id="wpc_late_bookings_type" class="wpc-settings-input" name="wpc_late_bookings_type">
                         <?php
-                        $selected_late_booking = !empty( $settings['wpc_late_bookings'] ) ? $settings['wpc_late_bookings'] : "";
-                        $wpc_late_bookings= array( 
-                            '1'       => esc_html__( 'Up to the last minute', 'wpcafe' ),
-                            '15'      => esc_html__( 'At least 15 minutes in advance', 'wpcafe' ),
-                            '30'      => esc_html__( 'At least 30 minutes in advance', 'wpcafe' ),
-                            '45'      => esc_html__( 'At least 45 minutes in advance', 'wpcafe' ),
+                        $selected_late_booking_type = !empty( $settings['wpc_late_bookings_type'] ) ? $settings['wpc_late_bookings_type'] : "";
+                        $wpc_late_bookings_type= array( 
+                            'hours'       => esc_html__( 'Hours', 'wpcafe' ),
+                            'minutes'      => esc_html__( 'Minutes', 'wpcafe' ),
                             );
-                            foreach( $wpc_late_bookings as $key => $value ) { ?>
-                                <option <?php selected( $selected_late_booking , $key , true ); ?> value='<?php echo esc_attr( $key ); ?>'><?php echo esc_html( $value ); ?></option>
+                            foreach( $wpc_late_bookings_type as $key => $value ) { ?>
+                                <option <?php selected( $selected_late_booking_type , $key , true ); ?> value='<?php echo esc_attr( $key ); ?>'><?php echo esc_html( $value ); ?></option>
                             <?php }
                         ?>
                     </select>
+                    <?php     
+                    $wpc_late_bookings_value = !empty( $settings['wpc_late_bookings_value'] ) ? esc_attr( $settings['wpc_late_bookings_value'] ) : '';?>
+                    
+                    <input type="number" id="wpc_late_bookings_value" name="wpc_late_bookings_value"
+                     value="<?php echo ( !empty( $settings['wpc_late_bookings_value'] ) ) ? esc_attr( $settings['wpc_late_bookings_value'] ) : ''; ?>"
+                     min="0" 
+                     class="wpc-settings-input">
+  
+                    <?php     
+                        $wpc_late_bookings = !empty( $settings['wpc_late_bookings'] ) ? $settings['wpc_late_bookings'] : "";
+                    ?>
+                    <input type="hidden" id="wpc_late_bookings" name="wpc_late_bookings" value="<?php echo esc_html($wpc_late_bookings) ?>">
                 </div>
             </div>
         </div>
@@ -836,6 +852,10 @@ $reserv_time_interval = !empty( $settings['reserv_time_interval'] ) ? $settings[
                                 array(
                                     "tag_name" => '{branch_name}',
                                     "description" => esc_html__('Branch Name', 'wpcafe'),
+                                ),
+                                array(
+                                    "tag_name" => '{extra_field}',
+                                    "description" => esc_html__('Extra reservation details', 'wpcafe'),
                                 ),
                         );
                         foreach ($tag_box as $key => $value) { ?>

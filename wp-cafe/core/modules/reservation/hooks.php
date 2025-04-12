@@ -275,7 +275,8 @@ class Hooks{
             '{date}',
             '{current_time}',
             '{invoice_no}',
-            '{branch_name}'
+            '{branch_name}',
+            '{extra_field}'
         ];
 		
         $wpc_value_arr = [
@@ -289,10 +290,26 @@ class Hooks{
             date_i18n($wpc_date_format, strtotime( $wpc_booking_date ) ).' ' . $schedule_1 . $separator. $schedule_2,
             date_i18n( $wpc_date_format . ' ' . $wpc_time_format ),
             $reservation_invoice,
-            get_post_meta( $reservation_id, 'wpc_branch', true )
+            get_post_meta( $reservation_id, 'wpc_branch', true ),
+            $this->get_extra_fields($reservation_id)
         ];
 
         return str_replace( $wpc_tag_arr, $wpc_value_arr , $content );
+    }
+
+    public function get_extra_fields($reservation_id){
+        $reserv_extra   = get_post_meta($reservation_id, 'reserv_extra', true);
+        $output = "";
+        if(is_array($reserv_extra) && !empty($reserv_extra)){
+            for ($i=0; $i < count( $reserv_extra ) ; $i++) {
+                $value = get_post_meta($reservation_id, 'reserv_extra_'.$i, true);
+                if(!empty($value)){
+                    $output .= "{$reserv_extra[$i]['label']}: {$value}\n";
+                }
+            }    
+        }
+        
+        return $output;
     }
 
 }

@@ -365,12 +365,18 @@
         $('.wpc_reservation_table').on('click', '#wpc_cancel_request', function () {
             $('.wpc-reservation-form .wpc_reservation_table').slideUp();
             $('.wpc-reservation-form .wpc_reservation_cancel_form').slideDown();
+            $('.wpc-reservationb-extra-msg').hide();
+            $('.reservation-title').hide();
+            $('.wpc-reservation-pagination').hide();
             cancel_form_validation();
         });
 
         $('.wpc_reservation_cancel_form').on('click', '#wpc_book_table', function () {
             $('.wpc-reservation-form .wpc_reservation_cancel_form').slideUp();
             $('.wpc-reservation-form .wpc_reservation_table').slideDown();
+            $('.wpc-reservationb-extra-msg').show();
+            $('.reservation-title').show();
+            $('.wpc-reservation-pagination').show();
         });
 
         var wpc_cart_block = $('.wpc-cart_main_block');

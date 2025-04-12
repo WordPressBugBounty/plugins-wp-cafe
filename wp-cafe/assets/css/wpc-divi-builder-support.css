@@ -109,8 +109,7 @@
 .theme-blocksy .woocommerce-mini-cart-item .ct-image-container {
   position: static;
   display: block;
-  -webkit-mask-image: unset !important;
-          mask-image: unset !important;
+  mask-image: unset !important;
 }
 .theme-blocksy .woocommerce-mini-cart-item .ct-image-container .ct-ratio {
   padding: 0 !important;

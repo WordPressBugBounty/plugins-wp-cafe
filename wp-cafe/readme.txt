@@ -1,387 +1,307 @@
-===WPCafe - Online Food Ordering, Restaurant Menu, Delivery, and Reservations for WooCommerce===
+===**WPCafe: Food Menu, Ordering, Reservation, and Delivery Solution – All in One Place!**===
 Contributors: themewinter, ataurr, rezakhan995, abrasel600
 Tags: food menu, food ordering, food delivery, restaurant reservations, restaurant menu
 Requires at least: 5.2
 Tested up to: 6.7.2
-Stable tag: 2.2.32
+Stable tag: 2.2.33
 Requires PHP: 7.4
 License: GPLv2 or later
-License URI: https://www.gnu.org/licenses/gpl-2.0.html
+License URI: [https://www.gnu.org/licenses/gpl-2.0.html](https://www.gnu.org/licenses/gpl-2.0.html)
 
-WPCafe - A restaurant plugin to increase sales with an Online Ordering System, Delivery, Pickup, Food Menu, Reservations, and Table Management. 
+Boost your restaurant sales with WPCafe! Streamline food menu design, food ordering, pickup & delivery, and table reservations in WordPress effortlessly. 🚀
 
 == Description ==
 
-[Try the Demo](https://product.themewinter.com/wpcafe/) | [Documentation](https://support.themewinter.com/docs/plugins/docs/wp-cafe/) | [Upgrade to Pro](https://themewinter.com/wp-cafe/) | [Restaurant Theme](https://themewinter.com/cafesio/)
+[**WPCafe**](https://themewinter.com/wp-cafe/) is powerful restaurant management solution for WordPress. Using this plugin, you can display food menus at restaurants website or place online food orders using Woocommerce.🍜
 
-[WPCafe](https://themewinter.com/wp-cafe/) is a simple WooCommerce plugin designed to be your one-stop solution for managing your restaurant business. WPCafe offers everything you need to take control. No Commission Fees.
+This feature-rich plugin is specifically designed for online food businesses. It offers **🪄[food menu design](https://themewinter.com/how-to-create-a-food-menu-for-restaurant-on-wordpress/)**, **🪄[online food ordering](https://themewinter.com/create-an-online-food-ordering-website-using-wordpress/)**, managing **🪄[food delivery & pickup](https://themewinter.com/woocommerce-food-pickup-and-delivery-schedule-in-wordpress/)** and **🪄[restaurant reservations](https://support.themewinter.com/docs/plugins/plugin-docs/reservation/reservation-with-food-order-pro/) -**all in one place. Take control of your **restaurant operations management** and elevate your online presence with WPCafe today!
 
-Create beautiful, responsive, and informative **restaurant food menus** with drag and drop functions using Elementor with customization options, set up an **online ordering system** for **food pickup** or **delivery**, and accept unlimited **restaurant reservations** and **table bookings** with ease.
+Check all the useful WPCafe restaurant management solution inside WordPress **👇**.
 
-== Who Is It For? ==
+[**Live Demo](https://product.themewinter.com/wpcafe/) | [Documentation](https://support.themewinter.com/docs/plugins/docs/wp-cafe/) | [Roadmap](https://themewinter.com/wpcafe-roadmaps/) | [Features and Integrations](https://themewinter.com/eventin/features/) | [Tutorials + Demos](https://www.youtube.com/playlist?list=PLW54c-mt4ObB2k9t8A5ALlwKGjeWxB8zQ) |  [Restaurant Theme](https://themewinter.com/cafesio/) | [Update to Pro](https://themewinter.com/wp-cafe/)** 
 
-👉 Restaurant Owners & Managers
+[https://www.youtube.com/watch?v=TObankbZWmc&t=5s](https://www.youtube.com/watch?v=TObankbZWmc&t=5s)
 
-👉 Online Food Ordering System Providers
+Need help setting up your online food ordering Website? 👉 [**Let Us Know**](https://themewinter.com/support/).
 
-👉 Online Food Delivery System Providers
+== Who Is WPCafe Restaurant Management Solution For? ==
 
-👉 Cloud Kitchen Owners and Managers
+👉 Restaurant Owners 
 
-👉 Cafe Owners and Managers
+👉 Cloud Kitchen Owners
+
+👉 Street Food Vendors 
+
+👉 Local Restaurants and Cafes
+
+👉 Takeout/Takeaway Businesses
 
 👉 Food Service Businesses
 
-== The Benefits You Will Gain From WPCafe == 
+👉 Online Food Ordering Business
 
-* 14+ Elementor Widgets
+👉 Online Food Delivery and and Service Providers
 
-* 10+ [Food Menu](https://support.themewinter.com/docs/plugins/plugin-docs/food-ordering/add-new-food-item/) Styles in WPCafe Free
+==The Problems We Solve **💪**==
 
-* 33+ Food Menu Styles in WPCafe Pro
+Online restaurant and food business owners face several challenges when running their food ordering websites. To resolve this issue, we developed the WPCafe Restaurant Manager plugin. Among the primary problems that we try to solve, there are the following:
 
-* RTL Support for Form and Calendar
+**📌 Problem:** Managing online orders manually is time-consuming and error-prone.
 
-* Create and Cancel a [Reservation](https://support.themewinter.com/docs/plugins/plugin-docs/reservation/reservation-with-food-order-pro/) from Front-End 
+- **Solve:** WPCafe automates order management for real-time and efficiency.
 
-* Customizable [Schedules](https://support.themewinter.com/docs/plugins/plugin-docs/reservation/schedule/) for Early/Late Booking time
+**📌 Problem:** Overbooking and no-shows disrupt table reservations.
 
-* Add Restaurant Table Reservations
+- **Solve:** WPCafe offers an online table booking system to optimize seating.
 
-* Food Menu List Widget
+**📌 Problem:** Keeping online ordering menus updated is challenging.
 
-* Food Menu Tab Widget
+- **Solve:** WPCafe provides restaurant/cafe menu management for easy updates.
 
-* Detailed Sales Report
+**📌 Problem:** Poor online ordering experiences lead to lost sales.
 
-* Analytical Report for ordered **Food with Reservation**
+- **Solve:** WPCafe enhances customer experience with a user-friendly interface.
 
-* Customizable [Minicart](https://support.themewinter.com/docs/plugins/plugin-docs/food-ordering/minicart-2/)
+**📌 Problem:** Delays in communication cause customer dissatisfaction.
 
-* [Location Wise](https://support.themewinter.com/docs/plugins/plugin-docs/food-ordering/general-settings-5/) Food Menu
+- **Solve:** WPCafe sends real-time notifications to prepare food orders.
 
-* Complete Restaurant System
+**📌 Problem:** Managing multiple restaurant locations is complex work.
 
-* WooCommerce Food Ordering and Food Menu
+- **Solve:** WPCafe supports multi-location restaurant management from one dashboard.
 
-* Restaurant Menu for **Online Food Ordering**
+**📌 Problem:** Unprofessional website designs deter customers.
 
-* Branch Wise **Restaurant Bookings**
+- **Solve:** WPCafe offers customizable food menu templates to design restaurants.
 
-* **Responsive Online Food Menu**
+**📌 Problem:** Lack of data makes decision-making difficult.
 
-* [Special Menu](https://support.themewinter.com/docs/plugins/plugin-docs/food-ordering/special-menus/) of The Day
+- **Solve:** WPCafe provides analytics and reporting for actionable insights.
 
-* [Multivendor Support](https://support.themewinter.com/docs/plugins/plugin-docs/wp-cafe/wp-cafe-multivendor-restaurant-addon/)
+== Explore Advanced Restaurant Management Features with WPCafe! 🏆 ==
+Experience maximum growth in your restaurant business, with this complete restaurant management plugin for your WordPress website. It has all the features you need to manage your **restaurant website** and customers. Let's see what it offers:
 
-* [Loyalty Program](https://support.themewinter.com/docs/plugins/plugin-docs/integrations/loyalty-program/) for **Restaurant Orders**
+## **🍕 Food Menu Design**
 
-* [Live Order](https://support.themewinter.com/docs/plugins/plugin-docs/food-ordering/live-order/) Notification
+**34+ Food Menu Template**
 
-* [QR Code](https://support.themewinter.com/docs/plugins/plugin-docs/food-ordering/food-ordering-with-qr-code/) for Food Ordering
+- Set pre-made restaurant menu design with Gutenberg drag-and-drop, shortcode and [Elementor food menu blocks](https://support.themewinter.com/docs/plugins/plugin-docs/getting-started/wpcafe-elementor-widgets/).
 
-* Advanced [Search and Filtering](https://support.themewinter.com/docs/plugins/plugin-docs/wp-cafe/searching-products-with-pickup-delivery/)
+**Food Menu List Widget**
 
-* [Visual Table Reservation](https://support.themewinter.com/docs/plugins/plugin-docs/reservation/table-selection-layout/)
+- Display your food menu items in an organized list view with details like prices, descriptions, and add-to-cart buttons for quick access.
 
-* [Google Maps](https://support.themewinter.com/docs/plugins/plugin-docs/delivery-module/store-added-in-google-maps/) Food Store Location
+**Food Menu Tab Widget**
 
-* Google Autocomplete Address
+- Categorize your [food menu tabs](https://product.themewinter.com/wpcafe/tab-with-slider-pro/), making it easier for customers to navigate between different food sections effortlessly.
 
-* Setting [Minimum Order](https://support.themewinter.com/docs/plugins/plugin-docs/delivery-module/minimum-order-amount-to-place-order/) Amount
+**Responsive Online Food Menu**
 
-* Order Bump
+- Ensure your food menu looks stunning and functions perfectly on all devices, providing a seamless browsing experience for mobile, tablet, and desktop users.
 
-* [Discount](https://support.themewinter.com/docs/plugins/plugin-docs/food-ordering/discount-2/)
+**Location-Based Food Menu**
 
-* Product Addons
+- Create a [custom food menu](https://support.themewinter.com/docs/plugins/plugin-docs/food-ordering/general-settings-5/) based on your restaurant location. You can set different menus and set food availability for different branch locations.
 
-* [Shortcodes](https://support.themewinter.com/docs/plugins/plugin-docs/wp-cafe/wpcafe-shortcode/)
+**Restaurant Menu Of The Day**
 
-* and many other Food Online Premium options
+- -Show the [best-selling food items](https://support.themewinter.com/docs/plugins/plugin-docs/food-ordering/special-menus/) under a dedicated menu to the customers. Let your customers know what other people are liking. Offer a better experience and get extra sales.
 
+## **🍜 Online Food Ordering**
 
-[youtube https://www.youtube.com/watch?v=onxXm98D-Uk]
+**Food Ordering with QR Code**
 
-[youtube https://www.youtube.com/watch?v=7VZpZJ1AvP4]
+- You can offer single or multiple [QR Codes for food ordering](https://support.themewinter.com/docs/plugins/plugin-docs/food-ordering/food-ordering-with-qr-code/) to restaurant customers. Faster service without rushing customers.
 
-==Need Help Setting Up Your Restaurant Website?==
+**Set Order Preparation Time**
 
-**For support and issues** - [Contact Us Here](https://themewinter.com/support/)
+- Track and update food order preparation time to keep customers informed about their orders.
 
-WPCafe is a complete [Restaurant Solution Plugin](https://themewinter.com/wp-cafe/) to run your online Restaurant Business, **Online Food Order, Reservation System, Pickup, Delivery, Food Menu**, and more. It has all the features you need to manage your **restaurant website** and customers. You can keep track of your sales and customers with WPCafe.
+**Minimum Order Amount**
 
-With the **simple restaurant menu plugin**, you can also create [online food ordering](https://themewinter.com/create-an-online-food-ordering-website-using-wordpress/), **food listing**, **food online premium**, and other **food presentation** websites with WPCafe **Food Ordering Plugin**. It is the most user friendly WordPress restaurant booking plugin you can ask for. 
+- Set the smallest amount that customers have to spend before placing an order to specify a minimum order requirement.
 
-[youtube https://www.youtube.com/watch?v=xC5CpuFUMvg]
+**Live Order Notification with Sound and Tag**
 
-WPCafe has the best features to make your restaurant management experience smooth and simple. Create a mouth-watering food **menu**, save time by managing **restaurant reservations with food orders**, and schedule food pickup or delivery to give your customers a great experience.
+- New orders will highlight the ordered list. A beep sound and a [pop-up will be displayed](https://support.themewinter.com/docs/plugins/plugin-docs/food-ordering/live-order/) on your screen for each new order placed on the website.
 
-You can also use the [WPCafe app](https://themewinter.com/introducing-wpcafe-app-the-perfect-white-label-food-ordering-app/) to help customers make mobile reservations.
+## **📅 Restaurant Reservation Solution**
 
-==Features and Benefits of WPCafe==
+**Single/Multiple Slot Reservation**
 
-✅ **Plenty of Food Menus**
+- Set single/multiple slots, early or late booking. Schedules and select minimum/maximum guest size for early booking.
 
-[Try the Demo](https://product.themewinter.com/wpcafe/tab-style-2/) | [Documentation](https://support.themewinter.com/docs/plugins/plugin-docs/food-ordering/add-new-food-item/)
+**Holiday Special Reservation**
 
-WPCafe offers over 33+ food menus for you to choose from. You can create **restaurant main menu**, **lunch** menu, **dinner menu**, special day [menu](https://product.themewinter.com/wpcafe/menu-list/), special menu of the day, category based **advanced food menu**, **cafe menu**, and a lot greater styles for a beautiful **food presentation**! In other words, It's an **advanced food menu plugin**.
+- Set a special holiday schedule and manage holiday sales smoothly. Avoid conflict with the regular schedule of your restaurants.
 
-With WPCafe's multiple food menu styles, you can have an organized **food listing** for your customers.
+**Food With Restaurant Reservation**
 
-[youtube https://www.youtube.com/watch?v=wFbH0yBRJFE]
+- Customers can pick food items while placing a restaurant reservation. The feature is time savings for both customers and restaurant owners.
 
-✅ **Live Order Notification and Tipping**
+**Branch-wise Seat Capacity & Reservation**
 
-[Try the Demo](https://product.themewinter.com/wpcafe/) | [Documentation](https://support.themewinter.com/docs/plugins/plugin-docs/food-ordering/live-order/)
+- Set maximum seat capacity and automate [branch-wise restaurant reservations](https://product.themewinter.com/wpcafe/reservation-with-food-menu-2/) according to seat limits. Create separate reservations at different branches.
 
-By using WPCafe, you will never miss an order. With the **live order notification** and tipping feature, every time a customer places a food or drink order, you will receive a **notification message** instantly.
+**Reservation Email Notification**
 
-You can also receive tips through the restaurant menu plugin. You can set a fixed amount of tip or you can set a customizable amount, meaning the customer will tip you as they please. 
+- Keeping the customer up-to-date about the [reservation notification](https://support.themewinter.com/docs/plugins/plugin-docs/reservation/notification-email/) status by automatically sending confirmations, cancellations, and reminder emails.
 
-[youtube https://www.youtube.com/watch?v=POEWj3NXc2o]
+**Visual Table Reservation**
 
-✅ **Food Ordering with QR Code**
+- Visually [design restaurant table layouts](https://product.themewinter.com/wpcafe/visual-table-reservation/) and let customers choose which table they want to book. Allows your staff to manage customer seats more efficiently.
 
-[Documentation](https://support.themewinter.com/docs/plugins/plugin-docs/food-ordering/food-ordering-with-qr-code/)
+[https://www.youtube.com/watch?v=Zj7phn0Olu4&list=PLW54c-mt4ObB2k9t8A5ALlwKGjeWxB8zQ&index=7](https://www.youtube.com/watch?v=Zj7phn0Olu4&list=PLW54c-mt4ObB2k9t8A5ALlwKGjeWxB8zQ&index=7)
 
-The less your customer’s hassle, the more your restaurant will grow. With WPCafe, your customers can [order food just by scanning a QR Code](https://themewinter.com/food-ordering-with-qr-code/). 
+## **⚖️ Food Order Discount**
 
-Say, some customers have come to your place to have [lunch](https://product.themewinter.com/wpcafe/food-menu-list-pro/). Customers can just scan the QR Code and will be able to access the restaurant menu. 
+**Percentage Discount**
 
-When a customer orders the food or drink, they will be able to see the table number in their invoice. You, as a restaurant owner, can see the orders in the dashboard too. 
+- [Percentage-based discounts](https://support.themewinter.com/docs/plugins/plugin-docs/food-ordering/discount-2/) can be applied to total orders or specific items to encourage customers to spend more.
 
-[youtube https://www.youtube.com/watch?v=aheW_gyAka0]
+**Standard Discount**
 
-✅ **Visual Table Reservation**
+- Set fixed-amount discounts to provide simple and straightforward price reductions.
 
-[Try the Demo](https://product.themewinter.com/wpcafe/visual-table-reservation/) | [Documentation](https://support.themewinter.com/docs/plugins/plugin-docs/reservation/table-selection-layout/)
+**Discount Message**
 
-Your customers can now reserve their preferred table seats from their homes. With this feature, you will be able to upload the layout of your restaurant, including the position of the tables and chairs of your restaurant, and your customers can [make table reservations online](https://themewinter.com/how-to-design-visual-restaurant-reservation-system-on-your-website/). 
+- Display custom discount messages at checkout to inform customers of savings and encourage future purchases.
 
-With this visual **table reservation** system, **restaurant booking system**, and managing **restaurant reservation seats** will be a hassle-free experience for your customers and yourself. 
+## **🚴 Food Delivery and Pickup**
 
-Customers can also include their number and check in and check out times through a reservation form. If you can leverage this feature, you won’t be bound by the traditional methods which might make your customers unhappy and result in your ratings going down. 
+Offer flexible and [custom food delivery and pickup](https://support.themewinter.com/docs/plugins/plugin-docs/food-ordering/pickup/) options to meet your customers’ preferences. Customize your service availability with these advanced features:
 
-[youtube https://www.youtube.com/watch?v=Zj7phn0Olu4]
+**Weekly Schedule**
 
-✅ **Multivendor Support**
+- Set specific days and times for food delivery and pickup to manage operations smoothly and align with your business hours.
 
-[Documentation](https://support.themewinter.com/docs/plugins/plugin-docs/wp-cafe/wp-cafe-multivendor-restaurant-addon/)
+**Time Interval**
 
-**Multivendors** are a great way to step up your game as a food ordering business owner.
+- Define precise time slots for order scheduling, allowing customers to choose convenient pickup or delivery windows.
 
-You can now create a [multivendor restaurant website](https://support.themewinter.com/docs/plugins/plugin-docs/wp-cafe/wp-cafe-multivendor-restaurant-addon/) with WPCafe as WPCafe now provides addons for [Dokan multivendor](https://wordpress.org/plugins/dokan-lite/) plugin. By adding this new addon, you can now add multiple sellers to your website and grow your business.
+**Holiday Availability**
 
-WPCafe now has Dokan [multivendor support](https://themewinter.com/build-a-multivendor-food-ordering-website/) which will allow you to add multiple vendors and multiple variations of menus. Your customers can have easy access to all of them now with just a few clicks.
+- Customize availability for holidays to ensure customers know when your services are open or paused, improving communication and planning.
 
-[youtube https://www.youtube.com/watch?v=4gbz71pdgYw]
+**Google Map API Key**
 
-[youtube https://www.youtube.com/watch?v=3ZG4E5uaXis]
+- Using Google Maps to offer accurate food delivery zones and address autofill for faster checkout, integrate location-based services.
 
-✅ **Advanced Search and Filtering Option**
+[**Google Auto-complete Address**](https://support.themewinter.com/docs/plugins/plugin-docs/delivery-module/google-autocomplete-address-in-the-checkout/)
 
-[Try the Demo](https://product.themewinter.com/wpcafe/products-filter/) | [Documentation](https://support.themewinter.com/docs/plugins/plugin-docs/wp-cafe/searching-products-with-pickup-delivery/)
+- During checkout, customers do not need to enter their whole address in the address field. It will automatically complete the address for you.
 
-WPCafe brings an advanced form of search and filtering option for you. Initially, you will have to select whether you want to use this feature for pickup or delivery. Then you can filter out the search results with categories and price ranges. 
+**Food Delivery Tipping**
 
-✅ **Analytics**
+- With the help of tips, you can allow your customers to share their happiness and satisfaction with the delivery man .
 
-With the accurate data analyzed by the WPCafe restaurant management plugin, you can now take the correct move for your restaurant to grow and plan out [great marketing strategies that will bring sales](https://themewinter.com/restaurant-marketing-ideas-that-bring-sales/) to your restaurant. 
+## **🔖 Food Minicart Option**
 
-✅ **Google Map Food Store Location**
+**Quantity Picker**
 
-[Try the Demo](https://product.themewinter.com/wpcafe/google-map-food-store-location/) | [Documentation](https://support.themewinter.com/docs/plugins/plugin-docs/delivery-module/store-added-in-google-maps/)
+- Allow customers to easily adjust item quantities directly from the minicart for a faster and more intuitive shopping process.
 
-If you run a restaurant that has **a location based food menu**, using Google Maps for showing food store locations will be a huge plus point for you. 
+[**Minicart Style and Icon**](https://support.themewinter.com/docs/plugins/plugin-docs/food-ordering/minicart-2/)
 
-You can add the Google Maps coordinates of your store on the website if you use WPCafe. With this feature, your customers can get a better idea of your store location. If you have a **restaurant ordering** business that has **multivendors**, customers can check location-wise restaurants.
+- Personalize the appearance of the minicart to match with your website’s design. Choose from various cart icon designs to improve visibility and encourage users.
 
-✅ **Google Auto-complete Address**
+**Minicart Empty Button**
 
-[Documentation](https://support.themewinter.com/docs/plugins/plugin-docs/delivery-module/google-autocomplete-address-in-the-checkout/)
+- Add an option for customers to clear the minicart with a single click, simplifying order management and improving usability.
 
-Now, you can lessen your customer’s checkout time with Google Auto-complete Address feature. When the customers are at the checkout page, they don’t need to write down their whole address in the address field. Google will auto-complete the address on its own. 
+## **✳️** Additional Features
 
-Little things like these are what make the customers happy and slowly become a regular person in your restaurant. 
+**Product Add-ons**
 
-✅ **Setting Minimum Order Amount**
+- Increase sales by giving customers multiple options to choose from as [product addons](https://support.themewinter.com/docs/plugins/plugin-docs/food-ordering/product-addons/) with their order.
 
-[Documentation](https://support.themewinter.com/docs/plugins/plugin-docs/delivery-module/minimum-order-amount-to-place-order/)
+**Order Bump**
 
-As a restaurant manager/owner, with WPCafe, you have the liberty to set a minimum order amount for your products. This means that customers have to order a certain number of burgers, [pizzas](https://themewinter.com/create-pizza-ordering-website-with-wpcafe/), or any food or drink to be able to proceed to checkout. This helps to generate more sales.
+- During the checkout process, Order Bump will recommend the food item that best suits each customer.
 
-✅ **Minicart**
+**RTL Support for Form and Calendar**
 
-[Try the Demo](https://product.themewinter.com/wpcafe/) | [Documentation](https://support.themewinter.com/docs/plugins/plugin-docs/food-ordering/minicart-2/)
+- Fully [support RTL languages](https://themewinter.com/how-to-enable-rtl-support-on-wordpress/), ensuring forms and calendars are user-friendly for everyone.
 
-With WPCafe you also have the option to add a **minicart** to build your **online ordering system for restaurants**. Your customers can add their preferred food or drink to this virtual cart. After choosing their preferred food or drink, customers can then check out food items from the minicart.
+**Loyalty Program for Restaurant Orders**
 
-✅ **Order Bump**
+- Retain repeat customers with a loyalty program that offers points, discounts, or exclusive deals.
 
-[Documentation](https://support.themewinter.com/docs/plugins/plugin-docs/food-ordering/order-bumps/)
+**Advanced Search and Filtering**
 
-When your customer is at the checkout page, WPCafe will suggest the closest best food item the customer can buy if they are willing to pay a little more extra. This is called an order bump. 
+- Make it easier for customers to find their desired items by using powerful search and filter options.
 
-Order bump is one of the [most effective techniques to increase sales](https://themewinter.com/how-wpcafe-help-to-boost-sales-on-your-restaurant/#:~:text=Boost%20Sales%20for%20Your%20Restaurant%20with%20Order%20Bump) in today’s ecommerce business scenes. 
+**Detailed Sales Report**
 
-✅ **Discount**
+- Track revenue, popular items, and customer trends with comprehensive restaurant sales reports.
 
-[Documentation](https://support.themewinter.com/docs/plugins/plugin-docs/food-ordering/discount-2/)
+**Shortcodes**
 
-[You can add discounts](https://themewinter.com/how-to-add-discount-option-in-food-menu-on-wordpress/) to your preferred products to attract more customers and generate more sales. You can add a discount percentage or standard discount or even select a specific menu to give a special discount on that food menu.
+- If you've ever been tired of creating new food category styles, restaurant menu lists, and menu styles, WPCafe's [shortcodes](https://support.themewinter.com/docs/plugins/plugin-docs/wp-cafe/wpcafe-shortcode/) will let you save time and focus on more important tasks.
 
-[youtube https://www.youtube.com/watch?v=aVaopHF8Qpk]
+## **🧩 Better User Experience with Advanced Integrations**
 
-✅ **Product Addons**
+**➕ WooCommerce: H**elps [create online food ordering systems](https://themewinter.com/create-a-woocommerce-restaurant-food-ordering-system-with-wpcafe/) and makes restaurant operations management more flexible for customers.
 
-[Product Addon Documentation](https://support.themewinter.com/docs/plugins/plugin-docs/food-ordering/product-addons/) | [Multivendor Product Addon Documentation](https://support.themewinter.com/docs/plugins/plugin-docs/food-ordering/product-addons-for-vendor/)
+**➕ Elementor Page Builder:** Access [Elementor food menu widgets](https://support.themewinter.com/docs/plugins/plugin-docs/getting-started/wpcafe-elementor-widgets/) easily with the Elementor page builder. Available in the widget list while editing any page.
 
-You can spice things up for your physical or online food store. You can add addons to your food items in any food menu. You can add addons not only to individual products but also to a whole category of products.
+**➕ Gutenberg Restaurant Block:** Build a restaurant website with the [Gutenberg Restaurant Block](https://support.themewinter.com/docs/plugins/plugin-docs/food-ordering/add-new-food-item/). Edit layouts and add media with its block-based editor.
 
-You can add product addons to your multivendor restaurant website too. With this feature you will have more flexibility and so will your customers.
+**➕ DIVI Page Builder:** Easily [customize restaurant food menu with DIVI page builder](https://themewinter.com/divi-compatibility-now-wp-cafe-now-available/), allowing you to personalize your website content without switching themes.
 
-[youtube https://www.youtube.com/watch?v=OPsaBgQyHYA]
+**➕ Dokan Multivendor:** You can create or convert your restaurant website into an online food hub using the [Dokan Multi-vendor marketplace](https://themewinter.com/create-multivendor-restaurant-website/).
 
-[youtube https://www.youtube.com/watch?v=3ZG4E5uaXis]
+**➕ Pabbly:** It saves you from using multiple applications by taking care of all your [food sales and restaurant marketing](https://support.themewinter.com/docs/plugins/plugin-docs/integrations/pabbly-integration/) needs.
 
-✅ **Special Menus**
+**➕ Zapier:** Can help restaurant websites by [connecting apps and automating](https://support.themewinter.com/docs/plugins/plugin-docs/integrations/zapier-integration/) workflows. Helps restaurants to save time, and reduce errors.
 
-[Documentation](https://support.themewinter.com/docs/plugins/plugin-docs/food-ordering/special-menus/)
+**➕ Oxygen Page Builder: A**llows you to visually [design restaurant website](https://support.themewinter.com/docs/plugins/plugin-docs/getting-started/wpcafe-oxygen-builder-elements/)
 
-Special days require special **restaurant menu** ordering. Give your customers a reason to make their day special by crafting a special menu with WPCafe. You can even add a special discount on the special menu.
+, from header to footer, without needing to write any code.
 
-[youtube https://www.youtube.com/watch?v=7rFYlGUomUg]
+## **People Opinions for WPCafe Worldwide**
 
-✅ **Shortcodes**
+[https://www.youtube.com/watch?v=7VZpZJ1AvP4&list=PLW54c-mt4ObB2k9t8A5ALlwKGjeWxB8zQ&index=8](https://www.youtube.com/watch?v=7VZpZJ1AvP4&list=PLW54c-mt4ObB2k9t8A5ALlwKGjeWxB8zQ&index=8)
 
-[Documentation](https://support.themewinter.com/docs/plugins/plugin-docs/wp-cafe/wpcafe-shortcode/)
+**🏆 Featured by Industry Leaders in WordPress:**
 
-If you ever feel tired of creating a new food category style/ food menu list/ food menu style and so on, fear not. You can do anything on WPCafe with Shortcodes so that you can save your time and get going with your more important tasks.
+- [Elegant Theme](https://www.elegantthemes.com/blog/wordpress/best-wordpress-restaurant-plugins): “Complete restaurant solution that offers a full range of features to help manage virtually every aspect of a food business”.
+- [WPLeaders](https://wpleaders.com/best-restaurant-menu-food-ordering-wordpress-plugins/): “Besides food ordering, WP Cafe also gives you the ability to create beautiful responsive restaurant menus for your website. The menus are highly customizable and lets you set food availability based on location”.
+- [ThemeGrill](https://themegrill.com/blog/wordpress-restaurant-menu-plugins/): “Complete food menu, restaurant reservation, food delivery and pickup plugin for WooCommerce”.
+- [Rara Themes](https://rarathemes.com/blog/best-restaurant-wordpress-plugins/): “Multi-faceted WordPress plugin and service that caters to various aspects of restaurant and food business management”.
+- [Themejunkie](https://www.theme-junkie.com/wordpress-restaurant-menu-plugin/): “This plugin is perfect for restaurant websites that want to provide a simple ordering experience to customers.”
 
-==Integrations==
+## **📚 Support and Documentation**
 
-🚀 **Fluent CRM**
+- Simply visit our [Documentation](https://support.themewinter.com/docs/plugins/docs/wp-cafe/)
+- For any questions, ask them away on [WPCafe Forum](https://wordpress.org/support/plugin/wp-cafe/).
+- Help us improve, input your valuable suggestions [WPCafe Roadmap](https://themewinter.com/wpcafe-roadmaps/).
 
-[Documentation](https://support.themewinter.com/docs/plugins/plugin-docs/integrations/wpc-fluentcrm-integration/)
+So, why wait? 📅 Master in Restaurant Management Solution with WPCafe 🚀
 
-[FluentCRM](https://wordpress.org/plugins/fluent-crm/) is one of the most well-known self hosted Email Marketing Automation plugins for WordPress. It is your one-stop go-to solution for email marketing and since we here at Themewinter want to give you the perfect solution for your problems, we have integrated FluentCRM with WPCafe.
+## **🚨 Did you like WPCafe Restaurant Manager for WordPress?**
 
-🚀 **Zapier Integration**
+- Join our All-Time Active [**Facebook Group**](https://www.facebook.com/groups/492321335116367).
+- Learn actionable tutorials on our [**YouTube Channel**](https://www.youtube.com/playlist?list=PLW54c-mt4ObB2k9t8A5ALlwKGjeWxB8zQ).
+- Give us your inspiring [**Rating on WordPress**](https://wordpress.org/support/plugin/wp-cafe/reviews/).
+- Rate us on [**Trustpilot**](https://www.trustpilot.com/review/arraytics.com).
 
-[Documentation](https://support.themewinter.com/docs/plugins/plugin-docs/integrations/zapier-integration/)
+## 🔥 So, What’s Next?
 
-[Zapier](https://wordpress.org/plugins/zapier/) allows you to automate your workflow. This means that you can connect multiple apps and once each task is finished, Zapier will immediately trigger the next app you are planning to work with. This is an extremely efficient way to manage your workflow. 
+If you’re impressed with WPCafe restaurant management plugin for WordPress, please check out our other awesome WordPress plugins:
 
-So, for our customers to have the best time while using our food ordering plugin, we have decided to [integrate Zapier with WPCafe](https://themewinter.com/wpcafe-integrations-zapier-and-pabbly/#:~:text=Integrate%20Zapier%20with%20WPCafe).
+📅  **[Eventin**:](https://wordpress.org/plugins/eventin/) Create and manage events and **sell event tickets** to event attendees with the AI-powered event management solutions.
+🗓️ [**WP Timetics:**](https://wordpress.org/plugins/timetics/) An **AI-powered Appointment Scheduling plugin for WordPress**, with [visual seat arrangement](https://themewinter.com/visual-seat-plan-to-boost-event-roi/).
+✍ [**Authorsy:**](https://wordpress.org/plugins/authorsy/) A **Multi-Style Author Manager Plugin for WordPress** to show your work to the world.
 
-[youtube https://www.youtube.com/watch?v=S8fi1kU0Mbg]
+💻 **[Poptics](https://wordpress.org/plugins/poptics/)**: A **Popup Builder plugin for WordPress** designed to increase leads and sales for your website.
 
-🚀 **Pabbly Integration**
+If you’re interested, visit [**ThemeWinter](http://themewinter.com/)** to learn more about WordPress scheduling, event management, restaurant reservationss, and lots of [**Marketing Tips & Tricks](https://themewinter.com/blog/)!** 🎉
 
-[Documentation](https://support.themewinter.com/docs/plugins/plugin-docs/integrations/pabbly-integration/)
-
-[Pabbly](https://www.pabbly.com/) Connect can integrate and connect with up to 750+ apps for real time data transfer. You have the option of using Zapier-like actions to set up data collection from your website. As a result, your workflow will be smoother than ever.
-
-Because of these advantages, we have decided to [integrate Pabbly Connect with WPCafe](https://themewinter.com/wpcafe-integrations-zapier-and-pabbly/#:~:text=Setting%20up%20WPCafe,Pabbly%20with%20WPCafe).
-
-[youtube https://www.youtube.com/watch?v=fLXjPl-7Je0]
-
-🚀 **Shipday Integration**
-
-[Documentation](https://support.themewinter.com/docs/plugins/plugin-docs/integrations/food-delivery-ship-day-plugin-integration/)
-
-It is because of the [Shipday](https://www.shipday.com/) integration that we were able to provide you with promising features like Google Food Store Location, Google Auto-complete Address, and Minimum Order Amount.
-
-Shipday is an All-in-One delivery system. It will help you to automate the whole picking up and delivery service in a matter of minutes. 
-
-[youtube https://www.youtube.com/watch?v=zyTNtuquk6U]
-
-🚀 **Twilio SMS Integration**
-
-[Documentation](https://support.themewinter.com/docs/plugins/plugin-docs/integrations/twilio-sms-integration/)
-
-[Twilio](https://www.twilio.com/) offers Communication APIs for SMS, Voice, Video, and Authentication. You can connect with your customers through any SMS or Calling channels on any platform.
-
-By using Twilio with WPCafe, you can effortlessly connect with your customers. The more you can connect with your customers, the more you can generate leads. 
-
-[youtube https://www.youtube.com/watch?v=xtmLxpcHS-s]
-
-🚀 **Thermal Printer Integration**
-
-[Documentation](https://support.themewinter.com/docs/plugins/plugin-docs/integrations/thermal-printer-integration/)
-
-You can now connect a thermal printer to your **food delivery/restaurant website** if you have WPCafe with you. To use a thermal printer, you have to install [Star CloudPRNT for WooCommerce](https://wordpress.org/plugins/star-cloudprnt-for-woocommerce/). 
-
-🚀 **WooCommerce Clover POS Integration**
-
-[Documentation](https://support.themewinter.com/docs/plugins/plugin-docs/integrations/woocommerce-clover-pos-integration/)
-
-Don’t be bound by only the physical mode of payments. With [WooCommerce Clover POS](https://wordpress.org/plugins/woo-clover-gateway-by-zaytech/) Integration, your customers will be able to order food or drink from your website and pay the money with their card through this food menu plugin. 
-
-To make your and your customers' lives easier, we have given you the option to integrate WooCommerce Clover Post with WPCafe. 
-
-🚀 **Loyalty Program Points and Rewards for Food Order in your Restaurant**
-
-[Documentation](https://support.themewinter.com/docs/plugins/plugin-docs/integrations/loyalty-program/)
-
-For each purchase a customer makes, they are given a point. When the customer has enough points, they can redeem those points to make another purchase but this time, points can be used instead of money. 
-
-Restaurants [adapting loyalty programs](https://themewinter.com/loyalty-programs-for-restaurants/) are a common scenario these days. So, you should not be left behind. We have integrated [Points and Rewards for WooCommerce](https://wordpress.org/plugins/points-and-rewards-for-woocommerce/) plugin with WPCafe so that you can also give your customer some points as a gesture of gratitude.
-
-==What Others Say About WPCafe==
-
->*I was happy when I found this restaurant plugin. I am using the pro version for my client restaurant’s website at the moment together with the Gutenberg editor.*
-    - Gilles
-
->*Just started testing this plugin for a client and works really well. I contacted support for a quick question and they solved it pretty fast. Thanks! Recommended.*
-    - sebastianguerreroa
-
->*Thank you so much for this awesome plugin*
-    - ezzeldean
-
-==Other Products by the Same Author==
-
-WPCafe is a **restaurant management**, **online food delivery**, **restaurant reservation** plugin developed by Themewinter. This is not the only plugin developed by us. The other plugins that are developed by us are-
-
-* [Eventin](https://wordpress.org/plugins/wp-event-solution/): A WordPress event plugin for events manager, event calendar, and woocommerce event tickets
-
-* [WPCafe Restaurant Addon for Oxygen Builder](https://wordpress.org/plugins/wpcafe-oxygen-addon/): A restaurant addon for oxygen builder
-
-* [WPCafe Multivendor Restaurant Addon for Dokan](https://wordpress.org/plugins/wpcafe-multivendor/): A multivendor restaurant addon for Dokan
-
-* [Eventin Divi Addon](https://wordpress.org/plugins/eventin-divi-addon/): An event management addon for Divi
-
-
-== Frequently Asked Questions ==
-
-= How do I display minicart and menu settings? =
-
-Allow minicart from WPCafe Settings => Food Menu => Allow Cart. It will display how you can change minicart styles. Allow location popup in front-page from menu settings.
-
-= How do I display my menu? =
-
-You can either make use of the included ‘Menu’ Eleemntor widget or the [wpc_food_menu_tab wpc_food_categories=’16,21,18,17,20′ no_of_product=’5′ product_thumbnail =’on’ wpc_cart_button =’on’ ]shortcode (just replace the wpc_food_categories with the actual category id of the menu you want to display. 
-
-Change no_of_product to show total no’s of product. Show /Hide image by product_thumbnail on/off. Show /Hide cart button by wpc_cart_button on/off ).
-
-= How to make a reservation? =
-
-You can change min/max guest no and automatically confirmed booking for specific no of guest from WpCafe Settings => Reservation Options. 
-
-Allow cancellations of booking, Change Date format , Set dynamic message. You can set reservation schedule from WpCafe Settings => Reservation Schedule. 
-
-Finally just place the shortcode from WpCafe settings => Available shortcode, just place the shortcode where you want to display[wpc_reservation_form wpc_image_url=”]
-
-= How to get notifications? =
-
-You can change Admin and client notifications for booking request from WpCafe settings => Reservation Email => Notification Settings. 
-
-You can enable/disable notifications both for admin and client. You can set message for new notifictaion. It will be added with default message.
-
-
+## **🚀** Ready to Transform Your Restaurant? Get started today !
 
 == Screenshots ==
+
 1. Dashboard Overview
 2. Actionable Qrcode
 3. Customizable Mini cart and Quantity Picker
@@ -393,14 +313,52 @@ You can enable/disable notifications both for admin and client. You can set mess
 9. Visual Table Layout Reservation
 10. Tipping Option for Orders
 
+== Frequently Asked Questions ==
+
+= **I’m new to WooCommerce. Can I install WPCafe and use all the features myself?** =
+
+-WPCafe design is beginner-friendly and offers easy installation and configuration options. Als,o have detailed documentation and helpful tutorials to guide you through the process.
+
+= **Is the WpCafe WordPress Plugin regularly updating its features?** =
+
+-Yes! WpCafe consistently updates and introduces new features.
+
+= **Can I add add-on items without offering a discount?** =
+
+-Absolutely! You can add items without providing any discount.
+
+=  **Will this plugin work with my existing WooCommerce theme?** =
+
+-In most cases, yes. WPCafe plugins are designed to be compatible with a wide range of themes.
+
+= **Why do I need a Live Order Notification Plugin for my WooCommerce store?** =
+
+-It helps you stay organized by providing an easy way to track orders and ensure timely delivery.
+
+= **Can customers see and choose addons during the checkout process?** =
+
+-Yes, customers can select add-ons while placing their orders.
+
+**=Does WPCafe offer menu customization options?=**
+
+-Yes, WPCafe offers food menu customization options. There are multiple category styles and food menu designs available. You can create one or two-column food menus.
 
 == Changelog ==
 
-= 2.2.32 ( March 9, 2025 ) =
+= 2.2.33 ( April 12, 2025 ) =
+
+Fix 			: Mini-cart UX update
+Fix 			: Custom Date format fix
+Fix 			: Booking cancel feature on Reservation forms
+Fix 			: Dynamic Late booking time
+Tweak 			: Sync Food with Reservation with Reservation list
+Fix 			: Patch LFI security for Food Menu Tab Shortcode
+
+= 2.2.32 ( March 17, 2025 ) =
 
 Fix 			: Checkout conflict fix with third party plugin
 Fix 			: Local Timezone setting improvement
-Fix 			: Patch LFI security for Food Menu shortcode
+Fix 			: Patch LFI security for Food Menu Shortcode
 
 = 2.2.31 ( December 8, 2024 ) =
 
@@ -423,8 +381,7 @@ Tweak 			: Improved Gutenberg blocks
 
 New 			: Location Gutenberg checkout block
 Tweak 			: Improved Gutenberg block security
-Fix 			: Single product add to cart issue fix 
-
+Fix 			: Single product add to cart issue fix
 
 = 2.2.27 ( June 13, 2024 ) =
 
@@ -443,7 +400,7 @@ Fix 			: Add to Cart functionality not working
 
 = 2.2.24 ( May 09, 2024 ) =
 
-Fix 			: Security performance issue fixed 
+Fix 			: Security performance issue fixed
 
 = 2.2.23 ( March 10, 2024 ) =
 
@@ -462,9 +419,8 @@ Fix 			: Dashboard Markup Validation issue fixed
 Fix 			: Pro settings field condition added
 
 = 2.2.19 ( November 05, 2023 ) =
-Fix             : Reservation email notification guest no 
+Fix             : Reservation email notification guest no
 Fix             : Manual Reservation email not going to user and admin
-
 
 = 2.2.18 ( October 22, 2023 ) =
 Tweak           : PHP & JS script optimization
@@ -479,25 +435,34 @@ Fix             : Reservation form validation updated
 Fix             : WooCommerce mini-cart Ajax functionality issue fixed.
 
 = 2.2.15 ( June 21, 2023 ) =
-Fix             : Astra theme conflict issue 
+Fix             : Astra theme conflict issue
 
 = 2.2.14 ( April 26, 2023 ) =
 Tweak           : PHP & JS script optimization
 
 = 2.2.13 ( April 02, 2023 ) =
-Fix             : Reservation Exception date timezone issue 
+Fix             : Reservation Exception date timezone issue
 Fix             : Elementor widget bug fix
 
+= 2.2.14 ( March 16, 2025 ) =
+Fix 			: Reservation cancellation issue
+Fix 			: Pickup & delivery date & time showing issue
+Fix 			: Shortcode issue in Japanese language
+Fix 			: Discount calculation issue on checkout page
+Fix 			: Multiple reservations on the same date & time issue
+Fix 			: Already booked seats not showing in reservation form issue
+Fix 			: Mini-cart styling and grammatical issue
+Fix 			: Fixed reservation on custom date format issue
+Tweak 			: Show reservation extra information in email
+Tweak 			: Showing delivery and pickup time in email after completing order
+Tweak 			: Added dynamic time allocation for late reservation booking from settings
 
 == Upgrade Notice ==
 
-
 == Installation ==
 
-
 1. Upload the plugin files to the `/wp-content/plugins/plugin-name` directory, or install the plugin through the WordPress plugins screen directly.
-1. Activate the plugin through the 'Plugins' screen in WordPress
-1. All Settings will be found in Admin sidebar -> WPCafe 
-
+2. Activate the plugin through the 'Plugins' screen in WordPress
+3. All Settings will be found in Admin sidebar -> WPCafe
 
 eg.  This plugin requires Woocommerce to use all functionality.

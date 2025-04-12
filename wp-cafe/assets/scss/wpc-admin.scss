@@ -14,7 +14,7 @@
 	margin: 0px;
 }
 .notice {
-    margin-bottom: 15px;
+	margin-bottom: 15px;
 }
 body.toplevel_page_cafe_menu {
 	background-color: #ededf8;
@@ -221,7 +221,7 @@ body.toplevel_page_cafe_menu {
 		}
 	}
 	//   checkbox style
-	.wpc-weekly-schedule-list {		
+	.wpc-weekly-schedule-list {
 		input[type="checkbox"] + label {
 			cursor: pointer;
 			margin-right: 15px;
@@ -409,22 +409,22 @@ body.toplevel_page_cafe_menu {
 
 .wpc-pro {
 	a {
-	  font-size: 12px;
-	  font-weight: 700;
-	  background-color: #FEF6E6;
-	  border: 1px solid #FB9E12;
-	  display: inline-block;
-	  color: #0A1018;
-	  padding: 9px 10px;
-	  border-radius: 5px;
-	  line-height: 0.8;
-	  text-decoration: none;
-	  transition: all ease 0.3s;
-	  &:hover {
-		background-color: darken(#FEF6E6, 5%);
-	  }
+		font-size: 12px;
+		font-weight: 700;
+		background-color: #fef6e6;
+		border: 1px solid #fb9e12;
+		display: inline-block;
+		color: #0a1018;
+		padding: 9px 10px;
+		border-radius: 5px;
+		line-height: 0.8;
+		text-decoration: none;
+		transition: all ease 0.3s;
+		&:hover {
+			background-color: darken(#fef6e6, 5%);
+		}
 	}
-  }
+}
 /*------------------------
   Reservation table
   -----------------------*/
@@ -1124,8 +1124,7 @@ responsive
 					height: 0;
 					border-style: solid;
 					border-width: 10px 10px 0 10px;
-					border-color: $secondary-color transparent transparent
-						transparent;
+					border-color: $secondary-color transparent transparent transparent;
 					opacity: 0;
 					visibility: hidden;
 				}
@@ -1442,8 +1441,8 @@ span.add_multi_diff_schedule_block.wpc-btn,
 
 // product addon settings
 .addons-block.wrap {
-    background: #fff;
-    margin-right: 15px;
+	background: #fff;
+	margin-right: 15px;
 }
 .wpc-product-addons-wrapper {
 	.wpc-pro-pao-actions {
@@ -1768,8 +1767,8 @@ li {
 	}
 }
 
-// tools page style 
-.wpc-tools-content { 
+// tools page style
+.wpc-tools-content {
 	padding-bottom: 35px;
 	.wpc-main-title {
 		font-size: 36px;
@@ -1777,7 +1776,7 @@ li {
 	}
 	.wpc-desc {
 		font-size: 16px;
-		color: #71787C;
+		color: #71787c;
 		margin: 18px 0;
 	}
 }
@@ -1820,8 +1819,13 @@ li {
 		flex-wrap: nowrap;
 	}
 }
-.woocommerce-page  {
+.woocommerce-page {
 	.wp-list-table .column-name {
 		width: 12%;
 	}
+}
+
+// reservation minimum time duration card
+.wpc-minimum-reservation-field {
+	margin-bottom: 12px;
 }

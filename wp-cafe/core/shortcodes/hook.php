@@ -299,7 +299,11 @@ class Hook{
             $settings["wpc_price_show"]        = $wpc_price_show;
             // render template
             $template = \Wpcafe::core_dir() ."shortcodes/views/food-menu/food-tab.php";
-            if( file_exists( $template ) ){
+
+            $allowed_styles = ['style-1', 'style-2'];
+            if( in_array( $style, $allowed_styles, true ) 
+            && file_exists( \Wpcafe::plugin_dir() . "widgets/wpc-food-menu-tab/style/{$style}.php" )
+            && file_exists( $template ) ){
                 include $template;
             }
         }
@@ -831,7 +835,7 @@ class Hook{
     function add_wpc_product_type_in_wc_product_meta($types) {
         $types['wpc_product'] = array(
             'id'            => '_wpc_product',
-            'wrapper_class' => 'show_if_simple',
+            'wrapper_class' => 'show_if_simple show_if_variable show_if_grouped show_if_external',
             'label'         => __( 'WPC Product', 'wpcafe' ),
             'description'   => __( 'This checkmark ensure that you will sell WPCafe Menu item via this product.', 'wpcafe' ),
             'default'       => 'yes'

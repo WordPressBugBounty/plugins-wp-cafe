@@ -43,7 +43,11 @@ if ( !empty($settings['minicart_style']) && $settings['minicart_style'] === 'sty
             <div class="wpc-minicart-header">
                 <div class="cart-counts">
                     <span class="cart-count">
-                        <span class="cart-items-count count wpc-mini-cart-count"></span><?php echo esc_html__(' items', 'wpcafe'); ?>
+                        <span class="cart-items-count count wpc-mini-cart-count"></span>
+                        <?php 
+                            $cart_count = count(WC()->cart->get_cart());
+                            echo esc_html__($cart_count > 1 ? ' items' : ' item', 'wpcafe'); 
+                        ?>
                     </span>
                     <?php echo esc_html__('in cart', 'wpcafe'); ?>
                 </div>

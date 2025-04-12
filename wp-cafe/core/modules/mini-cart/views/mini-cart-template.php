@@ -57,7 +57,7 @@ $cart_link 		= !empty($settings['wpc_mini_empty_cart_link']) ? $settings['wpc_mi
 						<div class="mini-cart-quantity-wrapper">
 							<?php echo apply_filters( 'woocommerce_widget_cart_item_quantity', '<span class="quantity">' . sprintf( '%s &times; %s', $product_price, $cart_item['quantity'] ) . '</span>', $cart_item, $cart_item_key ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
 							<strong class="single-subtotal-item">
-								<?php echo esc_html( get_woocommerce_currency_symbol() ); ?><span class="wpc-minicart-subtotal"><?php echo esc_html($cart_item['quantity'] * $_product->get_price()); ?></span>
+								= <?php echo esc_html( get_woocommerce_currency_symbol() ); ?><span class="wpc-minicart-subtotal"><?php echo esc_html($cart_item['quantity'] * $_product->get_price()); ?></span>
 							</strong>
 						</div>
 					</li>

@@ -4974,10 +4974,10 @@ body.toplevel_page_cafe_menu {
 .wpc-pro a {
   font-size: 12px;
   font-weight: 700;
-  background-color: #FEF6E6;
-  border: 1px solid #FB9E12;
+  background-color: #fef6e6;
+  border: 1px solid #fb9e12;
   display: inline-block;
-  color: #0A1018;
+  color: #0a1018;
   padding: 9px 10px;
   border-radius: 5px;
   line-height: 0.8;
@@ -6333,7 +6333,7 @@ li {
 }
 .wpc-tools-content .wpc-desc {
   font-size: 16px;
-  color: #71787C;
+  color: #71787c;
   margin: 18px 0;
 }
 
@@ -6380,6 +6380,10 @@ li {
 }
 .woocommerce-page .wp-list-table .column-name {
   width: 12%;
+}
+
+.wpc-minimum-reservation-field {
+  margin-bottom: 12px;
 }
 
 /*# sourceMappingURL=wpc-admin.css.map */

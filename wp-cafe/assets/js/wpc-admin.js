@@ -6,6 +6,23 @@
 
     $(document).ready(function() {
 
+
+        
+        /**
+         * Late booking time logic
+         */
+        $(document).on('change', '#wpc_late_bookings_value, #wpc_late_bookings_type', function() {
+            let late_booking_value = $('#wpc_late_bookings_value').val();
+            let late_booking_type = $('#wpc_late_bookings_type').val();
+            let late_booking = Number(late_booking_value);
+        
+            if (late_booking_type === 'hours') {
+                late_booking *= 60;
+            }
+        
+            $('#wpc_late_bookings').val(late_booking);
+        });
+
         if ( $('#wpc_over_view').length > 0 && typeof wpc_form_data !== "undefined" && typeof wpc_form_data[0] !=="undefined" ) {
 
             var overview_chart = {
@@ -553,6 +570,10 @@
             }
         }
         // Document end
+    
+    
+    
+    
     });
     
     // load color picker

@@ -152,7 +152,9 @@ class Wpc_Reservation_Report {
             $wpc_to_time        = get_post_meta( $post_id, 'wpc_to_time', true );
             
             if ( $wpc_booking_date !=="" ) {
-                $wpc_booking_date = Wpc_Utilities::get_formatted_date( $wpc_booking_date );
+                // $wpc_booking_date = Wpc_Utilities::get_formatted_date( $wpc_booking_date );
+                // convert the saved date to the wordpress admin date format
+                $wpc_booking_date = date_i18n( get_option( 'date_format' ), strtotime( $wpc_booking_date ) );
             }
             
             if ( $wpc_from_time !=="" ) {

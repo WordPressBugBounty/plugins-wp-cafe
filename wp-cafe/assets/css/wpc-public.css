@@ -4339,8 +4339,7 @@ body.woocomerce-layout-override-enable.woocommerce-cart .woocommerce .button.wpc
 .theme-blocksy .woocommerce-mini-cart-item .ct-image-container {
   position: static;
   display: block;
-  -webkit-mask-image: unset !important;
-          mask-image: unset !important;
+  mask-image: unset !important;
 }
 .theme-blocksy .woocommerce-mini-cart-item .ct-image-container .ct-ratio {
   padding: 0 !important;
@@ -4453,7 +4452,9 @@ body.ast-single-post.woocomerce-layout-override-enable.woocommerce-checkout .foo
 }
 
 .wpc_log_message,
-.wpc_error_message, .hide_field, .wpc_success_message {
+.wpc_error_message,
+.hide_field,
+.wpc_success_message {
   display: none;
 }
 
@@ -4674,7 +4675,7 @@ Food menu
   right: 10px;
   top: 10px;
   z-index: 1;
-  background-color: #FFE119;
+  background-color: #ffe119;
   padding: 0 10px;
   border-radius: 3px;
   font-weight: 700;
@@ -5109,7 +5110,7 @@ Food menu tab
 }
 .wpc-reservation-form .wpc-reservation-field .wpc-form-control {
   width: 100%;
-  background-color: #F1F1F5;
+  background-color: #f1f1f5;
   border: none;
   border: none;
   border-radius: 4;
@@ -5147,7 +5148,7 @@ Food menu tab
   font-size: 15px;
   font-weight: 600;
   color: #e3106e;
-  border-bottom: 2px solid #5D78FF;
+  border-bottom: 2px solid #5d78ff;
   margin-left: 10px;
 }
 .wpc-reservation-form.hide-cancel-text #wpc_cancel_request {
@@ -5177,9 +5178,9 @@ Food menu tab
   border-radius: 8px;
   -webkit-border-radius: 8px;
   -ms-border-radius: 8px;
-  background-color: #F1AE1F;
+  background-color: #f1ae1f;
   color: #fff;
-  border-color: #F1AE1F;
+  border-color: #f1ae1f;
 }
 .wpc-reservation-form .wpc_reservation_user_info .reservation-form-title {
   color: #fff;
@@ -5251,8 +5252,8 @@ Food menu tab
 }
 
 .wpc_log_message {
-  color: #4F8A10;
-  background-color: #DFF2BF;
+  color: #4f8a10;
+  background-color: #dff2bf;
   border: 1px solid #bce8f1;
   border-radius: 2px;
   padding: 10px;
@@ -5261,8 +5262,8 @@ Food menu tab
 
 .wpc_cancell_log_message {
   display: none;
-  color: #4F8A10;
-  background-color: #DFF2BF;
+  color: #4f8a10;
+  background-color: #dff2bf;
   border: 1px solid #bce8f1;
   border-radius: 2px;
   padding: 10px;
@@ -5389,7 +5390,7 @@ Food menu tab
   position: absolute;
   left: -30px;
   top: 0;
-  background: #5D78FF;
+  background: #5d78ff;
   padding: 20px 20px;
   color: #fff;
   border-top-left-radius: 9px;
@@ -5402,7 +5403,7 @@ Food menu tab
   vertical-align: top;
 }
 .wpc_cart_block .wpc_background_color {
-  background-color: #F1F1F1;
+  background-color: #f1f1f1;
   box-shadow: 0 10px 15px rgba(0, 0, 0, 0.05);
   padding: 15px;
   list-style-type: none;
@@ -5471,7 +5472,7 @@ Food menu tab
   padding-right: 20px !important;
   margin: 10px 0 20px !important;
   padding: 15px;
-  background-color: #F9F9F9;
+  background-color: #f9f9f9;
   border-radius: 4px;
   -webkit-border-radius: 4px;
   -ms-border-radius: 4px;
@@ -5689,7 +5690,7 @@ Food menu tab
   position: relative;
 }
 .wpc-minicart-wrapper .product_list_widget .mini_cart_item:not(:last-child) {
-  border-bottom: 1px solid #E0E0E0;
+  border-bottom: 1px solid #e0e0e0;
 }
 .wpc-minicart-wrapper .product_list_widget .mini_cart_item a:not(.remove) {
   color: #000000;
@@ -5726,6 +5727,8 @@ Food menu tab
   position: relative;
   padding: 10px 0;
   line-height: 20px;
+  gap: 2px;
+  flex-wrap: wrap;
 }
 .wpc-minicart-wrapper .product_list_widget .mini_cart_item .mini-cart-quantity-wrapper .quantity {
   margin: 0;
@@ -5791,8 +5794,7 @@ Food menu tab
 }
 .wpc-minicart-wrapper .product_list_widget .mini_cart_item .mini-cart-quantity-wrapper .single-subtotal-item {
   order: 3;
-  right: 14px;
-  position: absolute;
+  margin-left: auto;
 }
 .wpc-minicart-wrapper .woocommerce-mini-cart li {
   padding-left: 15px !important;
@@ -5804,8 +5806,8 @@ Food menu tab
   right: 0;
 }
 .wpc-minicart-wrapper .wpc-cross-sell-slider {
-  border-top: 4px solid #FF8A00;
-  border-bottom: 4px solid #FF8A00;
+  border-top: 4px solid #ff8a00;
+  border-bottom: 4px solid #ff8a00;
   position: relative;
 }
 .wpc-minicart-wrapper .wpc-cross-sell-slider .title-wrap {
@@ -5909,7 +5911,7 @@ Food menu tab
 .wpc-minicart-wrapper .wpc-coupon-wrapper .coupon_from .wpc-minicart-coupon-field {
   width: 100%;
   padding: 8px 16px;
-  border: 1px solid #E0E0E0;
+  border: 1px solid #e0e0e0;
   font-size: 16px;
   line-height: 26px;
 }
@@ -5986,7 +5988,7 @@ Food menu tab
 }
 .wpc-minicart-wrapper .woocommerce-mini-cart__buttons a.button.wc-forward {
   background-color: transparent !important;
-  border: 1px solid #E0E0E0;
+  border: 1px solid #e0e0e0;
   color: #000 !important;
   font-weight: 700;
   text-transform: capitalize;
@@ -6002,13 +6004,13 @@ Food menu tab
   margin-right: 0;
 }
 .wpc-minicart-wrapper .woocommerce-mini-cart__buttons a.button.checkout {
-  background-color: #48B775 !important;
-  border-color: #48B775;
+  background-color: #48b775 !important;
+  border-color: #48b775;
   color: #fff !important;
 }
 .wpc-minicart-wrapper .woocommerce-mini-cart__buttons a.button.checkout:hover {
-  background-color: #359A5D !important;
-  border-color: #359A5D;
+  background-color: #359a5d !important;
+  border-color: #359a5d;
 }
 .wpc-minicart-wrapper .wpc-subtotal-wrap {
   position: fixed;

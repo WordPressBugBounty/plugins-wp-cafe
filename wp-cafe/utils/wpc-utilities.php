@@ -1559,6 +1559,10 @@ class Wpc_Utilities {
 	}
 
 	public static function wpc_product_exist_in_cart(){
+		 //check if woocommerce exists
+		 if (!function_exists('WC') || !WC()->cart) {
+			return;
+		 }
 		$cart = WC()->cart->get_cart();
         $has_wpc_product = false;
         
