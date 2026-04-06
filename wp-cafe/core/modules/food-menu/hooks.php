@@ -41,21 +41,18 @@ class Hooks {
 	 */
 	public function get_customer_list() {
 
-			$date_from  = date('Y-m-d', strtotime(date('Y-m-d') . "-1 Month"));
-			$date_to    = date('Y-m-d', strtotime(date('Y-m-d') ));
+			$current_timestamp = current_time( 'timestamp' );
+			$date_from  = wp_date( 'Y-m-d', strtotime( '-1 Month', $current_timestamp ) );
+			$date_to    = wp_date( 'Y-m-d', $current_timestamp );
 			$clients = 0;
 
 			global $wpdb;
 
-			$post_meta      = $wpdb->postmeta;
-			$posts          = $wpdb->posts;
-			$users          = $wpdb->users;
-
 			$query = $wpdb->prepare(
-				"SELECT users.ID FROM $users AS users
-				INNER JOIN $post_meta AS customer_ids ON users.ID = customer_ids.meta_value
+				"SELECT users.ID FROM {$wpdb->users} AS users
+				INNER JOIN {$wpdb->postmeta} AS customer_ids ON users.ID = customer_ids.meta_value
 					AND customer_ids.meta_key = '_customer_user'
-				INNER JOIN $posts AS orders ON customer_ids.post_id = orders.ID
+				INNER JOIN {$wpdb->posts} AS orders ON customer_ids.post_id = orders.ID
 					AND orders.post_type='shop_order'
 					AND post_date BETWEEN %s AND %s",
 				"{$date_from} 00:00:00",
@@ -67,7 +64,7 @@ class Hooks {
 
 			if( !$clients ) {
 
-				$clients = $wpdb->get_results($query); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery
+				$clients = $wpdb->get_results($query); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.PreparedSQL.NotPrepared
 
 				wp_cache_set($cache_key, $clients, 'wpcafe_query_cache', 60);
 			}
@@ -85,26 +82,28 @@ class Hooks {
 			if (class_exists('Woocommerce') ) {
 
 					global $wpdb;
-					$date_from  = date('Y-m-d', strtotime(date('Y-m-d') . "-1 Month"));
-					$date_to    = date('Y-m-d', strtotime(date('Y-m-d') ));
-					$post_status= implode("','", $status );
+					$current_timestamp = current_time( 'timestamp' );
+					$date_from  = wp_date( 'Y-m-d', strtotime( '-1 Month', $current_timestamp ) );
+					$date_to    = wp_date( 'Y-m-d', $current_timestamp );
+
+					// Create placeholders for IN clause
+					$placeholders = implode( ', ', array_fill( 0, count( $status ), '%s' ) );
 
 					$query = $wpdb->prepare(
-						"SELECT * FROM $wpdb->posts 
+						"SELECT * FROM {$wpdb->posts}
 							WHERE post_type = 'shop_order'
-							AND post_status IN ('{$post_status}')
+							AND post_status IN ($placeholders)
 							AND post_date BETWEEN %s AND %s
 							",
-							"{$date_from} 00:00:00",
-							"{$date_to} 23:59:59"
+							array_merge( $status, array( "{$date_from} 00:00:00", "{$date_to} 23:59:59" ) )
 					);
 
 					$cache_key = Wpc_Utilities::get_query_cache( $query );
 					$orders = wp_cache_get( $cache_key, 'wpcafe_order_cache');
-		
+
 					if( !$orders ) {
 
-						$orders = $wpdb->get_results( $query ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery
+						$orders = $wpdb->get_results( $query ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.PreparedSQL.NotPrepared
 						wp_cache_set($cache_key, $orders, 'wpcafe_order_cache', 60);
 
 					}
@@ -133,7 +132,6 @@ class Hooks {
 
 		// remove astra theme conflict
 		add_action('init', [$this,'remove_astra_mini_cart']);
-
 	}
 	
 	/**
@@ -183,12 +181,12 @@ class Hooks {
 			// Food location
 			if(get_post_meta( $order_id, 'wpc_location_name', true ) != ''):
 			?>
-					<p><strong><?php echo esc_html__('Food Delivery Location:', 'wpcafe');
+					<p><strong><?php echo esc_html__('Food Delivery Location:', 'wp-cafe');
 					?></strong> <?php echo esc_html(get_post_meta( $order_id, 'wpc_location_name', true )); ?></p>
 			<?php
 			endif;
 
-			if (class_exists("Wpcafe_Pro")) {
+			if (function_exists("wpcafe_pro")) {
 					// Order type and schedule
 					$order_data = Pro_Utilities::get_order_type();
 					if (Pro_Utilities::data_validation_check_arr($order_data)) {

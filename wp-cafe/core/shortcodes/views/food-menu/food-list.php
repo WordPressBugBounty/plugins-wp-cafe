@@ -1,4 +1,6 @@
 <?php
+if ( ! defined( 'ABSPATH' ) ) exit;
+
     use WpCafe\Utils\Wpc_Utilities;
     $style               = $settings["food_menu_style"];
     $show_item_status   = $settings["show_item_status"];
@@ -18,7 +20,7 @@
     $column_tablet      = isset($settings['wpc_menu_col_tablet']) ? $settings['wpc_menu_col_tablet'] : 2;
     $column_mobile      = isset($settings['wpc_menu_col_mobile']) ? $settings['wpc_menu_col_mobile'] : 1;
 
-    apply_filters( 'elementor/control/search_data' , $settings , $unique_id , 'wpc-menus-list' );
+    apply_filters( 'cafetics/elementor/control/search_data' , $settings , $unique_id , 'wpc-menus-list' );
 
     ?>
     <div class="wpc-nav-shortcode main_wrapper_<?php echo esc_attr($unique_id .' '. $no_desc_class)?>" data-id="<?php echo esc_attr($unique_id)?>">
@@ -30,8 +32,14 @@
                 'wpc_cat'       => $wpc_menu_cat,
                 'order'         => $wpc_menu_order,
             );
+
+            $selected_location = wpc_selected_location_id();
+            if ( ! empty( $selected_location ) ) {
+                $food_list_args['wpc_location'] = $selected_location;
+            }
+
             $products = Wpc_Utilities::product_query( $food_list_args );
-            include \Wpcafe::plugin_dir() . "widgets/wpc-menus-list/style/{$style}.php";
+            include wpcafe()->plugin_directory . "/widgets/wpc-menus-list/style/{$style}.php";
             ?>
         </div>
     </div>

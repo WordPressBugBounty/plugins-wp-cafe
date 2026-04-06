@@ -1,0 +1,99 @@
+/**
+ * Discard Reservation Modal Styles
+ *
+ * @package WpCafe
+ * @since 1.0.0
+ */
+
+/* Discard Reservation Button - Text Link Style */
+#wpc-discard-reservation {
+    background: none;
+    border: none;
+    padding: 0;
+    cursor: pointer;
+    font-weight: normal;
+    display: inline;
+    margin: 0;
+    box-shadow: none;
+    font-size: 16px;
+}
+
+#wpc-discard-reservation:hover {
+    text-decoration: underline;
+}
+
+#wpc-discard-reservation:focus {
+    outline: none;
+}
+
+/* Modal Overlay */
+.wpc-discard-modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 9999;
+}
+
+/* Modal Content */
+.wpc-discard-modal {
+    background: white;
+    padding: 30px;
+    border-radius: 8px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    max-width: 400px;
+    text-align: center;
+}
+
+/* Modal Title */
+.wpc-discard-modal-title {
+    margin: 0 0 20px 0;
+    color: #333;
+    font-size: 18px;
+}
+
+/* Button Container */
+.wpc-discard-modal-buttons {
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+}
+
+/* Cancel Button */
+.wpc-discard-modal-cancel {
+    padding: 10px 20px;
+    border: 1px solid #ccc;
+    background: #f5f5f5;
+    border-radius: 4px;
+    cursor: pointer;
+    color: #333;
+    font-size: 14px;
+    transition: background 0.2s ease;
+}
+
+.wpc-discard-modal-cancel:hover {
+    background: #f5f5f5ee;
+    color: #333;
+    border: 1px solid #ccc;
+}
+
+/* Discard Button */
+.wpc-discard-modal-discard {
+    padding: 10px 20px;
+    border: none;
+    background: #dc3545;
+    color: white;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 14px;
+    transition: background 0.2s ease;
+}
+
+.wpc-discard-modal-discard:hover {
+    opacity: 0.9;
+}

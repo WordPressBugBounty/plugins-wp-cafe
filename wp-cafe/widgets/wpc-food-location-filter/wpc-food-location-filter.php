@@ -23,7 +23,7 @@ class Wpc_Food_Location_Filter extends Widget_Base {
      * @return string Widget title.
      */
     public function get_title() {
-        return esc_html__( 'Location Filter', 'wpcafe' );
+        return esc_html__( 'Location Filter', 'wp-cafe' );
     }
 
     /**
@@ -49,26 +49,26 @@ class Wpc_Food_Location_Filter extends Widget_Base {
         $this->start_controls_section(
             'section_tab',
             [
-                'label' => esc_html__( 'WPC Food Location', 'wpcafe' ),
+                'label' => esc_html__( 'WPC Food Location', 'wp-cafe' ),
             ]
         );
 
         $this->add_responsive_control(
             'location_alignment',
             [
-                'label' => esc_html__( 'Alignment', 'wpcafe' ),
+                'label' => esc_html__( 'Alignment', 'wp-cafe' ),
                 'type' => \Elementor\Controls_Manager::CHOOSE,
                 'options' => [
                     'left' => [
-                        'title' => esc_html__( 'Left', 'wpcafe' ),
+                        'title' => esc_html__( 'Left', 'wp-cafe' ),
                         'icon' => 'eicon-text-align-left',
                     ],
                     'center' => [
-                        'title' => esc_html__( 'Center', 'wpcafe' ),
+                        'title' => esc_html__( 'Center', 'wp-cafe' ),
                         'icon' => 'eicon-text-align-center',
                     ],
                     'right' => [
-                        'title' => esc_html__( 'Right', 'wpcafe' ),
+                        'title' => esc_html__( 'Right', 'wp-cafe' ),
                         'icon' => 'eicon-text-align-right',
                     ],
                 ],
@@ -84,14 +84,14 @@ class Wpc_Food_Location_Filter extends Widget_Base {
         $this->start_controls_section(
             'wpc_advance_style',
             [
-                'label' => esc_html__( 'Advance Style', 'wpcafe' ),
+                'label' => esc_html__( 'Advance Style', 'wp-cafe' ),
                 'tab'   => \Elementor\Controls_Manager::TAB_STYLE,
             ]
         );
         $this->add_responsive_control(
             'wpc_box_padding',
             [
-                'label'      => esc_html__( 'Padding', 'wpcafe' ),
+                'label'      => esc_html__( 'Padding', 'wp-cafe' ),
                 'type'       => Controls_Manager::DIMENSIONS,
                 'size_units' => ['px', '%', 'em'],
                 'selectors'  => [

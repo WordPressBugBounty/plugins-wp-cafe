@@ -1,14 +1,16 @@
-<?php 
-     $settings       = $this->settings_obj;
-     do_action('wpc_before_minicart');
+<?php
+if ( ! defined( 'ABSPATH' ) ) exit;
 
-if ( !empty($settings['minicart_style']) && $settings['minicart_style'] === 'style-1' ) { 
+    $settings       = wpc_get_option();
+    do_action('wpc_before_minicart');
+
+if ( ! empty( $settings['minicart_style'] ) && $settings['minicart_style'] === 'style-1' ) { 
     // style 1
     ?>
     <div class="wpc_cart_block wpc-minicart-wrapper style1 wpc-cart_main_block">
 
     <a href="#" class="wpc_cart_icon">
-        <div class="wpc-cart-message"><?php echo esc_html__('Product has been added', 'wpcafe'); ?></div>
+        <div class="wpc-cart-message"><?php echo esc_html__('Product has been added', 'wp-cafe'); ?></div>
 
         <i class="<?php echo esc_attr($wpc_cart_icon); ?>"></i>
         <sup class="basket-item-count" style="display: inline-block;">
@@ -18,9 +20,9 @@ if ( !empty($settings['minicart_style']) && $settings['minicart_style'] === 'sty
         <div class="wpc-menu-mini-cart wpc_background_color">
                 <div class="widget_shopping_cart_content"> 
                      <?php
-                        if(file_exists(\Wpcafe::core_dir().'modules/mini-cart/views/mini-cart-template.php')){
-                            include_once \Wpcafe::core_dir().'modules/mini-cart/views/mini-cart-template.php';
-                        }
+                        
+                        include_once wpcafe()->template_directory . '/mini-cart/mini-cart-template.php';
+                        
                     ?>
                 </div>
                 
@@ -32,7 +34,7 @@ if ( !empty($settings['minicart_style']) && $settings['minicart_style'] === 'sty
     ?>
     <div class="wpc-minicart-wrapper style2 wpc-cart_main_block">
         <a href="#" class="wpc_cart_icon">
-            <div class="wpc-cart-message"><?php echo esc_html__('Product has been added', 'wpcafe'); ?></div>
+            <div class="wpc-cart-message"><?php echo esc_html__('Product has been added', 'wp-cafe'); ?></div>
 
             <i class="<?php echo esc_attr($wpc_cart_icon); ?>"></i>
             <sup class="basket-item-count" style="display: inline-block;">
@@ -46,10 +48,10 @@ if ( !empty($settings['minicart_style']) && $settings['minicart_style'] === 'sty
                         <span class="cart-items-count count wpc-mini-cart-count"></span>
                         <?php 
                             $cart_count = count(WC()->cart->get_cart());
-                            echo esc_html__($cart_count > 1 ? ' items' : ' item', 'wpcafe'); 
+                            echo esc_html( _n( 'item', 'items', $cart_count, 'wp-cafe' ) ); 
                         ?>
                     </span>
-                    <?php echo esc_html__('in cart', 'wpcafe'); ?>
+                    <?php echo esc_html__('in cart', 'wp-cafe'); ?>
                 </div>
                 <button type="button" class="minicart-close wpc-btn-border wpc-btn">
                     <svg width="26" height="26" viewBox="0 0 26 26" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -63,8 +65,8 @@ if ( !empty($settings['minicart_style']) && $settings['minicart_style'] === 'sty
                 <div class="widget_shopping_cart_content">
                      <?php
                         
-                        if(file_exists(\Wpcafe::core_dir().'modules/mini-cart/views/mini-cart-template.php')){
-                            include_once \Wpcafe::core_dir().'modules/mini-cart/views/mini-cart-template.php';
+                        if(file_exists(wpcafe()->template_directory . '/mini-cart/mini-cart-template.php')){
+                            include_once wpcafe()->template_directory . '/mini-cart/mini-cart-template.php';
                         }
                         
                     ?>

@@ -1,202 +1,91 @@
 <?php
-
-/**
- *  @package wpcafe
- */
-
 /**
  * Plugin Name:        WP Cafe
  * Plugin URI:         https://product.themewinter.com/wpcafe
  * Description:        WordPress Restaurant solution plugin to launch Restaurant Websites.
- * Version:            2.2.33
+ * Version:            3.0.8
  * Author:             Themewinter
  * Author URI:         http://themewinter.com/
  * License:            GPL-2.0+
  * License URI:        http://www.gnu.org/licenses/gpl-2.0.txt
- * Text Domain:        wpcafe
+ * Text Domain:        wp-cafe
  * Domain Path:       /languages
+ * Requires at least: 6.2
+ * Requires PHP:      7.4
  */
 
 defined( 'ABSPATH' ) || exit;
 
-final class Wpcafe {
+use WpCafe\Init;
+use WpCafe\Container\Container;
+use WpCafe\Providers\Global_Service_Provider;
+use WpCafe\Compatibility_Handler;
 
-	/**
-	 * Plugin Version
-	 *
-	 * @since 1.3.9
-	 *
-	 * @var string The plugin version.
-	 */
-	static function version() {
-		return '2.2.33';
-	}
+require_once __DIR__ . '/vendor/autoload.php';
 
-	/**
-	 * Instance of self
-	 *
-	 * @since 1.3.9
-	 *
-	 * @var Wpcafe
-	 */
-	private static $instance = null;
 
-	/**
-	 * Initializes the Wpcafe() class
-	 *
-	 * Checks for an existing Wpcafe() instance
-	 * and if it doesn't find one, creates it.
-	 */
-	public static function init() {
+// Define constant for the Plugin file.
+define( 'WPCAFE_PLUGIN_NAME', 'WPCafe' );
+defined( 'WPCAFE_FILE' ) || define( 'WPCAFE_FILE', __FILE__ );
+defined( 'WPCAFE_DIR' ) || define( 'WPCAFE_DIR', __DIR__ );
+defined( 'WPCAFE_VERSION' ) || define( 'WPCAFE_VERSION', '3.0.8' );
 
-			if ( self::$instance === null ) {
-					self::$instance = new self();
-			}
+add_action( 'init', [ Compatibility_Handler::class, 'init' ] );
+add_action( 'init', [ Compatibility_Handler::class, 'register_hooks' ] );
 
-			return self::$instance;
-	}
+global $wpcafe_container;
 
-	/**
-	 * Instance of Wpcafe
-	 */
-	private function __construct() {
-		// Load translation
-		add_action( 'init', [$this, 'i18n'] );
+$wpcafe_container = new Container();
 
-				// Instantiate Base Class after plugins loaded
-				add_action( 'plugins_loaded', [$this, 'initialize_modules'], 999 );
+$wpcafe_container->add_service_provider( 'global', Global_Service_Provider::class );
 
-				define( 'WPCAFE_DEFAULT_DATE_FORMAT', 'Y-m-d' );
-				define( 'WPCAFE_DEFAULT_TIME_FORMAT', 'H:i:s' );
-	}
+/**
+ * wpcafe container
+ *
+ * @return  Container
+ */
+function wpcafe_container() {
+    global $wpcafe_container;
 
-	/**
-	 * Load Textdomain
-	 *
-	 * Load plugin localization files.
-	 * Fired by `init` action hook.
-	 *
-	 */
-	public function i18n() {
-		load_plugin_textdomain( 'wpcafe', false, dirname( self::plugins_basename( ) ) . '/languages/' );
-	}
-
-	/**
-	 * Initialize Modules
-	 *
-	 * @since 1.3.9
-	 */
-	public function initialize_modules() {
-
-		do_action( 'wpcafe/before_load' );
-
-		require_once self::plugin_dir() . 'bootstrap.php';
-		require_once self::plugin_dir() . 'utils/notice/notice.php';
-		require_once self::plugin_dir() . 'utils/banner/banner.php';
-		require_once self::plugin_dir() . 'utils/pro-awareness/pro-awareness.php';
-
-		\Oxaim\Libs\Notice::init();
-		\Wpmet\Libs\Pro_Awareness::init();
-
-		// action plugin instance class
-		\WpCafe\Bootstrap::instance()->init();
-
-		do_action( 'wpcafe/after_load' );
-	}
-
-	/**
-	 * Assets Directory Url
-	 *
-	 * @return void
-	 */
-	public static function assets_url() {
-		return trailingslashit( self::plugin_url() . 'assets' );
-	}
-
-	/**
-	 * Assets Folder Directory Path
-	 *
-	 * @since 1.3.9
-	 *
-	 * @return void
-	 */
-	public static function assets_dir() {
-		return trailingslashit( self::plugin_dir() . 'assets' );
-	}
-
-	/**
-	 * Plugin Core File Directory Url
-	 *
-	 * @since 1.3.9
-	 *
-	 * @return void
-	 */
-	public static function core_url() {
-		return trailingslashit( self::plugin_url() . 'core' );
-	}
-
-	/**
-	 * Plugin Core File Directory Path
-	 *
-	 * @since 1.3.9
-	 *
-	 * @return void
-	 */
-	public static function core_dir() {
-		return trailingslashit( self::plugin_dir() . 'core' );
-	}
-
-	/**
-	 * Plugin Url
-	 *
-	 * @since 1.3.9
-	 *
-	 * @return void
-	 */
-	public static function plugin_url() {
-		return trailingslashit( plugin_dir_url( self::plugin_file() ) );
-	}
-
-	/**
-  * Plugin Directory Path
-  *
-  * @since 1.3.9
-  *
-  * @return void
-  */
-	public static function plugin_dir() {
-		return trailingslashit( plugin_dir_path( self::plugin_file() ) );
-	}
-
-	/**
-	 * Plugins Basename
-	 *
-	 * @since 1.3.9
-	 */
-	public static function plugins_basename(){
-		return plugin_basename( self::plugin_file() );
-	}
-
-	/**
-	 * Plugin File
-	 *
-	 * @since 1.3.9
-	 *
-	 * @return void
-	 */
-	public static function plugin_file(){
-		return __FILE__;
-	}
+    return $wpcafe_container;
 }
 
 /**
- * Load Wpcafe Addon when all plugins are loaded
+ * Main plugin initialization
  *
  * @return Wpcafe
  */
 function wpcafe() {
-  return Wpcafe::init();
+    return Init::instance();
 }
 
-// Let's Go...
+// Kick-off the plugin.
 wpcafe();
+
+/**
+ * Allow SVG uploads by adding the SVG mime type.
+ * Note: SVGs can contain scripts. Consider using a sanitizer if accepting user uploads.
+ */
+if ( ! function_exists( 'wpcafe_allow_svg_uploads' ) ) {
+    function wpcafe_allow_svg_uploads( $mimes ) {
+        $mimes['svg'] = 'image/svg+xml';
+        return $mimes;
+    }
+}
+add_filter( 'upload_mimes', 'wpcafe_allow_svg_uploads' );
+
+/**
+ * Ensure WordPress correctly recognizes SVG file type and mime on upload.
+ * This does NOT sanitize SVG content; it only fixes detection.
+ */
+if ( ! function_exists( 'wpcafe_sanitize_svg' ) ) {
+    function wpcafe_sanitize_svg( $data, $file, $filename, $mimes ) {
+        $ext = pathinfo( $filename, PATHINFO_EXTENSION );
+        if ( strtolower( $ext ) === 'svg' ) {
+            $data['ext']  = 'svg';
+            $data['type'] = 'image/svg+xml';
+        }
+        return $data;
+    }
+}
+add_filter( 'wp_check_filetype_and_ext', 'wpcafe_sanitize_svg', 10, 4 );

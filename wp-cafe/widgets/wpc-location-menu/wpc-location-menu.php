@@ -27,7 +27,7 @@ class Wpc_Location_Menu extends Widget_Base
      */
 	public function get_title()
     {
-        return esc_html__('WPC Food Location Filter', 'wpcafe');
+        return esc_html__('WPC Food Location Filter', 'wp-cafe');
     }
 
 	/**
@@ -54,18 +54,18 @@ class Wpc_Location_Menu extends Widget_Base
         $this->start_controls_section(
             'section_tab',
             [
-                'label' => esc_html__('WPC Food Location Filter', 'wpcafe'),
+                'label' => esc_html__('WPC Food Location Filter', 'wp-cafe'),
             ]
         );
 
         $this->add_control(
             'food_menu_style',
             [
-                'label' => esc_html__('Menu Style', 'wpcafe'),
+                'label' => esc_html__('Menu Style', 'wp-cafe'),
                 'type' => Controls_Manager::SELECT,
                 'default' => 'style-1',
                 'options' => [
-                    'style-1'  => esc_html__('Menu Style 1', 'wpcafe'),
+                    'style-1'  => esc_html__('Menu Style 1', 'wp-cafe'),
                 ],
             ]
         );
@@ -73,7 +73,7 @@ class Wpc_Location_Menu extends Widget_Base
         $this->add_control(
             'wpc_menu_cat',
             [
-                'label' => esc_html__('Menu Category', 'wpcafe'),
+                'label' => esc_html__('Menu Category', 'wp-cafe'),
                 'type' => Controls_Manager::SELECT2,
                 'options' => $this->get_menu_category(),
                 'multiple' => true,
@@ -82,7 +82,7 @@ class Wpc_Location_Menu extends Widget_Base
         $this->add_control(
             'wpc_menu_count',
             [
-                'label'         => esc_html__('Menu count', 'wpcafe'),
+                'label'         => esc_html__('Menu count', 'wp-cafe'),
                 'type'          => Controls_Manager::NUMBER,
                 'default'       => '6',
             ]
@@ -90,12 +90,12 @@ class Wpc_Location_Menu extends Widget_Base
         $this->add_control(
             'wpc_menu_order',
             [
-                'label' => esc_html__('Menu Order', 'wpcafe'),
+                'label' => esc_html__('Menu Order', 'wp-cafe'),
                 'type' => \Elementor\Controls_Manager::SELECT,
                 'default' => 'DESC',
                 'options' => [
-                    'ASC'  => esc_html__('ASC', 'wpcafe'),
-                    'DESC' => esc_html__('DESC', 'wpcafe'),
+                    'ASC'  => esc_html__('ASC', 'wp-cafe'),
+                    'DESC' => esc_html__('DESC', 'wp-cafe'),
                 ],
             ]
         );
@@ -104,10 +104,10 @@ class Wpc_Location_Menu extends Widget_Base
         $this->add_control(
             'show_thumbnail',
             [
-                'label' => esc_html__('Show Thumbnail', 'wpcafe'),
+                'label' => esc_html__('Show Thumbnail', 'wp-cafe'),
                 'type' => \Elementor\Controls_Manager::SWITCHER,
-                'label_on' => esc_html__('Show', 'wpcafe'),
-                'label_off' => esc_html__('Hide', 'wpcafe'),
+                'label_on' => esc_html__('Show', 'wp-cafe'),
+                'label_off' => esc_html__('Hide', 'wp-cafe'),
                 'return_value' => 'yes',
                 'default' => 'yes',
             ]
@@ -116,10 +116,10 @@ class Wpc_Location_Menu extends Widget_Base
         $this->add_control(
             'show_item_status',
             [
-                'label' => esc_html__('Show Item Status', 'wpcafe'),
+                'label' => esc_html__('Show Item Status', 'wp-cafe'),
                 'type' => \Elementor\Controls_Manager::SWITCHER,
-                'label_on' => esc_html__('Show', 'wpcafe'),
-                'label_off' => esc_html__('Hide', 'wpcafe'),
+                'label_on' => esc_html__('Show', 'wp-cafe'),
+                'label_off' => esc_html__('Hide', 'wp-cafe'),
                 'return_value' => 'yes',
                 'default' => 'yes',
             ]
@@ -127,10 +127,10 @@ class Wpc_Location_Menu extends Widget_Base
         $this->add_control(
             'wpc_show_desc',
             [
-                'label' => esc_html__('Show Description', 'wpcafe'),
+                'label' => esc_html__('Show Description', 'wp-cafe'),
                 'type' => \Elementor\Controls_Manager::SWITCHER,
-                'label_on' => esc_html__('Show', 'wpcafe'),
-                'label_off' => esc_html__('Hide', 'wpcafe'),
+                'label_on' => esc_html__('Show', 'wp-cafe'),
+                'label_off' => esc_html__('Hide', 'wp-cafe'),
                 'return_value' => 'yes',
                 'default' => 'yes',
             ]
@@ -138,7 +138,7 @@ class Wpc_Location_Menu extends Widget_Base
         $this->add_control(
             'wpc_desc_limit',
             [
-                'label'         => esc_html__('Description Limit', 'wpcafe'),
+                'label'         => esc_html__('Description Limit', 'wp-cafe'),
                 'type'          => Controls_Manager::NUMBER,
                 'default'       => '15',
                 'condition' => ['wpc_show_desc' => 'yes']
@@ -147,10 +147,10 @@ class Wpc_Location_Menu extends Widget_Base
         $this->add_control(
             'title_link_show',
             [
-                'label' => esc_html__('Use Title Link?', 'wpcafe'),
+                'label' => esc_html__('Use Title Link?', 'wp-cafe'),
                 'type' => \Elementor\Controls_Manager::SWITCHER,
-                'label_on' => esc_html__('Show', 'wpcafe'),
-                'label_off' => esc_html__('Hide', 'wpcafe'),
+                'label_on' => esc_html__('Show', 'wp-cafe'),
+                'label_off' => esc_html__('Hide', 'wp-cafe'),
                 'return_value' => 'yes',
                 'default' => 'yes',
             ]
@@ -159,10 +159,10 @@ class Wpc_Location_Menu extends Widget_Base
         $this->add_control(
             'wpc_delivery_time_show',
             [
-                'label' => esc_html__('Show Preparing and Delivery Time', 'wpcafe'),
+                'label' => esc_html__('Show Preparing and Delivery Time', 'wp-cafe'),
                 'type' => \Elementor\Controls_Manager::SWITCHER,
-                'label_on' => esc_html__('Show', 'wpcafe'),
-                'label_off' => esc_html__('Hide', 'wpcafe'),
+                'label_on' => esc_html__('Show', 'wp-cafe'),
+                'label_off' => esc_html__('Hide', 'wp-cafe'),
                 'return_value' => 'yes',
                 'default' => 'no',
             ]
@@ -170,10 +170,10 @@ class Wpc_Location_Menu extends Widget_Base
         $this->add_control(
             'wpc_cart_button_show',
             [
-                'label' => esc_html__('Show Cart Button', 'wpcafe'),
+                'label' => esc_html__('Show Cart Button', 'wp-cafe'),
                 'type' => \Elementor\Controls_Manager::SWITCHER,
-                'label_on' => esc_html__('Show', 'wpcafe'),
-                'label_off' => esc_html__('Hide', 'wpcafe'),
+                'label_on' => esc_html__('Show', 'wp-cafe'),
+                'label_off' => esc_html__('Hide', 'wp-cafe'),
                 'return_value' => 'yes',
                 'default' => 'yes',
             ]
@@ -182,14 +182,14 @@ class Wpc_Location_Menu extends Widget_Base
         $this->add_control(
             'wpc_price_show',
             [
-                'label'   => esc_html__( 'Show Price', 'wpcafe' ),
+                'label'   => esc_html__( 'Show Price', 'wp-cafe' ),
                 'type'    => Controls_Manager::SELECT,
                 'default' => 'yes',
                 'options' => [
-                    'yes'  => esc_html__( 'Show', 'wpcafe' ),
-                    'no'  => esc_html__( 'Hide', 'wpcafe' ),
-                    'min'   => esc_html__( 'Min Price (For Variation)', 'wpcafe' ),
-                    'max'   => esc_html__( 'Max Price (For Variation)', 'wpcafe' ),
+                    'yes'  => esc_html__( 'Show', 'wp-cafe' ),
+                    'no'  => esc_html__( 'Hide', 'wp-cafe' ),
+                    'min'   => esc_html__( 'Min Price (For Variation)', 'wp-cafe' ),
+                    'max'   => esc_html__( 'Max Price (For Variation)', 'wp-cafe' ),
                 ],
             ]
         );
@@ -200,7 +200,7 @@ class Wpc_Location_Menu extends Widget_Base
         $this->start_controls_section(
             'item_pro_thumbanil_style',
             [
-                'label' => esc_html__('Thumbnail Style', 'wpcafe'),
+                'label' => esc_html__('Thumbnail Style', 'wp-cafe'),
                 'tab' => \Elementor\Controls_Manager::TAB_STYLE,
 
             ]
@@ -208,7 +208,7 @@ class Wpc_Location_Menu extends Widget_Base
         $this->add_responsive_control(
             'thumbnail_width',
             [
-                'label' => esc_html__('Width', 'wpcafe'),
+                'label' => esc_html__('Width', 'wp-cafe'),
                 'type' => Controls_Manager::SLIDER,
                 'size_units' => ['px', '%'],
                 'range' => [
@@ -230,7 +230,7 @@ class Wpc_Location_Menu extends Widget_Base
         $this->add_responsive_control(
             'thumbnail_height',
             [
-                'label' => esc_html__('Height', 'wpcafe'),
+                'label' => esc_html__('Height', 'wp-cafe'),
                 'type' => Controls_Manager::SLIDER,
                 'size_units' => ['px', '%'],
                 'range' => [
@@ -253,7 +253,7 @@ class Wpc_Location_Menu extends Widget_Base
         $this->add_responsive_control(
             'wpc_pro_thum_border_radius',
             [
-                'label' => esc_html__('Border Radius', 'wpcafe'),
+                'label' => esc_html__('Border Radius', 'wp-cafe'),
                 'type' => Controls_Manager::DIMENSIONS,
                 'size_units' => ['px', '%', 'em'],
                 'selectors' => [
@@ -268,7 +268,7 @@ class Wpc_Location_Menu extends Widget_Base
         $this->start_controls_section(
             'item_pro_cart_button_style',
             [
-                'label' => esc_html__('Cart Button Style', 'wpcafe'),
+                'label' => esc_html__('Cart Button Style', 'wp-cafe'),
                 'tab' => \Elementor\Controls_Manager::TAB_STYLE,
                 'condition' => ['wpc_cart_button_show' => 'yes']
             ]
@@ -276,7 +276,7 @@ class Wpc_Location_Menu extends Widget_Base
         $this->add_control(
             'wpc_pro_cart_color',
             [
-                'label'         => esc_html__('Cart Button Color', 'wpcafe'),
+                'label'         => esc_html__('Cart Button Color', 'wp-cafe'),
                 'type'         => Controls_Manager::COLOR,
                 'selectors'     => [
                     '{{WRAPPER}} .wpc-food-menu-item .wpc-add-to-cart a' => 'color: {{VALUE}};',
@@ -286,7 +286,7 @@ class Wpc_Location_Menu extends Widget_Base
         $this->add_control(
             'wpc_pro_cart_button_bg_color',
             [
-                'label'         => esc_html__('Cart Button BG Color', 'wpcafe'),
+                'label'         => esc_html__('Cart Button BG Color', 'wp-cafe'),
                 'type'         => Controls_Manager::COLOR,
                 'selectors'     => [
                     '{{WRAPPER}} .wpc-food-menu-item .wpc-add-to-cart a' => 'background-color: {{VALUE}};',
@@ -297,14 +297,14 @@ class Wpc_Location_Menu extends Widget_Base
             \Elementor\Group_Control_Typography::get_type(),
             [
                 'name'         => 'wpc_pro_cart_button_typo',
-                'label'         => esc_html__('Typography', 'wpcafe'),
+                'label'         => esc_html__('Typography', 'wp-cafe'),
                 'selector'     => '{{WRAPPER}} .wpc-food-menu-item .wpc-add-to-cart a',
             ]
         );
         $this->add_responsive_control(
             'wpc_pro_cart_btn_width',
             [
-                'label' => esc_html__('Width', 'wpcafe'),
+                'label' => esc_html__('Width', 'wp-cafe'),
                 'type' => Controls_Manager::SLIDER,
                 'size_units' => ['px', '%'],
                 'range' => [
@@ -330,7 +330,7 @@ class Wpc_Location_Menu extends Widget_Base
         $this->add_responsive_control(
             'wpc_pro_cart_btn_height',
             [
-                'label' => esc_html__('Height', 'wpcafe'),
+                'label' => esc_html__('Height', 'wp-cafe'),
                 'type' => Controls_Manager::SLIDER,
                 'size_units' => ['px', '%'],
                 'range' => [
@@ -356,7 +356,7 @@ class Wpc_Location_Menu extends Widget_Base
         $this->add_responsive_control(
             'wpc_pro_cart_btn_paddding',
             [
-                'label' => esc_html__('Padding', 'wpcafe'),
+                'label' => esc_html__('Padding', 'wp-cafe'),
                 'type' => Controls_Manager::DIMENSIONS,
                 'size_units' => ['px', '%', 'em'],
                 'selectors' => [
@@ -367,7 +367,7 @@ class Wpc_Location_Menu extends Widget_Base
         $this->add_responsive_control(
             'wpc_pro_cart_btn_border_raidus',
             [
-                'label' => esc_html__('Border Radius', 'wpcafe'),
+                'label' => esc_html__('Border Radius', 'wp-cafe'),
                 'type' => Controls_Manager::DIMENSIONS,
                 'size_units' => ['px', '%', 'em'],
                 'selectors' => [
@@ -379,7 +379,7 @@ class Wpc_Location_Menu extends Widget_Base
         $this->add_responsive_control(
             'wpc_pro_cart_btn_position_rtl',
             [
-                'label' => esc_html__('Button Right To Left', 'wpcafe'),
+                'label' => esc_html__('Button Right To Left', 'wp-cafe'),
                 'type' => Controls_Manager::SLIDER,
                 'size_units' => ['px', '%'],
                 'range' => [
@@ -404,7 +404,7 @@ class Wpc_Location_Menu extends Widget_Base
         $this->add_responsive_control(
             'wpc_pro_cart_btn_position_ttb',
             [
-                'label' => esc_html__('Button Bottom To Top', 'wpcafe'),
+                'label' => esc_html__('Button Bottom To Top', 'wp-cafe'),
                 'type' => Controls_Manager::SLIDER,
                 'size_units' => ['px', '%'],
                 'range' => [
@@ -434,7 +434,7 @@ class Wpc_Location_Menu extends Widget_Base
         $this->start_controls_section(
             'item_status_style',
             [
-                'label' => esc_html__('Item Status Style', 'wpcafe'),
+                'label' => esc_html__('Item Status Style', 'wp-cafe'),
                 'tab' => \Elementor\Controls_Manager::TAB_STYLE,
                 'condition' => ['show_item_status' => 'yes']
             ]
@@ -442,7 +442,7 @@ class Wpc_Location_Menu extends Widget_Base
         $this->add_control(
             'wpc_menu_item_status_color',
             [
-                'label'         => esc_html__('Item Status Color', 'wpcafe'),
+                'label'         => esc_html__('Item Status Color', 'wp-cafe'),
                 'type'         => Controls_Manager::COLOR,
                 'selectors'     => [
                     '{{WRAPPER}} .wpc-menu-tag li' => 'color: {{VALUE}};',
@@ -452,7 +452,7 @@ class Wpc_Location_Menu extends Widget_Base
         $this->add_control(
             'wpc_menu_item_status_bg_color',
             [
-                'label'         => esc_html__('Item Status BG Color', 'wpcafe'),
+                'label'         => esc_html__('Item Status BG Color', 'wp-cafe'),
                 'type'         => Controls_Manager::COLOR,
                 'selectors'     => [
                     '{{WRAPPER}} .wpc-menu-tag li' => 'background-color: {{VALUE}};',
@@ -463,14 +463,14 @@ class Wpc_Location_Menu extends Widget_Base
             \Elementor\Group_Control_Typography::get_type(),
             [
                 'name'         => 'wpc_menu_status_typo',
-                'label'         => esc_html__('Typography', 'wpcafe'),
+                'label'         => esc_html__('Typography', 'wp-cafe'),
                 'selector'     => '{{WRAPPER}} .wpc-menu-tag li',
             ]
         );
         $this->add_responsive_control(
             'wpc_menu_item_status_paddding',
             [
-                'label' => esc_html__('Padding', 'wpcafe'),
+                'label' => esc_html__('Padding', 'wp-cafe'),
                 'type' => Controls_Manager::DIMENSIONS,
                 'size_units' => ['px', '%', 'em'],
                 'selectors' => [
@@ -481,7 +481,7 @@ class Wpc_Location_Menu extends Widget_Base
         $this->add_responsive_control(
             'wpc_item_status_border_radius',
             [
-                'label' => esc_html__('Border Radius', 'wpcafe'),
+                'label' => esc_html__('Border Radius', 'wp-cafe'),
                 'type' => Controls_Manager::DIMENSIONS,
                 'size_units' => ['px', '%', 'em'],
                 'selectors' => [
@@ -498,14 +498,14 @@ class Wpc_Location_Menu extends Widget_Base
         $this->start_controls_section(
             'title_style',
             [
-                'label' => esc_html__('Title Style', 'wpcafe'),
+                'label' => esc_html__('Title Style', 'wp-cafe'),
                 'tab' => \Elementor\Controls_Manager::TAB_STYLE,
             ]
         );
         $this->add_control(
             'wpc_menu_title_color',
             [
-                'label'         => esc_html__('Title Color', 'wpcafe'),
+                'label'         => esc_html__('Title Color', 'wp-cafe'),
                 'type'         => Controls_Manager::COLOR,
                 'selectors'     => [
                     '{{WRAPPER}} .wpc-post-title a' => 'color: {{VALUE}};',
@@ -515,7 +515,7 @@ class Wpc_Location_Menu extends Widget_Base
         $this->add_control(
             'wpc_menu_title_hover_color',
             [
-                'label'         => esc_html__('Title Hover Color', 'wpcafe'),
+                'label'         => esc_html__('Title Hover Color', 'wp-cafe'),
                 'type'         => Controls_Manager::COLOR,
                 'selectors'     => [
                     '{{WRAPPER}} .wpc-post-title a:hover' => 'color: {{VALUE}};',
@@ -526,7 +526,7 @@ class Wpc_Location_Menu extends Widget_Base
         $this->add_control(
             'wpc_menu_title_border_color',
             [
-                'label'         => esc_html__('Title Border Color', 'wpcafe'),
+                'label'         => esc_html__('Title Border Color', 'wp-cafe'),
                 'type'         => Controls_Manager::COLOR,
                 'condition' => ['food_menu_style' => 'style-1'],
                 'selectors'     => [
@@ -539,14 +539,14 @@ class Wpc_Location_Menu extends Widget_Base
             \Elementor\Group_Control_Typography::get_type(),
             [
                 'name'         => 'wpc_menu_title',
-                'label'         => esc_html__('Title Typography', 'wpcafe'),
+                'label'         => esc_html__('Title Typography', 'wp-cafe'),
                 'selector'     => '{{WRAPPER}} .wpc-post-title',
             ]
         );
         $this->add_responsive_control(
             'wpc_title_margin',
             [
-                'label' => esc_html__('Title Margin', 'wpcafe'),
+                'label' => esc_html__('Title Margin', 'wp-cafe'),
                 'type' => Controls_Manager::DIMENSIONS,
                 'size_units' => ['px', '%', 'em'],
                 'selectors' => [
@@ -561,14 +561,14 @@ class Wpc_Location_Menu extends Widget_Base
         $this->start_controls_section(
             'price_style',
             [
-                'label' => esc_html__('Price Style', 'wpcafe'),
+                'label' => esc_html__('Price Style', 'wp-cafe'),
                 'tab' => \Elementor\Controls_Manager::TAB_STYLE,
             ]
         );
         $this->add_control(
             'wpc_menu_price_color',
             [
-                'label'         => esc_html__('Price Color', 'wpcafe'),
+                'label'         => esc_html__('Price Color', 'wp-cafe'),
                 'type'         => Controls_Manager::COLOR,
                 'selectors'     => [
                     '{{WRAPPER}} .wpc-menu-currency' => 'color: {{VALUE}};',
@@ -578,7 +578,7 @@ class Wpc_Location_Menu extends Widget_Base
         $this->add_control(
             'wpc_menu_price_bg_color',
             [
-                'label'         => esc_html__('Price background Color', 'wpcafe'),
+                'label'         => esc_html__('Price background Color', 'wp-cafe'),
                 'type'         => Controls_Manager::COLOR,
                 'condition' => ['food_menu_style' => 'style-3'],
                 'selectors'     => [
@@ -592,7 +592,7 @@ class Wpc_Location_Menu extends Widget_Base
             \Elementor\Group_Control_Typography::get_type(),
             [
                 'name'         => 'wpc_menu_price',
-                'label'         => esc_html__('Price Typography', 'wpcafe'),
+                'label'         => esc_html__('Price Typography', 'wp-cafe'),
                 'selector'     => '{{WRAPPER}} .wpc-menu-currency',
             ]
         );
@@ -603,7 +603,7 @@ class Wpc_Location_Menu extends Widget_Base
         $this->start_controls_section(
             'wpc_desc_style',
             [
-                'label' => esc_html__('Description Style', 'wpcafe'),
+                'label' => esc_html__('Description Style', 'wp-cafe'),
                 'tab' => \Elementor\Controls_Manager::TAB_STYLE,
                 'condition' => ['wpc_show_desc' => 'yes'],
             ]
@@ -611,7 +611,7 @@ class Wpc_Location_Menu extends Widget_Base
         $this->add_control(
             'wpc_menu_desc_color',
             [
-                'label'         => esc_html__('Description Color', 'wpcafe'),
+                'label'         => esc_html__('Description Color', 'wp-cafe'),
                 'type'         => Controls_Manager::COLOR,
                 'selectors'     => [
                     '{{WRAPPER}} .wpc-food-inner-content p' => 'color: {{VALUE}};',
@@ -624,7 +624,7 @@ class Wpc_Location_Menu extends Widget_Base
             \Elementor\Group_Control_Typography::get_type(),
             [
                 'name'         => 'wpc_menu_desc',
-                'label'         => esc_html__('Description Typography', 'wpcafe'),
+                'label'         => esc_html__('Description Typography', 'wp-cafe'),
                 'selector'     => '{{WRAPPER}} .wpc-food-inner-content p',
             ]
         );
@@ -632,7 +632,7 @@ class Wpc_Location_Menu extends Widget_Base
         $this->add_responsive_control(
             'wpc_desc_padding',
             [
-                'label' => esc_html__('Description Padding', 'wpcafe'),
+                'label' => esc_html__('Description Padding', 'wp-cafe'),
                 'type' => Controls_Manager::DIMENSIONS,
                 'size_units' => ['px', '%', 'em'],
                 'selectors' => [
@@ -643,7 +643,7 @@ class Wpc_Location_Menu extends Widget_Base
         $this->add_responsive_control(
             'wpc_desc_margin',
             [
-                'label' => esc_html__('Description Margin', 'wpcafe'),
+                'label' => esc_html__('Description Margin', 'wp-cafe'),
                 'type' => Controls_Manager::DIMENSIONS,
                 'size_units' => ['px', '%', 'em'],
                 'selectors' => [
@@ -657,26 +657,26 @@ class Wpc_Location_Menu extends Widget_Base
         $this->start_controls_section(
             'wpc_location_field_style',
             [
-                'label' => esc_html__('Location Field Style', 'wpcafe'),
+                'label' => esc_html__('Location Field Style', 'wp-cafe'),
                 'tab' => \Elementor\Controls_Manager::TAB_STYLE,
             ]
         );
         $this->add_responsive_control(
             'location_alignment',
             [
-                'label' => esc_html__( 'Alignment', 'wpcafe' ),
+                'label' => esc_html__( 'Alignment', 'wp-cafe' ),
                 'type' => \Elementor\Controls_Manager::CHOOSE,
                 'options' => [
                     'left' => [
-                        'title' => esc_html__( 'Left', 'wpcafe' ),
+                        'title' => esc_html__( 'Left', 'wp-cafe' ),
                         'icon' => 'fa fa-align-left',
                     ],
                     'center' => [
-                        'title' => esc_html__( 'Center', 'wpcafe' ),
+                        'title' => esc_html__( 'Center', 'wp-cafe' ),
                         'icon' => 'fa fa-align-center',
                     ],
                     'right' => [
-                        'title' => esc_html__( 'Right', 'wpcafe' ),
+                        'title' => esc_html__( 'Right', 'wp-cafe' ),
                         'icon' => 'fa fa-align-right',
                     ],
                 ],
@@ -692,14 +692,14 @@ class Wpc_Location_Menu extends Widget_Base
         $this->start_controls_section(
             'wpc_advance_style',
             [
-                'label' => esc_html__('Advance Style', 'wpcafe'),
+                'label' => esc_html__('Advance Style', 'wp-cafe'),
                 'tab' => \Elementor\Controls_Manager::TAB_STYLE,
             ]
         );
         $this->add_responsive_control(
             'wpc_box_margin',
             [
-                'label' => esc_html__('Margin', 'wpcafe'),
+                'label' => esc_html__('Margin', 'wp-cafe'),
                 'type' => Controls_Manager::DIMENSIONS,
                 'size_units' => ['px', '%', 'em'],
                 'selectors' => [
@@ -710,7 +710,7 @@ class Wpc_Location_Menu extends Widget_Base
         $this->add_responsive_control(
             'wpc_box_padding',
             [
-                'label' => esc_html__('Padding', 'wpcafe'),
+                'label' => esc_html__('Padding', 'wp-cafe'),
                 'type' => Controls_Manager::DIMENSIONS,
                 'size_units' => ['px', '%', 'em'],
                 'selectors' => [
@@ -724,7 +724,7 @@ class Wpc_Location_Menu extends Widget_Base
             \Elementor\Group_Control_Box_Shadow::get_type(),
             [
                 'name' => 'box_shadow',
-                'label' => esc_html__('Box Shadow', 'wpcafe'),
+                'label' => esc_html__('Box Shadow', 'wp-cafe'),
                 'selector' => '{{WRAPPER}} .wpc-food-menu-item',
             ]
         );
@@ -732,7 +732,7 @@ class Wpc_Location_Menu extends Widget_Base
             \Elementor\Group_Control_Border::get_type(),
             [
                 'name' => 'wpc_menu_item_border',
-                'label' => esc_html__('Border', 'wpcafe'),
+                'label' => esc_html__('Border', 'wp-cafe'),
                 'selector' => '{{WRAPPER}} .wpc-food-menu-item',
             ]
         );
@@ -799,7 +799,7 @@ class Wpc_Location_Menu extends Widget_Base
 
             <div class="location_menu" data-product_data ="<?php echo esc_attr( json_encode( $product_data  ));?>"
             data-id="<?php echo esc_attr( $unique_id );?>">
-                <?php include \WpCafe::plugin_dir() . "core/shortcodes/views/food-menu/location-select.php"; ?>
+                <?php include wpcafe()->plugin_directory . "/core/shortcodes/views/food-menu/location-select.php"; ?>
             </div>
         </div>
         <?php

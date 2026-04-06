@@ -19,14 +19,14 @@ class Wpc_Reservation_Report {
         add_action( "restrict_manage_posts", [$this, 'reservation_report_filter_status_dropdown'], 10, 2 );
 
         $filter_hooks = array(
-                array(
-                    'hook'      =>'manage_wpc_reservation_posts_columns',
-                    'callback'  =>'wpc_reservation_post_columns',
-                ),
                 // remove bulk action edit
                 array(
                     'hook'      =>'bulk_actions-edit-wpc_reservation',
                     'callback'  =>'custom_bulk_actions',
+                ),
+                array(
+                    'hook'      =>'manage_wpc_reservation_posts_custom_column',
+                    'callback'  =>'wpc_reservation_custom_column',
                 ),
                 // reservation report order by desc
                 array(
@@ -76,29 +76,6 @@ class Wpc_Reservation_Report {
     }
 
     /**
-     * Column name
-     */
-    public function wpc_reservation_post_columns( $columns ) {
-        unset( $columns['date'] );
-        unset( $columns['title'] );
-        $columns['id']                      =   esc_html__(  'Id', 'wpcafe' );
-        $settings = \WpCafe\Core\Base\Wpc_Settings_Field::instance()->get_settings_option();
-        if( isset($settings['show_branches']) && $settings['show_branches'] !==""){
-            $columns['wpc_branch']          =   esc_html__(  'Branch', 'wpcafe' );
-        }
-        $columns['wpc_name']                =   esc_html__(  'Name', 'wpcafe' );
-        $columns['wpc_email']               =   esc_html__(  'Email', 'wpcafe' );
-        $columns['wpc_phone']               =   esc_html__(  'Phone', 'wpcafe' );
-        $columns['wpc_guest_count']         =   esc_html__(  'Seat(s)', 'wpcafe' );
-        $columns['wpc_booking_date']        =   esc_html__(  'Date', 'wpcafe' );
-        $columns['wpc_reservation_state']   =   esc_html__(  'Status', 'wpcafe' );
-        $columns['wpc_reservation_invoice'] =   esc_html__(  'Invoice', 'wpcafe' );
-        $columns = apply_filters( 'wpcafe_pro/reservation/report_extra_field_title', $columns);
-
-        return $columns;
-    }
-
-    /**
      * Return row
      */
     public function wpc_reservation_custom_column( $column, $post_id ) {
@@ -115,12 +92,12 @@ class Wpc_Reservation_Report {
         case 'wpc_guest_count':
             $total_guest = esc_attr( get_post_meta( $post_id, 'wpc_total_guest', true ) );
             
-            if ( class_exists( 'Wpcafe_Pro' ) ) {
+            if ( function_exists( 'wpcafe_pro' ) ) {
                 if ( !empty( \WpCafe_Pro\Utils\Utilities::is_table_layout_enabled() ) ) {
-                    $booked_seats_info = \Wpcafe_Pro\Utils\Table_Utils::get_booked_seats_info( $post_id );
+                    $booked_seats_info = \WpCafe_Pro\Utils\Table_Utils::get_booked_seats_info( $post_id );
 
                     if ( !empty( $booked_seats_info ) && count( $booked_seats_info ) > 0 ) {
-                        $total_guest = esc_html__( 'Total Guest: ', 'wpcafe' ) . $total_guest . '<br>';
+                        $total_guest = esc_html__( 'Total Guest: ', 'wp-cafe' ) . $total_guest . '<br>';
                         $total_guest .= join( ';<br>', $booked_seats_info );
                     }
                 }
@@ -130,11 +107,11 @@ class Wpc_Reservation_Report {
         case 'wpc_reservation_state':
             $status_meta =  get_post_meta( $post_id, 'wpc_reservation_state', true );
             $reservation_states = array(
-                'pending'   => esc_html__( 'Pending', 'wpcafe' ),
-                'confirmed' => esc_html__( 'Confirmed', 'wpcafe' ),
-                'cancelled' => esc_html__( 'Cancelled', 'wpcafe' ),
-                'completed' => esc_html__( 'Completed', 'wpcafe' ),
-                'Processing' => esc_html__( 'Processing', 'wpcafe' )
+                'pending'   => esc_html__( 'Pending', 'wp-cafe' ),
+                'confirmed' => esc_html__( 'Confirmed', 'wp-cafe' ),
+                'cancelled' => esc_html__( 'Cancelled', 'wp-cafe' ),
+                'completed' => esc_html__( 'Completed', 'wp-cafe' ),
+                'Processing' => esc_html__( 'Processing', 'wp-cafe' )
             );
             echo esc_attr( ucfirst( $reservation_states[$status_meta] ) );
             break;
@@ -152,7 +129,6 @@ class Wpc_Reservation_Report {
             $wpc_to_time        = get_post_meta( $post_id, 'wpc_to_time', true );
             
             if ( $wpc_booking_date !=="" ) {
-                // $wpc_booking_date = Wpc_Utilities::get_formatted_date( $wpc_booking_date );
                 // convert the saved date to the wordpress admin date format
                 $wpc_booking_date = date_i18n( get_option( 'date_format' ), strtotime( $wpc_booking_date ) );
             }
@@ -193,14 +169,14 @@ class Wpc_Reservation_Report {
             $meta_values = wp_cache_get( $cache_key, 'wpcafe_meta_cache');
 
             if( !$meta_values ) {
-                $meta_values = $wpdb->get_col( $query ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery
+                $meta_values = $wpdb->get_col( $query ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.PreparedSQL.NotPrepared
                 wp_cache_set($cache_key, $meta_values, 'wpcafe_meta_cache', 60);
             }
 
             if (!empty($meta_values)) {
                 ?>
                     <select name="meta_filter">
-                        <option value=""><?php echo esc_html__('Filter By Status', 'wpcafe'); ?></option>
+                        <option value=""><?php echo esc_html__('Filter By Status', 'wp-cafe'); ?></option>
                         <?php
                         foreach ($meta_values as $value) {
                             $meta_filter = isset($_GET['meta_filter']) ? sanitize_text_field($_GET['meta_filter']) : '';

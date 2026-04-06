@@ -1,0 +1,42 @@
+{
+    "name": "themewinter/wp-cafe",
+    "description": "WordPress Restaurant solution plugin to launch Restaurant Websites.",
+    "type": "project",
+    "require": {
+        "themewinter/uninstaller_form": "dev-main",
+        "arraytics/tools-sdk": "dev-main",
+        "arraytics/plugin-notice-sdk": "dev-main",
+        "themewinter/email-notification-sdk": "dev-main"
+    },
+    "autoload": {
+        "classmap": [
+            "base/",
+            "core/",
+            "utils/",
+            "upgrades/",
+            "traits/",
+            "widgets/"
+        ],
+        "files": [
+            "utils/helpers.php"
+        ]
+    },
+    "repositories": [
+        {
+            "type": "vcs",
+            "url": "https://github.com/themewinter/uninstaller_form"
+        },
+        {
+            "type": "vcs",
+            "url": "https://github.com/themewinter/tools-sdk"
+        },
+        {
+            "type": "vcs",
+            "url": "https://github.com/themewinter/plugin-notice-sdk"
+        },
+        {
+            "type": "vcs",
+            "url": "https://github.com/themewinter/email-notification-sdk"
+        }
+    ]
+}

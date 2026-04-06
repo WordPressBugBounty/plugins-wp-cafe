@@ -4232,7 +4232,7 @@ body.woocomerce-layout-override-enable.woocommerce-cart .woocommerce .button.wpc
 // Theme compatible css
 ======================-=====================================================*/
 /* astra theme support css */
-.theme-astra .wpc_cart_block .woocommerce-mini-cart li .remove.remove_from_cart_button {
+.theme-astra .wpc_cart_block .wpc-woocommerce-mini-cart li .remove.remove_from_cart_button {
   line-height: 16px;
 }
 
@@ -4251,7 +4251,7 @@ body.woocomerce-layout-override-enable.woocommerce-cart .woocommerce .button.wpc
 }
 
 .theme-astra .wpc-nav-shortcode .wpc-tab-grid-style2 .wpc-food-menu-item .wpc-price {
-  line-height: 90px;
+  line-height: 1.2;
   padding: 0;
 }
 
@@ -4299,7 +4299,7 @@ body.woocomerce-layout-override-enable.woocommerce-cart .woocommerce .button.wpc
   border: none;
 }
 
-.theme-storefront .wpc_cart_block .woocommerce-mini-cart li .remove.remove_from_cart_button:before {
+.theme-storefront .wpc_cart_block .wpc-woocommerce-mini-cart li .remove.remove_from_cart_button:before {
   color: #fff;
 }
 
@@ -4333,24 +4333,24 @@ body.woocomerce-layout-override-enable.woocommerce-cart .woocommerce .button.wpc
 .theme-blocksy .wpc-product-popup-content .onsale {
   left: auto;
 }
-.theme-blocksy .woocommerce-mini-cart-item img {
+.theme-blocksy .wpc-woocommerce-mini-cart-item img {
   top: 8px;
 }
-.theme-blocksy .woocommerce-mini-cart-item .ct-image-container {
+.theme-blocksy .wpc-woocommerce-mini-cart-item .ct-image-container {
   position: static;
   display: block;
   mask-image: unset !important;
 }
-.theme-blocksy .woocommerce-mini-cart-item .ct-image-container .ct-ratio {
+.theme-blocksy .wpc-woocommerce-mini-cart-item .ct-image-container .ct-ratio {
   padding: 0 !important;
 }
-.theme-blocksy .woocommerce-mini-cart-item .quantity .qty {
+.theme-blocksy .wpc-woocommerce-mini-cart-item .quantity .qty {
   height: 30px;
   background-color: #fff;
 }
 
 /* generatepress theme support css */
-.theme-generatepress .wpc_cart_block .woocommerce-mini-cart li .remove.remove_from_cart_button {
+.theme-generatepress .wpc_cart_block .wpc-woocommerce-mini-cart li .remove.remove_from_cart_button {
   text-decoration: none !important;
   line-height: 16px;
 }
@@ -4376,15 +4376,15 @@ body.woocomerce-layout-override-enable.woocommerce-cart .woocommerce .button.wpc
 }
 
 /* kadence theme support css */
-.theme-kadence .woocommerce-mini-cart .quantity, .theme-kadence .woocommerce-mini-cart .quantity:hover {
+.theme-kadence .wpc-woocommerce-mini-cart .quantity, .theme-kadence .wpc-woocommerce-mini-cart .quantity:hover {
   background-color: transparent;
   border-color: transparent;
 }
-.theme-kadence .woocommerce-mini-cart .quantity .minus, .theme-kadence .woocommerce-mini-cart .quantity .plus, .theme-kadence .woocommerce-mini-cart .quantity:hover .minus, .theme-kadence .woocommerce-mini-cart .quantity:hover .plus {
+.theme-kadence .wpc-woocommerce-mini-cart .quantity .minus, .theme-kadence .wpc-woocommerce-mini-cart .quantity .plus, .theme-kadence .wpc-woocommerce-mini-cart .quantity:hover .minus, .theme-kadence .wpc-woocommerce-mini-cart .quantity:hover .plus {
   padding: 0;
   padding-right: 5px;
 }
-.theme-kadence .woocommerce-mini-cart .remove.remove_from_cart_button {
+.theme-kadence .wpc-woocommerce-mini-cart .remove.remove_from_cart_button {
   text-decoration: none;
 }
 
@@ -4516,7 +4516,7 @@ Food menu
   position: relative;
 }
 .wpc-food-menu-item .wpc-food-inner-content .wpc-post-title {
-  font-size: 24px;
+  font-size: 20px;
   margin: 0 0 15px;
   position: relative;
 }
@@ -4735,6 +4735,7 @@ Food menu
   text-align: center;
   border: 1px dashed #bcbcbc;
   transition: all 0.4s ease;
+  margin: 0 0 16 0px;
 }
 .wpc-food-menu-item.style3 .wpc-food-single-item .wpc-food-menu-thumb {
   overflow: visible;
@@ -4747,9 +4748,10 @@ Food menu
   -webkit-transition: all 0.4s ease;
   -moz-transition: all 0.4s ease;
   -ms-transition: all 0.4s ease;
+  border-radius: 20px;
 }
 .wpc-food-menu-item.style3 .wpc-food-single-item:hover {
-  background: #e3106e;
+  background: var(--wpc-primary-color, #e3106e);
   border-color: transparent;
   transform: translateY(-30px);
   color: #fff;
@@ -4758,18 +4760,19 @@ Food menu
   color: #fff;
 }
 .wpc-food-menu-item.style3 .wpc-food-single-item:hover .wpc-food-menu-thumb a img {
-  transform: scale(1.2) translateY(30px);
+  transform: scale(1.1) translateY(0px);
 }
 .wpc-food-menu-item.style3 .wpc-food-single-item:hover .wpc-add-to-cart a {
   background: #fff;
   border-color: transparent;
-  color: #e3106e;
+  color: var(--wpc-primary-color, #e3106e);
 }
 .wpc-food-menu-item.style3 .wpc-food-inner-content p {
   padding-right: 5px;
 }
 .wpc-food-menu-item.style3 .wpc-food-menu-thumb img {
   transition: all 0.4s ease;
+  margin-top: 10px;
 }
 .wpc-food-menu-item.style3 .wpc-add-to-cart {
   position: relative !important;
@@ -4866,6 +4869,13 @@ Food menu tab
 .wpc-tab-block1 .wpc-menu-tag-wrap {
   line-height: 0;
 }
+.wpc-tab-block1  .wpc-food-menu-item .wpc-food-inner-content .wpc-add-to-cart a{
+  height: 36px;
+  width: 36px;
+  padding: 4px;
+  line-height: 2;
+}
+
 @keyframes fadeUp {
   from {
     opacity: 0;
@@ -5363,7 +5373,7 @@ Food menu tab
 
 .wpc_cart_block {
   position: fixed;
-  right: -420px;
+  right: -500px;
   top: 50%;
   z-index: 99999;
   width: 460px;
@@ -5372,15 +5382,20 @@ Food menu tab
   -moz-transition: all 0.4s ease;
   -ms-transition: all 0.4s ease;
   transform: translateY(-50%);
-  padding-left: 40px;
+  padding-left: 0px;
   margin: 0;
 }
 @media (max-width: 767px) {
   .wpc_cart_block {
     width: 320px;
-    right: -278px;
-    transform: translateY(-20%);
-    top: 30%;
+    right: -320px;
+    /* transform: translateY(-20%);
+    top: 30%; */
+  }
+
+  .wpc_cart_block .wpc_cart_icon {
+    left: -75px !important;
+
   }
 }
 .wpc_cart_block.cart_icon_active {
@@ -5388,8 +5403,8 @@ Food menu tab
 }
 .wpc_cart_block .wpc_cart_icon {
   position: absolute;
-  left: -30px;
-  top: 0;
+  left: -108px;
+  top: 50%;
   background: #5d78ff;
   padding: 20px 20px;
   color: #fff;
@@ -5399,11 +5414,27 @@ Food menu tab
   text-align: center;
   max-height: 65px;
 }
+
+/* when cart_icon_active */
+.wpc-minicart-wrapper.cart_icon_active.style1 .wpc_cart_icon {
+  left: -64px;
+}
+
+.wpc-cart_main_block .wpc_cart_icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.wpc_cart_icon img {
+  width: 30px;
+  height: 30px;
+}
 .wpc_cart_block div#wpc-mini-cart-count .basket-item-count {
   vertical-align: top;
 }
 .wpc_cart_block .wpc_background_color {
-  background-color: #f1f1f1;
+  background-color: #fafafa;
   box-shadow: 0 10px 15px rgba(0, 0, 0, 0.05);
   padding: 15px;
   list-style-type: none;
@@ -5454,44 +5485,47 @@ Food menu tab
 .wpc_cart_block .wpc_background_color .wpc_pro_main_price {
   background: #f9f9f9;
 }
-.wpc_cart_block .woocommerce-mini-cart__buttons {
+.wpc_cart_block .wpc-woocommerce-mini-cart__buttons {
   display: flex;
   justify-content: space-between;
 }
-.wpc_cart_block .woocommerce-mini-cart {
+.wpc_cart_block .wpc-woocommerce-mini-cart {
   padding: 0;
   position: relative;
   list-style-type: none;
   margin: 0;
 }
-.wpc_cart_block .woocommerce-mini-cart li {
+.wpc_cart_block .wpc-woocommerce-mini-cart li {
   display: block;
   padding-left: 110px !important;
   min-height: 106px;
   padding-top: 15px !important;
   padding-right: 20px !important;
   margin: 10px 0 20px !important;
-  padding: 15px;
+  padding: 8px;
   background-color: #f9f9f9;
   border-radius: 4px;
   -webkit-border-radius: 4px;
   -ms-border-radius: 4px;
 }
-.wpc_cart_block .woocommerce-mini-cart li a {
+.wpc_cart_block .wpc-woocommerce-mini-cart li a {
   font-size: 18px;
   color: #e3106e;
   font-weight: 500;
 }
-.wpc_cart_block .woocommerce-mini-cart li img {
+.wpc_cart_block .wpc-woocommerce-mini-cart li img {
   width: 80px !important;
   position: absolute;
   height: 80px !important;
   object-fit: cover;
   left: 15px;
 }
-.wpc_cart_block .woocommerce-mini-cart li .remove.remove_from_cart_button {
+.wpc-minicart-wrapper.style1 .wpc-woocommerce-mini-cart li img {
+  display: none;
+}
+.wpc_cart_block .wpc-woocommerce-mini-cart li .remove.remove_from_cart_button {
   position: absolute;
-  right: 15px;
+  right: 0px;
   background: #f00;
   width: 20px;
   height: 20px;
@@ -5503,11 +5537,11 @@ Food menu tab
   -ms-border-radius: 50%;
   font-size: 14px;
 }
-.wpc_cart_block .woocommerce-mini-cart li .quantity {
+.wpc_cart_block .wpc-woocommerce-mini-cart li .quantity {
   display: block;
   font-size: 14px;
 }
-.wpc_cart_block .woocommerce-mini-cart__total {
+.wpc_cart_block .wpc-woocommerce-mini-cart__total {
   background-color: #f9f9f9;
   padding: 10px 15px;
   margin-bottom: 20px;
@@ -5534,8 +5568,8 @@ Food menu tab
   margin-right: 8px;
   margin-top: 2px;
 }
-.wpc_cart_block .woocommerce-mini-cart__empty-message {
-  margin: 0;
+.wpc_cart_block .wpc-woocommerce-mini-cart__empty-message {
+  margin: 20px 0;
   line-height: 34px;
   padding: 0;
 }
@@ -5581,28 +5615,44 @@ Food menu tab
   height: 80px;
   filter: brightness(0.5);
 }
-.wpc-menu-mini-cart .wpc-minicart-extra-total {
+/* .wpc-menu-mini-cart .wpc-minicart-extra-total {
   padding: 10px 15px;
-  background: #f9f9f9;
   margin-bottom: 20px;
   display: flex;
   flex-wrap: nowrap;
   justify-content: space-between;
   align-items: center;
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+  font-weight: 600 !important;
+  font-size: 18px !important;
+} */
+
+/* Style2 Mini Cart - scroll fix*/
+.wpc-minicart-wrapper.style2 .product_list_widget {
+  flex: 1 !important;
+  overflow-y: auto !important;
+  min-height: 0 !important;
+  max-height: none !important;
+  padding-bottom: 50px !important;
 }
 
 .wpc-minicart-wrapper.style1 .wpc-subtotal-wrap {
-  position: static;
-  bottom: auto;
+  position: relative !important;
+  bottom: auto !important;
+  flex-shrink: 0 !important;
+  z-index: 2 !important;
+  box-shadow: 0 -4px 12px rgba(86, 86, 86, 0.08) !important;
 }
 .wpc-minicart-wrapper.style1 .wpc_background_color {
   box-shadow: 0 10px 15px rgba(0, 0, 0, 0.05);
 }
-.wpc-minicart-wrapper.style1 .woocommerce-mini-cart__empty-message {
+.wpc-minicart-wrapper.style1 .wpc-woocommerce-mini-cart__empty-message {
   padding: 15px;
 }
 .wpc-minicart-wrapper.style1 .wpc-empty-btn {
-  display: none;
+  display: inline-block;
+  margin: 0 auto;
+  text-align: center;
 }
 .wpc-minicart-wrapper.style1 .wpc-cross-sell-slider .wpc-food-menu-item {
   padding: 0 25px;
@@ -5641,8 +5691,10 @@ Food menu tab
   box-shadow: none;
 }
 .wpc-minicart-wrapper .cart-wrapper {
-  max-height: calc(100vh - 400px);
+  height: 100vh;
   overflow-y: scroll;
+  display: flex !important;
+  flex-direction: column !important;
 }
 .wpc-minicart-wrapper .cart-wrapper::-webkit-scrollbar {
   width: 5px;
@@ -5658,7 +5710,6 @@ Food menu tab
   box-shadow: none;
 }
 .wpc-minicart-wrapper .wpc-menu-mini-cart .wpc-empty-btn {
-  margin-top: 20px;
   padding: 6px 40px;
   text-transform: capitalize;
 }
@@ -5678,8 +5729,9 @@ Food menu tab
   }
 }
 .wpc-minicart-wrapper .product_list_widget {
-  padding: 0 15px 0 40px !important;
-  margin: 30px 20px 15px 0 !important;
+  padding: 0 0px 0 24px !important;
+  margin: 20px 20px 15px 0 !important;
+  flex: 1 !important;
 }
 .wpc-minicart-wrapper .product_list_widget .mini_cart_item {
   background-color: transparent;
@@ -5693,9 +5745,17 @@ Food menu tab
   border-bottom: 1px solid #e0e0e0;
 }
 .wpc-minicart-wrapper .product_list_widget .mini_cart_item a:not(.remove) {
+  color: #3a3a3a;
+  font-size: 14px;
+  font-weight: 600;
+  display: block !important;
+  padding-right: 50px !important;
+  word-wrap: break-word !important;
+  overflow-wrap: break-word !important;
+  transition: all 0.3s ease;
+}
+.wpc-minicart-wrapper .product_list_widget .mini_cart_item a:not(.remove):hover {
   color: #000000;
-  font-size: 16px;
-  font-weight: 700;
 }
 .wpc-minicart-wrapper .product_list_widget .mini_cart_item .variation {
   display: flex;
@@ -5736,13 +5796,14 @@ Food menu tab
   padding-right: 0;
   padding-right: 40px;
   line-height: 23px;
+  text-align: center;
 }
 .wpc-minicart-wrapper .product_list_widget .mini_cart_item .mini-cart-quantity-wrapper .quantity::after {
   right: 15px;
   left: auto;
 }
 .wpc-minicart-wrapper .product_list_widget .mini_cart_item .mini-cart-quantity-wrapper .quantity .qty {
-  width: 90px;
+  width: 100px;
   text-align: center;
   appearance: none;
   -webkit-appearance: none;
@@ -5790,18 +5851,225 @@ Food menu tab
 }
 .wpc-minicart-wrapper .product_list_widget .mini_cart_item .mini-cart-quantity-wrapper .amount {
   order: 1;
-  font-weight: 700;
+  font-weight: 400 !important;
+  font-size: 16px;
 }
 .wpc-minicart-wrapper .product_list_widget .mini_cart_item .mini-cart-quantity-wrapper .single-subtotal-item {
   order: 3;
   margin-left: auto;
+  font-weight: 400 !important;
+  font-size: 16px !important;
 }
-.wpc-minicart-wrapper .woocommerce-mini-cart li {
+
+/* .wpc-minicart-wrapper .product_list_widget .mini_cart_item .mini-cart-quantity-wrapper .single-subtotal-item .wpc-minicart-subtotal {
+  font-size: 16px;
+} */
+
+/* Mini-Cart Item Loading State */
+.wpc-menu-mini-cart .product_list_widget li.loading,
+.wpc-woocommerce-mini-cart li.loading {
+  position: relative;
+  opacity: 0.6;
+  pointer-events: none;
+}
+
+.wpc-menu-mini-cart .product_list_widget li.loading:before,
+.wpc-woocommerce-mini-cart li.loading:before {
+  content: "";
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  width: 32px;
+  height: 32px;
+  border: 4px solid rgba(255, 255, 255, 0.3);
+  border-top-color: rgba(255, 255, 255, 1);
+  border-right-color: rgba(255, 255, 255, 0.8);
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  z-index: 10;
+  pointer-events: none;
+}
+
+.wpc-menu-mini-cart .product_list_widget li.loading img,
+.wpc-woocommerce-mini-cart li.loading img {
+  z-index: 0;
+  filter: brightness(0.5);
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.wpc-minicart-wrapper .wpc-woocommerce-mini-cart li {
   padding-left: 15px !important;
 }
-.wpc-minicart-wrapper .woocommerce-mini-cart li img {
-  display: none;
+/* ---------------------------- Style-2 list item layout ---------------------------- */
+.wpc-minicart-wrapper.style2 .wpc-woocommerce-mini-cart li {
+  position: relative;
+  padding: 8px !important;
+  margin-bottom: 12px !important;
+  border-radius: 4px;
 }
+
+
+/* ============================================
+STYLE-2 MINI-CART LAYOUT 
+============================================ */
+/* List item container - Grid Layout */
+.wpc-minicart-wrapper.style2 .wpc-woocommerce-mini-cart li > a:not(.remove) {
+  display: flex !important;
+  gap: 12px !important;
+}
+/* Hide the SVG and show a cross using CSS */
+.wpc-minicart-wrapper.style2 .wpc-woocommerce-mini-cart li .remove.remove_from_cart_button svg {
+  display: block;
+}
+.wpc-minicart-wrapper.style2 .wpc-woocommerce-mini-cart li {
+  display: grid !important;
+  grid-template-columns: 60px 1fr auto;
+  grid-template-rows: auto auto;
+  column-gap: 12px;
+  row-gap: 8px;
+  position: relative;
+  padding: 12px !important;
+  margin-bottom: 12px !important;
+  border-radius: 8px;
+  background: #fff !important;
+  border: 1px solid #e5e7eb !important;
+}
+
+/* Product link (contains image + name) - Grid position */
+.wpc-minicart-wrapper.style2 .wpc-woocommerce-mini-cart li > a:not(.remove) {
+  grid-column: 1 / 3;
+  grid-row: 1;
+  display: flex !important;
+  align-items: flex-start;
+  gap: 12px !important;
+  text-decoration: none;
+  color: #111;
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 1.4;
+  min-height: 60px;
+}
+
+/* Product Image */
+.wpc-minicart-wrapper.style2 .wpc-woocommerce-mini-cart li img {
+  display: block !important;
+  width: 60px !important;
+  height: 60px !important;
+  object-fit: cover;
+  border-radius: 6px;
+  flex-shrink: 0;
+  position: relative !important;
+  left: 0 !important;
+  margin: 0 !important;
+  top: 0 !important;
+  transform: translateY(0) !important;
+  float: none !important;
+}
+
+/* Meta data (Color, Size, etc) - Position below product name */
+.wpc-minicart-wrapper.style2 .wpc-woocommerce-mini-cart li dl.variation {
+  grid-column: 2;
+  grid-row: 1;
+  margin: 32px 0 0 0;
+  font-size: 12px;
+  color: #6b7280;
+  line-height: 1.3;
+  align-self: start;
+}
+
+.wpc-minicart-wrapper.style2 .wpc-woocommerce-mini-cart li dl.variation dt,
+.wpc-minicart-wrapper.style2 .wpc-woocommerce-mini-cart li dl.variation dd {
+  display: inline;
+  margin: 0;
+  font-weight: 400;
+}
+
+/* Quantity wrapper - Below image (Grid column 1-2, row 2) */
+.wpc-minicart-wrapper.style2
+  .wpc-woocommerce-mini-cart
+  li
+  .mini-cart-quantity-wrapper {
+  grid-column: 1 / 3 !important;
+  grid-row: 2 !important;
+  display: flex !important;
+  align-items: center;
+  gap: 8px !important;
+  margin: 0;
+  padding: 0;
+}
+
+/* Price positioning - Top right corner */
+.wpc-minicart-wrapper.style2
+  .wpc-woocommerce-mini-cart
+  li
+  .mini-cart-quantity-wrapper
+  > .woocommerce-Price-amount {
+  position: relative !important;
+  font-size: 16px !important;
+  font-weight: 600 !important;
+  color: #111 !important;
+  margin: 0 !important;
+}
+
+
+/* Delete button (X icon on image) */
+.wpc-minicart-wrapper.style2
+  .wpc-woocommerce-mini-cart
+  li
+  .remove.remove_from_cart_button {
+  text-decoration: none  !important;
+  position: absolute ;
+  top: 6px !important;
+  left: 6px !important;
+  width: 20px !important;
+  height: 20px !important;
+  background: rgba(0, 0, 0, 0.6) !important;
+  border-radius: 50%;
+  display: flex !important;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  border: none;
+  z-index: 10;
+  transition: background 0.2s ease !important;
+}
+
+.wpc-minicart-wrapper.style2
+  .wpc-woocommerce-mini-cart
+  li
+  .remove.remove_from_cart_button:hover {
+  background: rgba(239, 68, 68, 0.9) !important;
+}
+
+/* Hide SVG and show text "x" */
+.wpc-minicart-wrapper.style2
+  .wpc-woocommerce-mini-cart
+  li
+  .remove.remove_from_cart_button
+  svg {
+  display: none !important;
+}
+
+.wpc-minicart-wrapper.style2
+  .wpc-woocommerce-mini-cart
+  li
+  .remove.remove_from_cart_button::before {
+  content: "×";
+  color: #fff;
+  font-size: 18px;
+  font-weight: 400;
+  line-height: 1;
+}
+
 .wpc-minicart-wrapper.cart_icon_active .wpc_cart_block {
   right: 0;
 }
@@ -5809,6 +6077,11 @@ Food menu tab
   border-top: 4px solid #ff8a00;
   border-bottom: 4px solid #ff8a00;
   position: relative;
+}
+
+/* for style2 cross sell slider  position */
+.wpc-minicart-wrapper.style2 .wpc-cross-sell-slider {
+  bottom: 75px !important;
 }
 .wpc-minicart-wrapper .wpc-cross-sell-slider .title-wrap {
   display: flex;
@@ -5960,15 +6233,30 @@ Food menu tab
   margin: 20px 40px 0;
   border-bottom: 2px dashed #e5e5e5;
   padding: 0 0 15px;
+  color: #0a0a0a;
+  font-size: 18px !important;
+  font-weight: 600 !important;
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+}
+.wpc-minicart-wrapper .total strong {
+  font-size: 18px !important;
+  font-weight: 600 !important;
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
 }
 .wpc-minicart-wrapper .wpc-minicart-extra .wpc-minicart-extra-total {
   background: transparent;
   padding: 20px 40px 0;
   margin-bottom: 0;
   font-size: 16px;
-  font-weight: 700;
   margin-bottom: 20px;
   line-height: 20px;
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+  font-weight: 600 !important;
+  font-size: 16px !important;
+  display: flex;
+  flex-wrap: nowrap;
+  justify-content: space-between;
+  align-items: center;
 }
 .wpc-minicart-wrapper .wpc-minicart-extra .wpc-minicart-extra-total .wpc-extra-text {
   font-size: 13px;
@@ -5983,10 +6271,10 @@ Food menu tab
 .wpc-minicart-wrapper .wpc_pro_order_time .minicart-condition-parent {
   justify-content: center;
 }
-.wpc-minicart-wrapper .woocommerce-mini-cart__buttons {
+.wpc-minicart-wrapper .wpc-woocommerce-mini-cart__buttons {
   padding: 0 10px;
 }
-.wpc-minicart-wrapper .woocommerce-mini-cart__buttons a.button.wc-forward {
+.wpc-minicart-wrapper .wpc-woocommerce-mini-cart__buttons a.button.wc-forward {
   background-color: transparent !important;
   border: 1px solid #e0e0e0;
   color: #000 !important;
@@ -5995,29 +6283,29 @@ Food menu tab
   transition: all ease 0.4s;
   padding: 13px 10px;
 }
-.wpc-minicart-wrapper .woocommerce-mini-cart__buttons a.button.wc-forward:hover {
+.wpc-minicart-wrapper .wpc-woocommerce-mini-cart__buttons a.button.wc-forward:hover {
   background-color: #000 !important;
   color: #fff !important;
   border-color: #000;
 }
-.wpc-minicart-wrapper .woocommerce-mini-cart__buttons a.button.wc-forward:last-child {
+.wpc-minicart-wrapper .wpc-woocommerce-mini-cart__buttons a.button.wc-forward:last-child {
   margin-right: 0;
 }
-.wpc-minicart-wrapper .woocommerce-mini-cart__buttons a.button.checkout {
+.wpc-minicart-wrapper .wpc-woocommerce-mini-cart__buttons a.button.checkout {
   background-color: #48b775 !important;
   border-color: #48b775;
   color: #fff !important;
 }
-.wpc-minicart-wrapper .woocommerce-mini-cart__buttons a.button.checkout:hover {
+.wpc-minicart-wrapper .wpc-woocommerce-mini-cart__buttons a.button.checkout:hover {
   background-color: #359a5d !important;
   border-color: #359a5d;
 }
 .wpc-minicart-wrapper .wpc-subtotal-wrap {
-  position: fixed;
-  bottom: 0;
+  position: sticky !important;
+  bottom: 75px !important;
   width: 100%;
   background-color: #ffffff;
-  z-index: 1;
+  z-index: 20;
   padding: 10px 0;
 }
 .wpc-minicart-wrapper .wpc-field-wrap {
@@ -6118,6 +6406,11 @@ Food menu tab
 }
 .wpc-minicart-wrapper.style2 .wpc-empty-cart .cart-wrapper {
   overflow: hidden;
+}
+
+.wpc-minicart-wrapper.style1 .wpc-empty-cart .cart-wrapper {
+  text-align: center !important;
+  padding-top: 40% !important;
 }
 
 body.woocomerce-layout-override-enable.woocommerce-cart .wpc-cart_main_block,

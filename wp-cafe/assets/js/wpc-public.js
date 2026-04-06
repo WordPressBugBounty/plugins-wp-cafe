@@ -11,7 +11,7 @@
         var obj = {};
         var wpc_booking_form_data = {};
         if (typeof wpc_form_client_data !== "undefined") {
-            var wpc_form_data = JSON.parse(wpc_form_client_data);
+            var wpc_form_data = wpc_form_client_data;
             if ($.isArray(wpc_form_data.settings) && wpc_form_data.settings.length === 0) {
                 wpc_booking_form_data = null;
             } else {
@@ -406,6 +406,15 @@
 
             $(".reservation_form_submit").on('click', function (e) {
                 e.preventDefault();
+
+                const form = $(this).closest("form")[0];
+                                
+                // HTML5 form validation
+                if (!form.checkValidity()) {
+                    form.reportValidity(); // Shows the native validation errors
+                    return;
+                }
+
                 if ($(window).width() < 992) {
                     $('html, body').animate({ scrollTop: $(this).parents().find('.reservation_section').offset().top }, 'slow');
                 }

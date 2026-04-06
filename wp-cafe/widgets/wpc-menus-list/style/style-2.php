@@ -1,9 +1,10 @@
 <?php
+if ( ! defined( 'ABSPATH' ) ) exit;
 
 use \WpCafe\Utils\Wpc_Utilities;
 use \WpCafe\Core\Shortcodes\Template_Functions as Wpc_Widget_Template;
 
-$cafe_settings      =  \WpCafe\Core\Base\Wpc_Settings_Field::instance()->get_settings_option();
+$cafe_settings      =  wpc_get_option();
 $cart_icon          = !empty($cafe_settings['wpc_cart_icon']) ? $cafe_settings['wpc_cart_icon'] : 'wpcafe-cart_icon';
 $customization_icon = !empty($cafe_settings['wpc_customization_icon']) ? $cafe_settings['wpc_customization_icon'] : 'wpcafe-customize';
 $col = ($show_thumbnail == 'yes') ? 'wpc-col-md-8' : 'wpc-col-md-12';

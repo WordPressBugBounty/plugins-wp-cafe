@@ -5,15 +5,20 @@ namespace WpCafe\Widgets;
 defined( 'ABSPATH' ) || exit;
 
 use WpCafe\Utils\Wpc_Utilities;
+use WpCafe\Contracts\Switchable_Service_Contract;
 
-Class Manifest {
+Class Manifest implements Switchable_Service_Contract {
     use \WpCafe\Traits\Wpc_Singleton;
 
     private $categories = ['menu' => 'Wpcafe menu'];
 
-    public function init() {
+    public function register() {
         add_action( 'elementor/elements/categories_registered', [$this, 'add_elementor_widget_categories'] );
         add_action( 'elementor/widgets/register', [$this, 'register_widgets'] );
+    }
+
+    public function is_enable() {
+        return class_exists( '\Elementor\Plugin' );
     }
 
     public function get_input_widgets() {
@@ -35,6 +40,9 @@ Class Manifest {
      * Register all elementor widgets dynamically
      */
     public function register_widgets() {
+        if ( ! class_exists( '\Elementor\Plugin' ) ) {
+            return;
+        }
 
         foreach ( $this->get_input_widgets() as $v ):
             $f     = str_replace( '_', '-', $v );

@@ -34,49 +34,14 @@ class Hooks{
 
 
     /**
-     * Generate unique slug
-     * prefix_type1_type2_day_row
-     * slug_single_weekly_all_0
-     * 
-     * Check current slot and schedule
-     */
-    public static function check_current_slot() {
-        $data       = array( 'slot_type'=> '' ,'schedule_type'=> '' ,'schedule'=> [] );
-        $settings   =  \WpCafe\Core\Base\Wpc_Settings_Field::instance()->get_settings_option();
-
-        if ( empty($settings['reser_multi_schedule'] ) ||  "on" !== $settings['reser_multi_schedule']  ) {
-            $data['slot_type']      = "single";
-            if ( !empty( $settings['wpc_all_day_start_time'] ) && !empty( $settings['wpc_all_day_end_time'] ) ) {
-                $data['schedule_type']  = "all";
-                $data['schedule']       = [ 'days' => 'all' ,'start_time' => $settings['wpc_all_day_start_time'] ,
-                 'end_time' => $settings['wpc_all_day_end_time'] ];
-
-            }else{
-                $data['schedule_type']  = "weekly";
-                $data['schedule']       = [ 'days' => $settings['wpc_weekly_schedule'] ,
-                 'start_time'   => $settings['wpc_weekly_schedule_start_time'] ,
-                 'end_time'     => $settings['wpc_weekly_schedule_end_time'] ];
-
-            }
-        }else {
-            $data['slot_type']      = "multiple";
-        }
-
-        return $data;
-    }
-
-    /**
      * Filter data for chart
      */
     public function filter_report_by_date($type,$date_range){
         global $wpdb;
-        $post_meta      = $wpdb->postmeta;
-        $posts          = $wpdb->posts;
         $label_arr      = array();
         $cancel_arr     = array();
         $confirm_arr    = array();
         $query_type     = "single";
-        $sql            = "";
 
         if (( $date_range[0] !== null && $date_range[0] !=="" ) && ( $date_range[1] !== null && $date_range[1] !=="" )) {
             $query_type     = "both";
@@ -88,28 +53,31 @@ class Hooks{
             $query_type     = "second_single";
         }
 
-        $results        = array('labels' => $label_arr , 'datasets' => [ [ 'borderColor' => 'rgb(255, 99, 132)' , 'label'  => esc_html__('Confirmed','wpcafe') , 'data'  => [] ] ,
-            [ 'borderColor' => 'rgb(75, 192, 192)' , 'label'  => esc_html__('Cancelled','wpcafe') , 'data'  => [] ]
+        $results        = array('labels' => $label_arr , 'datasets' => [ [ 'borderColor' => 'rgb(255, 99, 132)' , 'label'  => esc_html__('Confirmed','wp-cafe') , 'data'  => [] ] ,
+            [ 'borderColor' => 'rgb(75, 192, 192)' , 'label'  => esc_html__('Cancelled','wp-cafe') , 'data'  => [] ]
          ]);
 
         if ( "reservations" == $type ) {
 
-			$base_query = "SELECT DISTINCT {$posts}.ID AS id,
-			(SELECT DISTINCT MONTHNAME(meta_value) FROM {$post_meta} WHERE meta_key = 'wpc_booking_date' AND post_id = {$posts}.ID) AS wpc_booking_date,
-			(SELECT DISTINCT meta_value FROM {$post_meta} WHERE meta_key = 'wpc_total_guest' AND post_id = {$posts}.ID) AS wpc_total_guest,
-			(SELECT DISTINCT meta_value FROM {$post_meta} WHERE meta_key = 'wpc_reservation_state' AND post_id = {$posts}.ID) AS wpc_reservation_state
-			FROM {$posts} INNER JOIN {$post_meta} ON {$posts}.ID = {$post_meta}.post_id
-			WHERE {$posts}.post_type='wpc_reservation' AND {$post_meta}.meta_key IN ('wpc_booking_date','wpc_total_guest','wpc_reservation_state')";
+			$base_query = "SELECT DISTINCT {$wpdb->posts}.ID AS id,
+			(SELECT DISTINCT MONTHNAME(meta_value) FROM {$wpdb->postmeta} WHERE meta_key = 'wpc_booking_date' AND post_id = {$wpdb->posts}.ID) AS wpc_booking_date,
+			(SELECT DISTINCT meta_value FROM {$wpdb->postmeta} WHERE meta_key = 'wpc_total_guest' AND post_id = {$wpdb->posts}.ID) AS wpc_total_guest,
+			(SELECT DISTINCT meta_value FROM {$wpdb->postmeta} WHERE meta_key = 'wpc_reservation_state' AND post_id = {$wpdb->posts}.ID) AS wpc_reservation_state
+			FROM {$wpdb->posts} INNER JOIN {$wpdb->postmeta} ON {$wpdb->posts}.ID = {$wpdb->postmeta}.post_id
+			WHERE {$wpdb->posts}.post_type='wpc_reservation' AND {$wpdb->postmeta}.meta_key IN ('wpc_booking_date','wpc_total_guest','wpc_reservation_state')";
 
 			if ( "both" == $query_type ) {
-			$prepared_query = $wpdb->prepare($base_query . " AND {$post_meta}.meta_value BETWEEN %s AND %s", $date_range[0], $date_range[1]);
+			// phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared -- $base_query contains only table names and static SQL, user input properly escaped via prepare() placeholders.
+			$prepared_query = $wpdb->prepare($base_query . " AND {$wpdb->postmeta}.meta_value BETWEEN %s AND %s", $date_range[0], $date_range[1]);
 			} else if ( "first_single" == $query_type ) {
-			$prepared_query = $wpdb->prepare($base_query . " AND {$post_meta}.meta_value = %s", $date_range[0]);
+			// phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared -- $base_query contains only table names and static SQL, user input properly escaped via prepare() placeholders.
+			$prepared_query = $wpdb->prepare($base_query . " AND {$wpdb->postmeta}.meta_value = %s", $date_range[0]);
 			} else if ( "second_single" == $query_type ) {
-			$prepared_query = $wpdb->prepare($base_query . " AND {$post_meta}.meta_value = %s", $date_range[1]);
+			// phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared -- $base_query contains only table names and static SQL, user input properly escaped via prepare() placeholders.
+			$prepared_query = $wpdb->prepare($base_query . " AND {$wpdb->postmeta}.meta_value = %s", $date_range[1]);
 			}
-            
-            $all_reservations = $wpdb->get_results($prepared_query, ARRAY_A); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery
+
+            $all_reservations = $wpdb->get_results($prepared_query, ARRAY_A); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.PreparedSQL.NotPrepared
 
             if (count($all_reservations)) {
                 foreach ($all_reservations as $key => $value) {
@@ -137,8 +105,8 @@ class Hooks{
                 }
 
                 $results  = array('labels' => $label_arr , 
-                    'datasets' => [ [ 'borderColor' => 'rgb(255, 99, 132)' , 'label'  => esc_html__('Confirmed','wpcafe') , 'data'  => $confirm_arr ] ,
-                    [ 'borderColor' => 'rgb(75, 192, 192)' , 'label'  => esc_html__('Cancelled','wpcafe') , 'data'  => $cancel_arr ]
+                    'datasets' => [ [ 'borderColor' => 'rgb(255, 99, 132)' , 'label'  => esc_html__('Confirmed','wp-cafe') , 'data'  => $confirm_arr ] ,
+                    [ 'borderColor' => 'rgb(75, 192, 192)' , 'label'  => esc_html__('Cancelled','wp-cafe') , 'data'  => $cancel_arr ]
                 ]);
             }
 
@@ -147,35 +115,61 @@ class Hooks{
         else if ( "food_ordering" == $type ) {
   
             if ( "both" == $query_type ) {
-                $sql .=" AND post_date BETWEEN '$date_range[0]' AND '$date_range[1]' ";
+                $query = $wpdb->prepare(
+                    "SELECT DISTINCT MONTHNAME(post_date) as order_date,
+                    SUM(1) as order_count,
+                    CASE post_status
+                        WHEN 'wc-processing' THEN 'wc-completed'
+                        WHEN 'wc-completed' THEN 'wc-completed'
+                        WHEN 'wc-refunded' THEN 'wc-refunded'
+                    END AS new_status
+                    FROM {$wpdb->posts}
+                    WHERE post_type = 'shop_order' AND post_status IN ('wc-processing','wc-completed','wc-refunded')
+                    AND post_date BETWEEN %s AND %s
+                    GROUP BY order_date, new_status",
+                    $date_range[0],
+                    $date_range[1]
+                );
             }
             else if ( "first_single" == $query_type ) {
-                $sql .=" AND post_date = '$date_range[0]'";
+                $query = $wpdb->prepare(
+                    "SELECT DISTINCT MONTHNAME(post_date) as order_date,
+                    SUM(1) as order_count,
+                    CASE post_status
+                        WHEN 'wc-processing' THEN 'wc-completed'
+                        WHEN 'wc-completed' THEN 'wc-completed'
+                        WHEN 'wc-refunded' THEN 'wc-refunded'
+                    END AS new_status
+                    FROM {$wpdb->posts}
+                    WHERE post_type = 'shop_order' AND post_status IN ('wc-processing','wc-completed','wc-refunded')
+                    AND post_date = %s
+                    GROUP BY order_date, new_status",
+                    $date_range[0]
+                );
             }
             else if ( "second_single" == $query_type ) {
-                $sql .=" AND post_date = '$date_range[1]'";
+                $query = $wpdb->prepare(
+                    "SELECT DISTINCT MONTHNAME(post_date) as order_date,
+                    SUM(1) as order_count,
+                    CASE post_status
+                        WHEN 'wc-processing' THEN 'wc-completed'
+                        WHEN 'wc-completed' THEN 'wc-completed'
+                        WHEN 'wc-refunded' THEN 'wc-refunded'
+                    END AS new_status
+                    FROM {$wpdb->posts}
+                    WHERE post_type = 'shop_order' AND post_status IN ('wc-processing','wc-completed','wc-refunded')
+                    AND post_date = %s
+                    GROUP BY order_date, new_status",
+                    $date_range[1]
+                );
             }
-
-            $query = $wpdb->prepare(
-                "SELECT DISTINCT MONTHNAME(post_date) as order_date,
-                SUM(1) as order_count,
-                CASE post_status
-                    WHEN 'wc-processing' THEN 'wc-completed'
-                    WHEN 'wc-completed' THEN 'wc-completed'
-                    WHEN 'wc-refunded' THEN 'wc-refunded'
-                END AS new_status
-                FROM $posts 
-                WHERE post_type = 'shop_order' AND post_status IN ('wc-processing','wc-completed','wc-refunded') %s
-                GROUP BY order_date, new_status",
-                $sql
-            );
 
             $cache_key = Wpc_Utilities::get_query_cache( $query );
 			$food_ordering = wp_cache_get( $cache_key, 'wpcafe_order_cache');
 
 			if( !$food_ordering ) {
 
-				$food_ordering = $wpdb->get_results($query, ARRAY_A); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery 
+				$food_ordering = $wpdb->get_results($query, ARRAY_A); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.PreparedSQL.NotPrepared
 
 				wp_cache_set($cache_key, $food_ordering, 'wpcafe_query_cache', 60);
 			}
@@ -198,8 +192,8 @@ class Hooks{
                 }
     
                 $results        = array('labels' => $label_arr , 
-                    'datasets' => [ [ 'borderColor' => 'rgb(255, 99, 132)' , 'label'  => esc_html__('Confirmed','wpcafe') , 'data'  => $confirm_arr ] ,
-                    [ 'borderColor' => 'rgb(75, 192, 192)' , 'label'  => esc_html__('Refunded','wpcafe') , 'data'  => $cancel_arr ]
+                    'datasets' => [ [ 'borderColor' => 'rgb(255, 99, 132)' , 'label'  => esc_html__('Confirmed','wp-cafe') , 'data'  => $confirm_arr ] ,
+                    [ 'borderColor' => 'rgb(75, 192, 192)' , 'label'  => esc_html__('Refunded','wp-cafe') , 'data'  => $cancel_arr ]
                 ]);
             }
 
@@ -215,12 +209,9 @@ class Hooks{
      * get monthly reservation details
      */
     public function get_monthly_reservation(){
-        global $wpdb;
-        $post_meta      = $wpdb->postmeta;
-        $posts          = $wpdb->posts;
-
-        $start = date('Y-m-01');
-        $end   = date('Y-m-t');
+        $current_timestamp = current_time( 'timestamp' );
+        $start = wp_date( 'Y-m-01', $current_timestamp );
+        $end   = wp_date( 'Y-m-t', $current_timestamp );
 
         $meta_query = 
         array(
@@ -258,8 +249,8 @@ class Hooks{
         $time_start         = get_post_meta( $reservation_id, 'wpc_from_time', true );
         $time_end           = get_post_meta( $reservation_id, 'wpc_to_time', true );
         $reservation_invoice= ( isset($invoice) || $invoice !="" ) ? $invoice : get_post_meta( $reservation_id, 'wpc_reservation_invoice', true);
-         $schedule_1         = $time_start !=="" ? esc_html__(' Start time ', 'wpcafe') . Wpc_Utilities::get_formatted_time( $time_start ) : " ";
-        $schedule_2         = $time_end !=="" ? esc_html__(' End time ', 'wpcafe'). Wpc_Utilities::get_formatted_time( $time_end ) : " ";
+         $schedule_1         = $time_start !=="" ? esc_html__(' Start time ', 'wp-cafe') . Wpc_Utilities::get_formatted_time( $time_start ) : " ";
+        $schedule_2         = $time_end !=="" ? esc_html__(' End time ', 'wp-cafe'). Wpc_Utilities::get_formatted_time( $time_end ) : " ";
         $separator          = ( $time_start !=="" && $time_end !=="" ) ? " : " : "";
 
         //pro active tag list check

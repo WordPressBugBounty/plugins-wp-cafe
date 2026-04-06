@@ -1,4 +1,6 @@
 <?php
+if ( ! defined( 'ABSPATH' ) ) exit;
+
 use WpCafe\Utils\Wpc_Utilities;
 use \WpCafe\Core\Shortcodes\Template_Functions;
 
@@ -7,7 +9,7 @@ if (!class_exists('Woocommerce')) { return; }
 
 if( is_array( $food_menu_tabs ) && count( $food_menu_tabs )>0 ){
     
-apply_filters( 'elementor/control/search_data' , $settings , $unique_id , 'wpc-food-menu-tab' );
+apply_filters( 'cafetics/elementor/control/search_data' , $settings , $unique_id , 'wpc-food-menu-tab' );
 
 $wpc_menu_count = is_array($settings) && isset($settings['wpc_menu_count']) ? $settings['wpc_menu_count'] : 5;
 $wpc_show_desc  = is_array($settings) && isset($settings['wpc_show_desc']) ? $settings['wpc_show_desc'] : 'yes';
@@ -33,6 +35,12 @@ $class = ($title_link_show=='yes')? '' : 'wpc-no-link';
                         'wpc_cat'       => $value['post_cats'],
                         'order'         => $wpc_menu_order,
                     );
+
+                    $selected_location = wpc_selected_location_id();
+                    if ( ! empty( $selected_location ) ) {
+                        $food_tab_args['wpc_location'] = $selected_location;
+                    }
+
                     $products = Wpc_Utilities::product_query( $food_tab_args );
 
                     $menu_tab_args = array(
@@ -49,7 +57,8 @@ $class = ($title_link_show=='yes')? '' : 'wpc-no-link';
                         'title_link_show'   => $title_link_show,
                         'show_item_status'  => $show_item_status,
                         'wpc_desc_limit'    => $wpc_desc_limit,
-                        'wpc_show_vendor'   => $wpc_show_vendor
+                        'wpc_show_vendor'   => $wpc_show_vendor,
+                        'wpc_menu_col'      => 6, // Default column setting for pro styles
                     );
                     Template_Functions::render_food_menu_tab_product_block( $menu_tab_args );
                 }

@@ -1,4 +1,6 @@
 <?php
+if ( ! defined( 'ABSPATH' ) ) exit;
+
         $wpc_custom_css = '';
 
         // cart bg color
@@ -55,7 +57,7 @@
                 
                 .wpc-food-menu-item .wpc-food-inner-content .wpc-menu-currency,
                 .wpc-food-menu-item .wpc-food-inner-content .wpc-post-title a:hover,
-                .wpc_cart_block .woocommerce-mini-cart li a,
+                .wpc_cart_block .wpc-woocommerce-mini-cart li a,
               
                 body.woocomerce-layout-override-enable.archive .products .product .price,
                 body.woocomerce-layout-override-enable.single-product .products .product .price,
@@ -100,7 +102,7 @@
                     
                 ';
             // icon cross
-            $wpc_custom_css .= '.wpc_cart_block .woocommerce-mini-cart li .remove.remove_from_cart_button {color: #fff !important; background-color : ' . esc_attr($bg_color) . '}';
+            $wpc_custom_css .= '.wpc_cart_block .wpc-woocommerce-mini-cart li .remove.remove_from_cart_button {color: #fff !important; background-color : ' . esc_attr($bg_color) . '}';
         } else {
             $wpc_custom_css .= '.wpc_background_color { background-color : #A352FF }';
             //button
@@ -140,7 +142,7 @@
                 }
                 ';
             // icon cross hover
-            $wpc_custom_css .= '.wpc_cart_block .woocommerce-mini-cart li .remove.remove_from_cart_button { background-color : ' . esc_attr($color) . '}';
+            $wpc_custom_css .= '.wpc_cart_block .wpc-woocommerce-mini-cart li .remove.remove_from_cart_button { background-color : ' . esc_attr($color) . '}';
             // count
             $wpc_custom_css .= '
                 .woocomerce-layout-override-enable.woocommerce div.product p.price,
@@ -155,7 +157,7 @@
             //button hover
             $wpc_custom_css .= '.wpc_cart_block .wpc_background_color a.button.wc-forward:hover { background-color : ' . esc_attr('#5D78FF') . '}';
             // icon cross hover
-            $wpc_custom_css .= '.wpc_cart_block .woocommerce-mini-cart li .remove.remove_from_cart_button:hover { background-color : ' . esc_attr('#5D78FF') . '}';
+            $wpc_custom_css .= '.wpc_cart_block .wpc-woocommerce-mini-cart li .remove.remove_from_cart_button:hover { background-color : ' . esc_attr('#5D78FF') . '}';
             // count 
             $wpc_custom_css .= '.cart-items-count { color : ' . esc_attr('#fff') . '}';
         }

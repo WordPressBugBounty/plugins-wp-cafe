@@ -12,6 +12,8 @@ class Template_Functions {
 	 */
 	public static function wpc_food_menu_list_template( $args ){
 			extract( $args );
+			// Get cart icon configuration from settings
+			$cart_icon_config = wpc_get_option('cart_icon');
 			?>
 				<div class="wpc-food-menu-item wpc-row">
 					<?php
@@ -102,7 +104,7 @@ class Template_Functions {
 													'wpc_btn_text'  => "",
 													'customize_btn' => "",
 													'widget_id'     => $unique_id,
-													'cart_icon'         => !empty($cart_icon),
+													'cart_icon'         => $cart_icon_config,
 													'customization_icon'=> !empty($customization_icon)
 											);
 
@@ -130,6 +132,8 @@ class Template_Functions {
 	 */
 	public static function wpc_food_menu_list_template_two( $args ){
 			extract( $args );
+			// Get cart icon configuration from settings
+			$cart_icon_config = wpc_get_option('cart_icon');
 			?>
 
 			<div class="wpc-food-menu-item style2">
@@ -179,18 +183,18 @@ class Template_Functions {
 											</div>
 									</div>
 									<!-- thumbnail -->
-									<?php 
+									<?php
 									if ( $show_thumbnail == 'yes' ) {
 
-											if ($product->get_image()) { 
+											if ($product->get_image()) {
 													?>
 															<div class="wpc-col-md-4">
 																	<div class="wpc-food-menu-thumb">
-																			<?php 
+																			<?php
 																	if( $product->get_type() !== 'variable' && $wpc_price_show !== 'no') {
 																			?>
 																			<span class="wpc-menu-currency">
-																					<?php 
+																					<?php
 																					echo wp_kses($product->get_price_html(), Wpc_Utilities::wpc_kses_allowed_tags() );
 																					?></span>
 																			</span>
@@ -198,7 +202,7 @@ class Template_Functions {
 																	} else {
 																			if( $wpc_price_show !== 'no'){
 																					// variation price.
-																					$variation_price = $product->get_variation_prices( true ); // true for getting tax price 
+																					$variation_price = $product->get_variation_prices( true ); // true for getting tax price
 
 																					$var_price = '';
 																					if( is_array( $variation_price ) && isset( $variation_price['price'] ) ){
@@ -233,7 +237,7 @@ class Template_Functions {
 																					'wpc_btn_text'  => "",
 																					'customize_btn' => "",
 																					'widget_id'     => $unique_id,
-																					'cart_icon'         => $cart_icon,
+																					'cart_icon'         => $cart_icon_config,
 																					'customization_icon'=> $customization_icon
 																			);
 																			echo wp_kses(Wpc_Utilities::product_add_to_cart( $add_cart_args ), Wpc_Utilities::wpc_kses_allowed_tags() );
@@ -254,6 +258,8 @@ class Template_Functions {
 	 */
 	public static function wpc_food_menu_list_template_three( $args ){
 			extract( $args );
+			// Get cart icon configuration from settings
+			$cart_icon_config = wpc_get_option('cart_icon');
 			?>
 					<div class="wpc-col-lg-<?php echo esc_attr($column_desktop); ?> wpc-col-md-<?php echo esc_attr($column_tablet); ?> wpc-col-sm-<?php echo esc_attr($column_mobile); ?>">
 							<div class="wpc-food-single-item">
@@ -309,15 +315,15 @@ class Template_Functions {
 															if( $product->get_type() !== 'variable' && $wpc_price_show !== 'no') {
 																	?>
 																	<span class="wpc-menu-currency">
-																					<?php 
+																					<?php
 																					echo wp_kses($product->get_price_html(), Wpc_Utilities::wpc_kses_allowed_tags() );
 																					?></span>
 																	</span>
 																	<?php
 															} else {
 																	if( $wpc_price_show !== 'no'){
-																			// variation price 
-																			$variation_price = $product->get_variation_prices( true ); // true for getting tax price 
+																			// variation price
+																			$variation_price = $product->get_variation_prices( true ); // true for getting tax price
 																			$var_price = '';
 																			if( is_array( $variation_price ) && isset( $variation_price['price'] ) ){
 																					if( $wpc_price_show == 'yes' || $wpc_price_show == 'min'){
@@ -349,7 +355,7 @@ class Template_Functions {
 																	'wpc_btn_text'  => "",
 																	'customize_btn' => "",
 																	'widget_id'     => $unique_id,
-																	'cart_icon'         => $cart_icon,
+																	'cart_icon'         => $cart_icon_config,
 																	'customization_icon'=> $customization_icon
 															);
 
@@ -424,10 +430,22 @@ class Template_Functions {
 			<div class='wpc-tab <?php echo esc_attr($active_class); ?>' data-id='tab_<?php echo intval($content_key); ?>' data-cat_id='<?php echo  esc_attr($cat_id);?>'>
 					<div class="tab_template_<?php echo esc_attr( $cat_id.'_'.$unique_id );?>"></div>
 					<div class="template_data_<?php echo esc_attr( $cat_id.'_'.$unique_id );?>">
-							<?php include \Wpcafe::plugin_dir() . "widgets/wpc-food-menu-tab/style/{$style}.php"; ?>
+							<?php
+							$is_pro_active = function_exists('wpcafe_pro') || defined('WPCAFE_PRO_FILE');
+							$style_path = wpcafe()->plugin_directory . "/widgets/wpc-food-menu-tab/style/{$style}.php";
+
+							if ( !file_exists( $style_path ) && $is_pro_active && function_exists('wpcafe_pro') ) {
+								$pro_style_path = wpcafe_pro()->plugin_directory . "/widgets/food-menu-tab/style/{$style}.php";
+								if ( file_exists( $pro_style_path ) ) {
+									$style_path = $pro_style_path;
+								}
+							}
+
+							include $style_path;
+							?>
 					</div>
 			</div><!-- Tab pane 1 end -->
-			<?php 
+			<?php
 	}
 
 	public static function modal_markup( $wpc_locations, $store_id = null ){
@@ -452,7 +470,7 @@ class Template_Functions {
 									}
 									?>
 							</select>
-							<button class="wpc-select-location wpc-btn wpc-btn-primary"><?php echo esc_html__( "Ok", "wpcafe" );?></button>
+							<button class="wpc-select-location wpc-btn wpc-btn-primary"><?php echo esc_html__( "Ok", 'wp-cafe' );?></button>
 							<button class="wpc-close wpc-btn"> X </button>
 					</div>
 			</div>
