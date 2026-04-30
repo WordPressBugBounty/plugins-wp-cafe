@@ -7,7 +7,8 @@
 if ( ! defined( 'ABSPATH' ) ) {
     exit;
 }
- 
+// phpcs:ignoreFile WordPress.NamingConventions.PrefixAllGlobals -- template scope; locally-extracted variables and third-party (Elementor) hook names.
+
 ?>
 <div id="loader" style="display: none;">
   <div class="spinner"></div> <!-- You can style this or use an SVG/CSS spinner -->

@@ -33,6 +33,7 @@ class WooCommerce_Admin implements Hookable_Service_Contract {
      */
     private function is_wpcafe_woocommerce_page() {
         // Check if wpcafe parameter is present
+        // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- admin list-table filter, capability-gated
         if ( ! isset( $_GET['wpcafe'] ) || $_GET['wpcafe'] !== 'true' ) {
             return false;
         }
@@ -612,6 +613,7 @@ class WooCommerce_Admin implements Hookable_Service_Contract {
      * @return string Modified location with wpcafe parameter if needed
      */
     public function wpcafe_keep_param_after_save( $location ) {
+        // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- admin list-table filter, capability-gated
         if ( ! empty( $_REQUEST['wpcafe'] ) && $_REQUEST['wpcafe'] === 'true' ) {
             $location = add_query_arg( 'wpcafe', 'true', $location );
         }
@@ -626,6 +628,7 @@ class WooCommerce_Admin implements Hookable_Service_Contract {
      */
     public function wpc_preserve_wpcafe_redirect( $location ) {
         // Check if the current request has the wpcafe parameter
+        // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- admin list-table filter, capability-gated
         if ( ! empty( $_REQUEST['wpcafe'] ) && $_REQUEST['wpcafe'] === 'true' ) {
             if ( strpos( $location, admin_url() ) === 0 || strpos( $location, '/wp-admin/' ) !== false ) {
                 // Check if wpcafe parameter is already present
@@ -882,7 +885,7 @@ class WooCommerce_Admin implements Hookable_Service_Contract {
      */
     private function get_woo_menu_items() {
         $current_screen = get_current_screen();
-        $current_url = $_SERVER['REQUEST_URI'];
+        $current_url = isset( $_SERVER['REQUEST_URI'] ) ? esc_url_raw( wp_unslash( $_SERVER['REQUEST_URI'] ) ) : '';
 
         return apply_filters( 'wpcafe_woo_menu_items', [
             [

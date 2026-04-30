@@ -462,6 +462,7 @@ class Location_Model {
         ];
 
         if ( ! empty( $search ) ) {
+            // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_query -- required for report/filter functionality
             $args['meta_query'] = [
                 'relation' => 'OR',
                 [
@@ -511,6 +512,7 @@ class Location_Model {
         $args = [
             'taxonomy'   => self::$taxonomy,
             'hide_empty' => false,
+            // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_query -- required for report/filter functionality
             'meta_query' => [
                 [
                     'key'   => $key,

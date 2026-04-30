@@ -1,5 +1,6 @@
 <?php
 if ( ! defined( 'ABSPATH' ) ) exit;
+// phpcs:ignoreFile WordPress.NamingConventions.PrefixAllGlobals -- widget/template scope; locally-extracted variables and Elementor-owned hook names (elementor/control/search_control, elementor/control/search_data).
 
 use \WpCafe\Core\Shortcodes\Template_Functions as Wpc_Widget_Template;
 

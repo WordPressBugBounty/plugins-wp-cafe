@@ -1,5 +1,6 @@
 <?php
 if ( ! defined( 'ABSPATH' ) ) exit;
+// phpcs:ignoreFile WordPress.NamingConventions.PrefixAllGlobals -- template scope; locally-extracted variables and third-party (Elementor) hook names.
 
     use WpCafe\Utils\Wpc_Utilities;
     $style               = $settings["food_menu_style"];
@@ -40,6 +41,8 @@ if ( ! defined( 'ABSPATH' ) ) exit;
             }
 
             $products = Wpc_Utilities::product_query( $food_list_args );
+            $allowed_styles = ['style-1', 'style-2', 'style-3'];
+            $style = in_array( $style, $allowed_styles, true ) ? $style : 'style-1';
             include wpcafe()->plugin_directory . "/widgets/wpc-menus-list/style/{$style}.php";
             ?>
         </div>

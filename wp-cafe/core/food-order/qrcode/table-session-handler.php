@@ -75,8 +75,10 @@ class Table_Session_Handler implements Hookable_Service_Contract {
      */
     public function capture_table_id_from_url() {
         // Check if wpc-table_id parameter exists in URL
+        // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- public QR code scan, no nonce by design
         if ( isset( $_GET['wpc-table_id'] ) && ! empty( $_GET['wpc-table_id'] ) ) {
-            $table_id = sanitize_text_field( $_GET['wpc-table_id'] );
+            // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- public QR code scan, no nonce by design
+            $table_id = sanitize_text_field( wp_unslash( $_GET['wpc-table_id'] ) );
         }
 
         if ( isset( $table_id ) ) {

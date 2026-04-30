@@ -1,5 +1,6 @@
 <?php
 if ( ! defined( 'ABSPATH' ) ) exit;
+// phpcs:ignoreFile WordPress.NamingConventions.PrefixAllGlobals -- template scope; locally-extracted variables, hook names include backward-compat filters.
 
 // check condition for calender view
 if ( isset($atts['form_style']) ) {
@@ -21,7 +22,7 @@ $multi_sch_class       = $multi_schedule == "on" ? "wpc-multi-reservation-msg" :
 
 ?>
 
-	<div class='wpc-reservation-form <?php echo esc_attr($cancellation_option) ?>' data-reservation_status='<?php echo json_encode( $booking_status ) ?>'>
+	<div class='wpc-reservation-form <?php echo esc_attr($cancellation_option) ?>' data-reservation_status='<?php echo esc_attr( wp_json_encode( $booking_status ) ); ?>'>
 			<div class='late_booking' data-late_booking="<?php echo esc_html($late_one.$late_two.$late_three.$late_four.$late_five);?>"></div>
 			<div class='wpc_cancell_log_message'></div>
 			<div class='wpc_error_message' data-time_compare="<?php echo esc_html__('Booking end time must be after start time','wp-cafe')?>"></div>

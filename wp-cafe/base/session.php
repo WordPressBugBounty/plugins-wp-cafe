@@ -23,7 +23,7 @@ class Session {
      */
     public static function set($key, $value) {
         self::start();
-        $_SESSION[$key] = maybe_serialize($value);
+        $_SESSION[$key] = $value;
     }
 
     /**
@@ -35,12 +35,8 @@ class Session {
      */
     public static function get($key, $default = null) {
         self::start();
-
-        if ( isset( $_SESSION[$key] ) ) {
-            return maybe_unserialize($_SESSION[$key]);
-        }
-
-        return $default;
+        // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- $_SESSION is server-side storage, plugin-controlled
+        return $_SESSION[$key] ?? $default;
     }
 
     /**

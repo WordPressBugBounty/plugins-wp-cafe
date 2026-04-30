@@ -274,6 +274,10 @@ abstract class Base_Assets implements Hookable_Service_Contract {
                 'url' => content_url( 'languages/plugins' ),
             ],
             [
+                'dir' => trailingslashit( WP_LANG_DIR ) . 'loco/plugins',
+                'url' => content_url( 'languages/loco/plugins' ),
+            ],
+            [
                 'dir' => trailingslashit( WP_CONTENT_DIR ) . 'wp-cafe/languages',
                 'url' => content_url( 'wp-cafe/languages' ),
             ],

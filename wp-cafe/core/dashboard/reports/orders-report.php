@@ -77,6 +77,7 @@ class Orders_Report {
         );
 
         // Exclude orders with reservation_id meta
+        // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_query -- required for report/filter functionality
         $args['meta_query'] = array(
             array(
                 'key'     => 'reservation_id',
@@ -124,6 +125,11 @@ class Orders_Report {
         $order = wc_get_order( $order_id );
         if ( ! $order ) {
             throw new \Exception( 'Order not found' );
+        }
+
+        $allowed_statuses = array_keys( wc_get_order_statuses() );
+        if ( ! in_array( 'wc-' . $status, $allowed_statuses, true ) && ! in_array( $status, $allowed_statuses, true ) ) {
+            throw new \Exception( 'Invalid order status' );
         }
 
         $order->update_status( $status );
@@ -226,10 +232,13 @@ class Orders_Report {
         );
 
         if ( $branch && 'all' !== $branch ) {
+            // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_key -- required for report/filter functionality
             $query_args['meta_key']   = 'wpc_location_id';
+            // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_value -- required for report/filter functionality
             $query_args['meta_value'] = $branch;
         }
 
+        // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_query -- required for report/filter functionality
         $query_args['meta_query'] = $meta_query;
 
         $query = new WC_Order_Query( $query_args );

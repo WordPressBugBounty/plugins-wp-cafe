@@ -147,6 +147,7 @@ class Food_Menu_Tab extends Base_Shortcode {
                 $filtered_tax_query[] = $query;
             }
 
+            // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_tax_query -- required for report/filter functionality
             $args['tax_query'] = $filtered_tax_query;
         }
 

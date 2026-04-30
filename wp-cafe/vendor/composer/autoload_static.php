@@ -210,6 +210,7 @@ class ComposerStaticInitb45f783447c7cd8d1e47479c0b420592
         'WpCafe\\Reservation\\Email\\Triggers\\Reservation_Confirmed_Trigger' => __DIR__ . '/../..' . '/core/reservation/email/triggers/reservation-confirmed-trigger.php',
         'WpCafe\\Reservation\\Email\\Triggers\\Reservation_Created_Trigger' => __DIR__ . '/../..' . '/core/reservation/email/triggers/reservation-created-trigger.php',
         'WpCafe\\Reservation\\Email\\Triggers\\Reservation_Pending_Trigger' => __DIR__ . '/../..' . '/core/reservation/email/triggers/reservation-pending-trigger.php',
+        'WpCafe\\Reservation\\Email\\Triggers\\Reservation_Updated_Trigger' => __DIR__ . '/../..' . '/core/reservation/email/triggers/reservation-updated-trigger.php',
         'WpCafe\\Reservation\\Reservation_Hooks' => __DIR__ . '/../..' . '/core/reservation/reservation-hooks.php',
         'WpCafe\\Reservation\\Reservation_Service_Provider' => __DIR__ . '/../..' . '/core/reservation/reservation-service-provider.php',
         'WpCafe\\Reservation\\Shortcodes\\Reservation_Form' => __DIR__ . '/../..' . '/core/reservation/shortcodes/reservation-form.php',

@@ -47,7 +47,8 @@ class Product_Filter implements Hookable_Service_Contract {
             return;
         }
 
-        $selected = isset( $_GET['location'] ) ? $_GET['location'] : '';
+        // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- admin list-table filter, capability-gated
+        $selected = isset( $_GET['location'] ) ? absint( $_GET['location'] ) : 0;
         $locations = Location_Model::all();
         ?>
         <select name="location">
@@ -73,9 +74,11 @@ class Product_Filter implements Hookable_Service_Contract {
     public function get_product_filter( $query ) {
         global $pagenow;
 
+        // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- admin list-table filter, capability-gated
         if ( is_admin() && $pagenow === 'edit.php' && ! empty( $_GET['location'] ) ) {
             if ( isset( $query->query_vars['post_type'] ) && $query->query_vars['post_type'] === 'product' ) {
-                $location = sanitize_text_field( $_GET['location'] );
+                // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- admin list-table filter, capability-gated
+                $location = absint( $_GET['location'] );
 
                 $query->set( 'tax_query', array(
                     array(

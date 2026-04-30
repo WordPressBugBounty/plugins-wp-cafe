@@ -55,6 +55,7 @@ class Top_Sales_Report {
 
         // Add branch filter if specified
         if ( $branch !== 'all' ) {
+            // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_query -- required for report/filter functionality
             $order_args['meta_query'] = array(
                 array(
                     'key'   => 'wpc_branch',

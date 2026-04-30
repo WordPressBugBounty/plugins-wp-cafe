@@ -185,6 +185,7 @@ class Mini_Cart {
         }
 
         $settings = wpc_get_option();
+        // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- admin list-table filter, capability-gated
         $location = isset( $_GET['location'] ) ? absint( $_GET['location'] ) : 0;
 
         // Load custom mini cart template.

@@ -422,7 +422,11 @@ class Wpc_Resevation_Form extends Widget_Base {
         $fluent_crm_webhook = !empty( $settings["fluent_crm_webhook"] ) ? $settings["fluent_crm_webhook"] : '';
         
         $style = $settings['style'];
-        echo do_shortcode( "[wpc_reservation_form fluent_crm_webhook='$fluent_crm_webhook' wpc_image_url='$reservation_image' form_style='$style'] " );
+        echo do_shortcode(
+            "[wpc_reservation_form fluent_crm_webhook='" . esc_url( $fluent_crm_webhook ) .
+            "' wpc_image_url='" . esc_url( $reservation_image ) .
+            "' form_style='" . esc_attr( $style ) . "']"
+        );
     }
 
     protected function get_menu_category() {

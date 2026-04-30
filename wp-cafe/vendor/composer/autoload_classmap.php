@@ -169,6 +169,7 @@ return array(
     'WpCafe\\Reservation\\Email\\Triggers\\Reservation_Confirmed_Trigger' => $baseDir . '/core/reservation/email/triggers/reservation-confirmed-trigger.php',
     'WpCafe\\Reservation\\Email\\Triggers\\Reservation_Created_Trigger' => $baseDir . '/core/reservation/email/triggers/reservation-created-trigger.php',
     'WpCafe\\Reservation\\Email\\Triggers\\Reservation_Pending_Trigger' => $baseDir . '/core/reservation/email/triggers/reservation-pending-trigger.php',
+    'WpCafe\\Reservation\\Email\\Triggers\\Reservation_Updated_Trigger' => $baseDir . '/core/reservation/email/triggers/reservation-updated-trigger.php',
     'WpCafe\\Reservation\\Reservation_Hooks' => $baseDir . '/core/reservation/reservation-hooks.php',
     'WpCafe\\Reservation\\Reservation_Service_Provider' => $baseDir . '/core/reservation/reservation-service-provider.php',
     'WpCafe\\Reservation\\Shortcodes\\Reservation_Form' => $baseDir . '/core/reservation/shortcodes/reservation-form.php',

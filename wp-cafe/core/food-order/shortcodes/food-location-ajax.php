@@ -4,6 +4,7 @@ namespace WpCafe\FoodOrder\Shortcodes;
 if ( ! defined( 'ABSPATH' ) ) exit;
 
 use WpCafe\Utils\Wpc_Utilities as Utils;
+use WpCafe\Session;
 
 /**
  * Food Location Ajax
@@ -30,7 +31,7 @@ class Food_Location_Ajax {
     public function food_location_ajax() {
         global $woocommerce;
 
-        if ( ! wp_verify_nonce( $_REQUEST['_wpc_nonce'], 'filter_food_location_nonce' ) ) {
+        if ( ! wp_verify_nonce( sanitize_text_field( wp_unslash( $_REQUEST['_wpc_nonce'] ?? '' ) ), 'filter_food_location_nonce' ) ) {
             wp_send_json_error(
                 [
                     'message' => esc_html__( 'Nonce verification failed!', 'wp-cafe' ),
@@ -40,6 +41,17 @@ class Food_Location_Ajax {
 
         $post_arr = filter_input_array( INPUT_POST, FILTER_SANITIZE_SPECIAL_CHARS );
         $location = $post_arr['location'];
+
+        $location_id = absint( $location );
+        if ( $location_id ) {
+            Session::set( 'selected_location', $location_id );
+            setcookie( 'wpc_selected_location', (string) $location_id, time() + ( 30 * DAY_IN_SECONDS ), COOKIEPATH ?: '/', COOKIE_DOMAIN, is_ssl(), false );
+            $_COOKIE['wpc_selected_location'] = (string) $location_id;
+        } else {
+            Session::delete( 'selected_location' );
+            setcookie( 'wpc_selected_location', '', time() - 3600, COOKIEPATH ?: '/', COOKIE_DOMAIN, is_ssl(), false );
+            unset( $_COOKIE['wpc_selected_location'] );
+        }
 
         if ( isset( $post_arr['product_data'] ) ) {
             $product_data           = $post_arr['product_data'];
@@ -51,7 +63,9 @@ class Food_Location_Ajax {
             $wpc_delivery_time_show = $product_data['wpc_delivery_time_show'];
             $wpc_desc_limit         = $product_data['wpc_desc_limit'];
             $unique_id              = $product_data['unique_id'];
-            $col                    = 'wpc-col-md-' . $product_data['wpc_menu_col'];
+            $allowed_cols           = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12'];
+            $menu_col               = isset($product_data['wpc_menu_col']) && in_array($product_data['wpc_menu_col'], $allowed_cols, true) ? $product_data['wpc_menu_col'] : '3';
+            $col                    = 'wpc-col-md-' . $menu_col;
             $title_link_show        = $product_data['title_link_show'];
             $get_location           = $location === '' ? [] : [ $location ];
 

@@ -7,15 +7,15 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/themewinter/plugin-notice-sdk.git",
-                "reference": "918a9ed9273321d16244292f00fa51ca1ad5397d"
+                "reference": "338fd3b470cfff5bf43eb7f39c0e85b04a112850"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/themewinter/plugin-notice-sdk/zipball/918a9ed9273321d16244292f00fa51ca1ad5397d",
-                "reference": "918a9ed9273321d16244292f00fa51ca1ad5397d",
+                "url": "https://api.github.com/repos/themewinter/plugin-notice-sdk/zipball/338fd3b470cfff5bf43eb7f39c0e85b04a112850",
+                "reference": "338fd3b470cfff5bf43eb7f39c0e85b04a112850",
                 "shasum": ""
             },
-            "time": "2025-10-28T08:39:47+00:00",
+            "time": "2026-03-17T05:04:40+00:00",
             "default-branch": true,
             "type": "library",
             "installation-source": "dist",
@@ -73,18 +73,18 @@
             "source": {
                 "type": "git",
                 "url": "git@github.com:themewinter/email-notification-sdk.git",
-                "reference": "7099c95ee6fac19faf150c7461108999527a1a00"
+                "reference": "8c5d46a27b8fbf95ad659f5c2f0cb723db792be4"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/themewinter/email-notification-sdk/zipball/7099c95ee6fac19faf150c7461108999527a1a00",
-                "reference": "7099c95ee6fac19faf150c7461108999527a1a00",
+                "url": "https://api.github.com/repos/themewinter/email-notification-sdk/zipball/8c5d46a27b8fbf95ad659f5c2f0cb723db792be4",
+                "reference": "8c5d46a27b8fbf95ad659f5c2f0cb723db792be4",
                 "shasum": ""
             },
             "require-dev": {
                 "phpunit/phpunit": "^10"
             },
-            "time": "2025-11-10T05:07:54+00:00",
+            "time": "2026-03-15T06:32:12+00:00",
             "default-branch": true,
             "type": "library",
             "installation-source": "dist",

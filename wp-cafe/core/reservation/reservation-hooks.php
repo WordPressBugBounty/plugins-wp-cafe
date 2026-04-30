@@ -8,6 +8,7 @@ use WpCafe\Reservation\Email\Triggers\Reservation_Created_Trigger;
 use WpCafe\Reservation\Email\Triggers\Reservation_Cancelled_Trigger;
 use WpCafe\Reservation\Email\Triggers\Reservation_Confirmed_Trigger;
 use WpCafe\Reservation\Email\Triggers\Reservation_Pending_Trigger;
+use WpCafe\Reservation\Email\Triggers\Reservation_Updated_Trigger;
 
 /**
  * Reservation Hooks Class
@@ -38,6 +39,7 @@ class Reservation_Hooks implements Hookable_Service_Contract {
         $available_triggers[] = Reservation_Cancelled_Trigger::class;
         $available_triggers[] = Reservation_Confirmed_Trigger::class;
         $available_triggers[] = Reservation_Pending_Trigger::class;
+        $available_triggers[] = Reservation_Updated_Trigger::class;
         return $available_triggers;
     }
 
@@ -111,7 +113,7 @@ class Reservation_Hooks implements Hookable_Service_Contract {
      * @return void
      */
     public function discard_reservation_ajax(): void {
-        if ( ! isset( $_POST['nonce'] ) || ! wp_verify_nonce( $_POST['nonce'], 'wpc_discard_reservation' ) ) {
+        if ( ! isset( $_POST['nonce'] ) || ! wp_verify_nonce( sanitize_text_field( wp_unslash( $_POST['nonce'] ) ), 'wpc_discard_reservation' ) ) {
             wp_send_json_error( [ 'message' => __( 'Security check failed', 'wp-cafe' ) ] );
         }
 

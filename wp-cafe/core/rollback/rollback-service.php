@@ -39,7 +39,7 @@ class Rollback_Service implements Hookable_Service_Contract {
         }
 
         $rollback_versions = $this->get_rollback_versions();
-        $version = ! empty( $_GET['version'] ) ? $_GET['version'] : '';
+        $version = ! empty( $_GET['version'] ) ? sanitize_text_field( wp_unslash( $_GET['version'] ) ) : '';
 
         if ( empty( $version ) || ! in_array( $version, $rollback_versions, true ) ) {
         	wp_die( esc_html__( 'An error occurred, the selected version is invalid. Try selecting different version.', 'wp-cafe' ) );

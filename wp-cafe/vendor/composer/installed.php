@@ -3,7 +3,7 @@
         'name' => 'themewinter/wp-cafe',
         'pretty_version' => 'dev-develop',
         'version' => 'dev-develop',
-        'reference' => '82e92a9e3e2635c3b6ece3fc7b4f8c8b2d99450e',
+        'reference' => '4a58b0bafe530a76025d0ade3e7352211ef11ce6',
         'type' => 'project',
         'install_path' => __DIR__ . '/../../',
         'aliases' => array(),
@@ -13,7 +13,7 @@
         'arraytics/plugin-notice-sdk' => array(
             'pretty_version' => 'dev-main',
             'version' => 'dev-main',
-            'reference' => '918a9ed9273321d16244292f00fa51ca1ad5397d',
+            'reference' => '338fd3b470cfff5bf43eb7f39c0e85b04a112850',
             'type' => 'library',
             'install_path' => __DIR__ . '/../arraytics/plugin-notice-sdk',
             'aliases' => array(
@@ -35,7 +35,7 @@
         'themewinter/email-notification-sdk' => array(
             'pretty_version' => 'dev-main',
             'version' => 'dev-main',
-            'reference' => '7099c95ee6fac19faf150c7461108999527a1a00',
+            'reference' => '8c5d46a27b8fbf95ad659f5c2f0cb723db792be4',
             'type' => 'library',
             'install_path' => __DIR__ . '/../themewinter/email-notification-sdk',
             'aliases' => array(
@@ -57,7 +57,7 @@
         'themewinter/wp-cafe' => array(
             'pretty_version' => 'dev-develop',
             'version' => 'dev-develop',
-            'reference' => '82e92a9e3e2635c3b6ece3fc7b4f8c8b2d99450e',
+            'reference' => '4a58b0bafe530a76025d0ade3e7352211ef11ce6',
             'type' => 'project',
             'install_path' => __DIR__ . '/../../',
             'aliases' => array(),

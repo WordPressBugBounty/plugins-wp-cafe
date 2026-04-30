@@ -36,6 +36,19 @@ class Reservation_Form extends Base_Shortcode {
         // Parse and merge attributes with defaults
         $atts = shortcode_atts( $default_atts, $atts, $this->tag() );
 
+        // Support for handling Elementor editor mode by adding place holder text in editor mode.
+        if (
+            did_action( 'elementor/loaded' )
+            && class_exists( '\Elementor\Plugin' )
+            && \Elementor\Plugin::$instance
+            && \Elementor\Plugin::$instance->editor
+            && \Elementor\Plugin::$instance->editor->is_edit_mode()
+        ) {
+            return '<div class="wpc-reservation-form-editor-placeholder" style="padding:24px;border:1px dashed #c3c4c7;background:#f6f7f7;text-align:center;color:#50575e;font-size:14px;border-radius:4px;">'
+                . esc_html__( 'WPC Reservation Form will appear on the frontend and also in preview mode.', 'wp-cafe' )
+                . '</div>';
+        }
+
         wp_enqueue_style( 'wpcafe-frontend-style' );
         wp_enqueue_script( 'wpcafe-frontend-scripts' );
 

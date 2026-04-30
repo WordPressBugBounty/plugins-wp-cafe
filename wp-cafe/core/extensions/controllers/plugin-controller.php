@@ -91,6 +91,13 @@ class Plugin_Controller extends Base_Rest_Controller {
 
         if ( $status === 'install' ) {
             if ( $download_url ) {
+                // Validate download URL scheme and host before installing.
+                $parsed          = wp_parse_url( $download_url );
+                $allowed_domains = [ 'wordpress.org', 'arraytics.com', 'themewinter.com', 'github.com' ];
+                if ( ( $parsed['scheme'] ?? '' ) !== 'https' || ! in_array( $parsed['host'] ?? '', $allowed_domains, true ) ) {
+                    return $this->error( __( 'Download URL must use HTTPS from a trusted domain.', 'wp-cafe' ) );
+                }
+
                 // Plugin is not on WordPress.org — install directly from the provided URL.
                 if ( PluginManager::is_installed( $slug ) ) {
                     $update = true;

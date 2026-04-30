@@ -126,6 +126,8 @@ class Location_Selector implements Hookable_Service_Contract {
      * @return  json
      */
     public function save_location() {
+        check_ajax_referer( 'wpc_location_nonce', 'nonce' );
+
         $location_id = ! empty( $_POST['location_id'] ) ? intval( $_POST['location_id'] ) : 0;
 
         if ( ! WC()->cart->is_empty() && $location_id != wpc_selected_location_id() ){

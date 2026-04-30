@@ -16,6 +16,7 @@ use WpCafe\Dashboard\Reports\Orders_Report;
 use WpCafe\Dashboard\Reports\Reservations_Report;
 use WpCafe\Dashboard\Reports\Customers_Report;
 use WpCafe\Dashboard\Reports\Top_Sales_Report;
+use WpCafe\Dashboard\Reports\Date_Utility;
 use WP_Error;
 use WP_HTTP_Response;
 use WP_REST_Server;
@@ -151,8 +152,14 @@ class Dashboard_Controller extends Base_Rest_Controller {
      */
     public function get_overview( $request ) {
         $current_timestamp = current_time( 'timestamp' );
-        $start_date = $request->get_param( 'start_date' ) ?: wp_date( 'Y-m-d', $current_timestamp );
-        $end_date = $request->get_param( 'end_date' ) ?: wp_date( 'Y-m-d', strtotime( '+1 day', $current_timestamp ) );
+        $start_date = $this->normalize_date(
+            $request->get_param( 'start_date' ),
+            wp_date( 'Y-m-d', $current_timestamp )
+        );
+        $end_date = $this->normalize_date(
+            $request->get_param( 'end_date' ),
+            wp_date( 'Y-m-d', strtotime( '+1 day', $current_timestamp ) )
+        );
         $branch = $request->get_param( 'branch' ) ?: 'all';
         try {
             // Get revenue data.
@@ -233,8 +240,8 @@ class Dashboard_Controller extends Base_Rest_Controller {
      * @return WP_HTTP_Response|WP_Error Response object or WP_Error on failure.
      */
     public function update_order_status( $request ) {
-        $order_id = $request->get_param( 'id' );
-        $status   = $request->get_param( 'status' );
+        $order_id = absint( $request->get_param( 'id' ) );
+        $status   = sanitize_text_field( $request->get_param( 'status' ) );
 
         if ( ! $status ) {
             return $this->error( 'Status is required', 400 );
@@ -269,6 +276,21 @@ class Dashboard_Controller extends Base_Rest_Controller {
         } catch ( Exception $e ) {
             return $this->error( $e->getMessage(), 500 );
         }
+    }
+
+    /**
+     * Normalize an incoming date string to Y-m-d.
+     *
+     * Delegates to Date_Utility::normalize_date() which supports multiple
+     * formats (admin WP date_format, Y-m-d, m/d/Y, d/m/Y, d.m.Y, F j, Y, etc.)
+     * so downstream WC_Order_Query date_created filters match correctly.
+     *
+     * @param string|null $value    Raw date input from the request.
+     * @param string      $fallback Y-m-d fallback when value is empty or unparseable.
+     * @return string Y-m-d formatted date.
+     */
+    private function normalize_date( $value, $fallback ) {
+        return Date_Utility::normalize_date( $value, $fallback );
     }
 
     /**

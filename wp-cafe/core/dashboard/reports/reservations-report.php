@@ -146,7 +146,9 @@ class Reservations_Report {
         );
 
         if ( $branch && 'all' !== $branch ) {
+            // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_key -- required for report/filter functionality
             $args['meta_key']   = 'branch_id';
+            // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_value -- required for report/filter functionality
             $args['meta_value'] = $branch;
         }
 

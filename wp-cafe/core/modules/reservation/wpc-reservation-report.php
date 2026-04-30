@@ -179,7 +179,8 @@ class Wpc_Reservation_Report {
                         <option value=""><?php echo esc_html__('Filter By Status', 'wp-cafe'); ?></option>
                         <?php
                         foreach ($meta_values as $value) {
-                            $meta_filter = isset($_GET['meta_filter']) ? sanitize_text_field($_GET['meta_filter']) : '';
+                            // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- admin list-table filter, capability-gated
+                            $meta_filter = isset($_GET['meta_filter']) ? sanitize_text_field( wp_unslash( $_GET['meta_filter'] ) ) : '';
                             $selected = ($meta_filter === $value) ? 'selected' : '';
                             echo wp_kses( "<option value=". esc_attr( $value ). esc_attr($selected). ">".esc_attr( $value )."</option>", Wpc_Utilities::wpc_kses_allowed_tags());
                         }
@@ -196,9 +197,12 @@ class Wpc_Reservation_Report {
 
     public function reservation_filter_status_by_meta($query) {
         global $pagenow;
+        // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- admin list-table filter, capability-gated
         if ('edit.php' === $pagenow && isset($_GET['post_type']) && 'wpc_reservation' === $_GET['post_type'] && isset($_GET['meta_filter']) && $_GET['meta_filter'] != '') {
+            // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_key -- required for report/filter functionality
             $query->query_vars['meta_key'] = 'wpc_reservation_state';
-            $query->query_vars['meta_value'] = $_GET['meta_filter'];
+            // phpcs:ignore WordPress.Security.NonceVerification.Recommended,WordPress.DB.SlowDBQuery.slow_db_query_meta_value -- admin list-table filter, capability-gated; required for report/filter functionality
+            $query->query_vars['meta_value'] = sanitize_text_field( wp_unslash( $_GET['meta_filter'] ) );
         }
     }
     

@@ -147,7 +147,8 @@ class Blueprint {
      * @return void
      */
     public function enum($column, array $values) {
-        $values_string = "'" . implode("','", $values) . "'";
+        $escaped_values = array_map( 'esc_sql', $values );
+        $values_string = "'" . implode("','", $escaped_values) . "'";
         $this->columns[] = "`{$column}` ENUM({$values_string})";
 
         return $this;
@@ -193,7 +194,7 @@ class Blueprint {
         $last_index = count($this->columns) - 1;
         if ($last_index >= 0) {
             if (is_string($value)) {
-                $value = "'{$value}'";
+                $value = "'" . esc_sql($value) . "'";
             }
             $this->columns[$last_index] .= " DEFAULT {$value}";
         }

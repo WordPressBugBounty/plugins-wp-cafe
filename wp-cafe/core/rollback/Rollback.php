@@ -70,8 +70,11 @@ class Rollback {
      * @param array $args Optional. Rollback arguments. Default is an empty array.
      */
     public function __construct( $args = [] ) {
+        $allowed = [ 'package_url', 'version', 'plugin_name', 'plugin_slug' ];
         foreach ( $args as $key => $value ) {
-            $this->{$key} = $value;
+            if ( in_array( $key, $allowed, true ) ) {
+                $this->{$key} = $value;
+            }
         }
     }
 

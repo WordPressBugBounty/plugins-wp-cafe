@@ -1,5 +1,6 @@
 <?php
 if ( ! defined( 'ABSPATH' ) ) exit;
+// phpcs:ignoreFile WordPress.NamingConventions.PrefixAllGlobals -- template scope; locally-extracted variables and third-party (Elementor) hook names.
 
 /**
  * Reservation Details Template
@@ -34,6 +35,28 @@ wp_localize_script( 'wpc-discard-reservation', 'wpcDiscardReservationColors', [
     'primary' => esc_attr( $primary_color ),
     'secondary' => esc_attr( $secondary_color ),
 ] );
+
+// Get show_reservation_end_time from reservation form customization (React form: end_time; legacy: to_time).
+$show_reservation_end_time = 'off';
+$form_customization = wpc_get_option('reservation_form_customization', []);
+if ( ! empty($form_customization) && is_array($form_customization) ) {
+    foreach ($form_customization as $step) {
+        if ( empty($step['fields']) || ! is_array($step['fields']) ) {
+            continue;
+        }
+        foreach ($step['fields'] as $field ) {
+            if ( empty($field['id']) ) {
+                continue;
+            }
+            if ( 'to_time' === $field['id'] || 'end_time' === $field['id'] ) {
+                if ( ! empty($field['visible']) ) {
+                    $show_reservation_end_time = 'on';
+                    break 2;
+                }
+            }
+        }
+    }
+}
 ?>
 
 <div class="wpc-reservation-info" style="background:#f9f9f9;padding:15px;margin-bottom:20px;border-radius:6px;">
@@ -81,7 +104,7 @@ wp_localize_script( 'wpc-discard-reservation', 'wpcDiscardReservationColors', [
         </p>
     <?php endif; ?>
 
-    <?php if ( ! empty( $reservation_data['end_time'] ) ) : ?>
+    <?php if ( ! empty( $reservation_data['end_time'] ) && $show_reservation_end_time == 'on' ) : ?>
         <p class="wpc-reservation-field wpc-reservation-end-time">
             <strong class="wpc-reservation-label"><?php echo esc_html__( 'End time', 'wp-cafe' ); ?> : </strong>
             <span class="wpc-reservation-value"><?php echo esc_html( gmdate( get_option( 'time_format' ), $reservation_data['end_time'] ) ); ?></span>

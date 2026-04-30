@@ -107,11 +107,21 @@ class Wpc_Utilities {
 				'class' => [],
 			],
 			'img'                           => [
-				'alt'    => [],
-				'class'  => [],
-				'height' => [],
-				'src'    => [],
-				'width'  => [],
+				'alt'         => [],
+				'class'       => [],
+				'height'      => [],
+				'src'         => [],
+				'width'       => [],
+				'srcset'      => [],
+				'sizes'       => [],
+				'loading'     => [],
+				'decoding'    => [],
+				'title'       => [],
+				'id'          => [],
+				'style'       => [],
+				'data-src'    => [],
+				'data-srcset' => [],
+				'data-sizes'  => [],
 			],
 			'li'                            => [
 				'class' => [],
@@ -163,7 +173,7 @@ class Wpc_Utilities {
 		if ( function_exists( 'wp_kses' ) ) { // WP is here
 			return wp_kses( $raw, $allowed_tags );
 		} else {
-			return $raw;
+			return '';
 		}
 
 	}
@@ -277,11 +287,21 @@ class Wpc_Utilities {
 				'class' => [],
 			],
 			'img'                           => [
-				'alt'    => [],
-				'class'  => [],
-				'height' => [],
-				'src'    => [],
-				'width'  => [],
+				'alt'         => [],
+				'class'       => [],
+				'height'      => [],
+				'src'         => [],
+				'width'       => [],
+				'srcset'      => [],
+				'sizes'       => [],
+				'loading'     => [],
+				'decoding'    => [],
+				'title'       => [],
+				'id'          => [],
+				'style'       => [],
+				'data-src'    => [],
+				'data-srcset' => [],
+				'data-sizes'  => [],
 			],
 			'li'                            => [
 				'class' => [],
@@ -434,9 +454,12 @@ class Wpc_Utilities {
 	 * @param array $args = [$to, $subject, $mail_body, $from, $from_name].
 	 */
 	public static function wpc_send_email( $args ) {
-		extract( $args );
+		$to        = $args['to'] ?? '';
+		$subject   = $args['subject'] ?? '';
+		$mail_body = $args['mail_body'] ?? '';
+		$from      = $args['from'] ?? '';
+		$from_name = $args['from_name'] ?? '';
 
-		$subject = $subject; // wp_specialchars_decode() does not decode all entities
 		$body    = wpautop( html_entity_decode( $mail_body ) );
 		$from_name = html_entity_decode( $from_name );
 
@@ -601,7 +624,17 @@ class Wpc_Utilities {
 			'wpc_location'  => null
 		);
 
-		extract( wp_parse_args( $params , $defaults ) );
+		$parsed = wp_parse_args( $params, $defaults );
+
+		$post_type     = $parsed['post_type'];
+		$no_of_product = $parsed['no_of_product'];
+		$wpc_cat       = $parsed['wpc_cat'];
+		$order         = $parsed['order'];
+		$page          = $parsed['page'];
+		$total_count   = $parsed['total_count'];
+		$search_value  = $parsed['search_value'];
+		$taxonomy      = $parsed['taxonomy'];
+		$wpc_location  = $parsed['wpc_location'];
 
 		$args = [];
 		$args['post_type']      = $post_type;
@@ -622,6 +655,7 @@ class Wpc_Utilities {
 			$args    = [ 'posts_per_page' =>  $no_of_product ];
 		}
 
+		// phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_tax_query -- required for report/filter functionality
 		$args['tax_query'] = array(
 			'relation' => 'AND',
 		);
@@ -650,9 +684,28 @@ class Wpc_Utilities {
 		$args['order']          = $order;
 		$args['post_status']    = 'publish';
 
+		// phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound -- wpc_ is the plugin's registered prefix.
 		$args = apply_filters( 'wpc_product_query_args', $args );
 
-		return wc_get_products($args);
+		// Translate WC_Product_Query keys (used by filters like timed-product) to WP_Query keys.
+		$key_map = [
+			'include' => 'post__in',
+			'exclude' => 'post__not_in', // phpcs:ignore WordPressVIPMinimum.Performance.WPQueryParams.PostNotIn_exclude -- exclusion applied only when explicitly requested by a filter hook; no alternative exists here.
+		];
+		foreach ( $key_map as $from => $to ) {
+			if ( ! empty( $args[ $from ] ) ) {
+				$args[ $to ] = (array) $args[ $from ];
+			}
+			unset( $args[ $from ] );
+		}
+
+		$args['post_type']     = $args['post_type'] ?? 'product';
+		$args['fields']        = 'ids';
+		$args['no_found_rows'] = true;
+
+		$ids = ( new \WP_Query( $args ) )->posts;
+
+		return $ids ? array_filter( array_map( 'wc_get_product', $ids ) ) : [];
 	}
 
 	/**
@@ -692,7 +745,13 @@ class Wpc_Utilities {
 	 */
 	public static function product_add_to_cart( $args ) {
 
-		extract( $args );
+		$product            = $args['product'] ?? null;
+		$cart_button        = $args['cart_button'] ?? '';
+		$wpc_btn_text       = $args['wpc_btn_text'] ?? '';
+		$customize_btn      = $args['customize_btn'] ?? '';
+		$widget_id          = $args['widget_id'] ?? '';
+		$cart_icon           = $args['cart_icon'] ?? '';
+		$customization_icon = $args['customization_icon'] ?? '';
 		$settings           = get_option('wpcafe_reservation_settings_options');
 		$icon_type = '';
 		$icon_value = '';
@@ -774,8 +833,8 @@ class Wpc_Utilities {
 				$product->is_in_stock() == true :
 				$price_html = '
 					<div class="wpc-external-product-link">
-						<a href="'.$product->get_product_url().'" class="wpc-btn">
-								'.$product->get_button_text().'
+						<a href="'.esc_url( $product->get_product_url() ).'" class="wpc-btn">
+								'.esc_html( $product->get_button_text() ).'
 						</a>
 					</div>
 					';
@@ -792,8 +851,10 @@ class Wpc_Utilities {
 	public static function qr_code_input() {
 		
 		$html = '';
+		// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- admin list-table filter, capability-gated
 		if ( !empty( $_GET['tableId'] ) ) {
-			$html = ' data-tableid="'. esc_html( sanitize_text_field( $_GET['tableId'] ) ).'"';
+			// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- admin list-table filter, capability-gated
+			$html = ' data-tableid="'. esc_attr( sanitize_text_field( wp_unslash( $_GET['tableId'] ?? '' ) ) ).'"';
 		}
 
 		return $html;

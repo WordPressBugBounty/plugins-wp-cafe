@@ -294,9 +294,9 @@ class Qrcode_Controller extends Base_Rest_Controller {
         
         $table_id = ! empty( $data['table_id'] ) ? sanitize_text_field( $data['table_id'] ) : '';
 
-        $table_name = ! empty( $data['table_name'] ) ? $data['table_name'] : [];
+        $table_name = ! empty( $data['table_name'] ) ? sanitize_text_field( $data['table_name'] ) : [];
 
-        $page_url = ! empty( $data['page_url'] ) ? $data['page_url'] : [];
+        $page_url = ! empty( $data['page_url'] ) ? sanitize_text_field( $data['page_url'] ) : [];
 
 
         if ( ! $table_id ) {

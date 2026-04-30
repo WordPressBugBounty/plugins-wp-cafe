@@ -20,13 +20,14 @@ class ActionListener {
     public function register($identifier) {
         $this->identifier = $identifier;
         $general_prefix   = Helpers::get_config_data($this->identifier,'general_prefix' );
+        $hook_prefix      = Helpers::get_config_data($this->identifier,'hook_prefix' );
         $sub_menu_filter_hook = Helpers::get_config_data($this->identifier,'sub_menu_filter_hook' );
 
         $this->flow_manager = new FlowManager($this->identifier);
 
         add_filter( $sub_menu_filter_hook, [$this, 'ens_add_sub_menu'], 10, 1 );
 
-        add_action( 'global_notification_hook', [$this, 'handle_action'], 10, 2 );
+        add_action( $hook_prefix . '_gln_hook', [$this, 'handle_action'], 10, 2 );
 
         add_action( $general_prefix . '_resume_flow_after_delay', function ( $flow_id, $resume_time ) {
             $this->flow_manager->resume_flow_callback( $flow_id, $resume_time );

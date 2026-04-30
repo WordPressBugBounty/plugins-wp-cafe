@@ -239,6 +239,7 @@ class Reservation_Model extends Post_Model {
 
         // Ensure blocking statuses is an array
         $blocking_statuses = wpc_get_option( 'block_timeslot_statuses', ['confirmed'] );
+        $blocking_statuses = self::expand_with_wc_equivalents( $blocking_statuses );
 
         $meta_query = [
             'relation' => 'AND',
@@ -274,6 +275,7 @@ class Reservation_Model extends Post_Model {
             'post_type' => 'wpc_reservation',
             'post_status' => $blocking_statuses,
             'numberposts' => -1,
+            // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_query -- required for report/filter functionality
             'meta_query' => $meta_query,
         ] );
 
@@ -363,11 +365,13 @@ class Reservation_Model extends Post_Model {
         if ( ! is_array( $statuses_for_blocking_seats ) || empty( $statuses_for_blocking_seats ) ) {
             $statuses_for_blocking_seats = ['confirmed'];
         }
+        $statuses_for_blocking_seats = self::expand_with_wc_equivalents( $statuses_for_blocking_seats );
 
         $posts = get_posts([
             'post_type'     => 'wpc_reservation',
             'post_status'   => $statuses_for_blocking_seats ,
             'numberposts'   => -1,
+            // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_query -- required for report/filter functionality
             'meta_query'    => $meta_query,
         ]);
 
@@ -389,5 +393,33 @@ class Reservation_Model extends Post_Model {
 
         // Return unique seat IDs
         return array_values( array_unique( $booked_seat_ids ) );
+    }
+
+    /**
+     * Expand a list of reservation statuses to also include their WooCommerce
+     * order-status equivalents.
+     *
+     * @param array $statuses Logical reservation statuses (`pending`, `confirmed`, `cancelled`, ...).
+     * @return array Statuses including WC equivalents, deduplicated.
+     */
+    private static function expand_with_wc_equivalents( $statuses ) {
+        if ( ! is_array( $statuses ) || empty( $statuses ) ) {
+            return $statuses;
+        }
+
+        $wc_equivalents = [
+            'pending'   => ['pending', 'on-hold', 'processing'],
+            'confirmed' => ['completed'],
+            'cancelled' => ['refunded', 'failed'],
+        ];
+
+        $expanded = $statuses;
+        foreach ( $statuses as $status ) {
+            if ( isset( $wc_equivalents[ $status ] ) ) {
+                $expanded = array_merge( $expanded, $wc_equivalents[ $status ] );
+            }
+        }
+
+        return array_values( array_unique( $expanded ) );
     }
 }

@@ -8,6 +8,10 @@
         "arraytics/plugin-notice-sdk": "dev-main",
         "themewinter/email-notification-sdk": "dev-main"
     },
+    "require-dev": {
+        "phpunit/phpunit": "^9.6",
+        "yoast/phpunit-polyfills": "^1.0"
+    },
     "autoload": {
         "classmap": [
             "base/",
@@ -20,6 +24,11 @@
         "files": [
             "utils/helpers.php"
         ]
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "WpCafe\\Tests\\": "tests/"
+        }
     },
     "repositories": [
         {
@@ -38,5 +47,9 @@
             "type": "vcs",
             "url": "https://github.com/themewinter/email-notification-sdk"
         }
-    ]
+    ],
+    "scripts": {
+        "test": "./vendor/bin/phpunit",
+        "test:unit": "./vendor/bin/phpunit"
+    }
 }

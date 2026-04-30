@@ -1,6 +1,8 @@
 <?php
 namespace WpCafe\Core\Blocks\BlockTypes;
 
+// phpcs:ignoreFile WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound -- plugin-wpc-prefix, public backward-compat hooks, or third-party (Elementor) hook names.
+
 defined( 'ABSPATH' ) || exit;
 
 use WpCafe\Utils\Wpc_Utilities;
@@ -123,6 +125,12 @@ class FoodList extends AbstractBlock {
 					'wpc_cat'       => $wpc_menu_cat,
 					'order'         => $wpc_menu_order,
 				];
+
+				$selected_location = function_exists( 'wpc_selected_location_id' ) ? wpc_selected_location_id() : null;
+				if ( ! empty( $selected_location ) ) {
+					$food_list_args['wpc_location'] = $selected_location;
+				}
+
 				$products       = Wpc_Utilities::product_query( $food_list_args );
 				include wpcafe()->plugin_directory . "/widgets/wpc-menus-list/style/{$template_file}.php";
 				?>

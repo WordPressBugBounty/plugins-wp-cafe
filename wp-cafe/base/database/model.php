@@ -106,6 +106,7 @@ class Model {
             return false;
         }
 
+        // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching -- plugin-owned table name, built from $wpdb->prefix + class constant
         $updated = $wpdb->update(
             $this->table,
             $data,
@@ -258,10 +259,13 @@ class Model {
 
         if ( ! empty( $this->wheres ) ) {
             $conditions = [];
-            foreach ($this->wheres as $where) {
-                $conditions[] = "{$where['column']} {$where['operator']} '" . esc_sql($where['value']) . "'";
+            $values     = [];
+            foreach ( $this->wheres as $where ) {
+                $conditions[] = "{$where['column']} {$where['operator']} %s";
+                $values[]     = $where['value'];
             }
-            $sql .= " WHERE " . implode(' AND ', $conditions);
+            $sql .= ' WHERE ' . implode( ' AND ', $conditions );
+            $sql  = static::$db->prepare( $sql, ...$values );
         }
 
         $results = static::$db->get_results( $sql, ARRAY_A );

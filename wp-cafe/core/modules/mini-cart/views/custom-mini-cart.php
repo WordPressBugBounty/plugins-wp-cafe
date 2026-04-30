@@ -1,5 +1,6 @@
 <?php
 if ( ! defined( 'ABSPATH' ) ) exit;
+// phpcs:ignoreFile WordPress.NamingConventions.PrefixAllGlobals -- locally-scoped template variables and public hook names (wpc_before_minicart / wpc_after_minicart are wpc-prefixed but flagged before phpcs.xml.dist loads).
 
     $settings       = wpc_get_option();
     do_action('wpc_before_minicart');

@@ -32,12 +32,12 @@ class Tipping_Ajax {
             'message'     => '',
         ];
 
-        if ( ! wp_verify_nonce( $_POST['security'], 'add_tip_nonce_value' ) ) {
+        if ( ! wp_verify_nonce( sanitize_text_field( wp_unslash( $_POST['security'] ?? '' ) ), 'add_tip_nonce_value' ) ) {
             $response['message'] = esc_html__( 'Nonce is not valid!', 'wp-cafe' );
         } else {
-            $type     = sanitize_text_field( $_POST['tip_selected_type'] );
+            $type     = isset( $_POST['tip_selected_type'] ) ? sanitize_text_field( wp_unslash( $_POST['tip_selected_type'] ) ) : '';
 
-            $tip_amount = ! empty( $_POST['tip_amount'] ) ? floatval( $_POST['tip_amount'] ) : 0;
+            $tip_amount = ! empty( $_POST['tip_amount'] ) ? min( floatval( $_POST['tip_amount'] ), PHP_FLOAT_MAX ) : 0;
 
             $tip_types = [
                 'fixed_amount',
@@ -75,7 +75,7 @@ class Tipping_Ajax {
             'message'     => '',
         ];
 
-        if ( ! wp_verify_nonce( $_POST['security'], 'remove_tip_nonce_value' ) ) {
+        if ( ! wp_verify_nonce( sanitize_text_field( wp_unslash( $_POST['security'] ?? '' ) ), 'remove_tip_nonce_value' ) ) {
             $response['message'] = esc_html__( 'Nonce is not valid!', 'wp-cafe' );
         } else {
             WC()->session->__unset( 'wpc_pro_tip' );

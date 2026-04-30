@@ -87,16 +87,19 @@ class Hooks {
 					$date_to    = wp_date( 'Y-m-d', $current_timestamp );
 
 					// Create placeholders for IN clause
-					$placeholders = implode( ', ', array_fill( 0, count( $status ), '%s' ) );
+					$status        = (array) $status;
+					$placeholders  = implode( ', ', array_fill( 0, count( $status ), '%s' ) );
 
+					// phpcs:disable WordPress.DB.PreparedSQL.InterpolatedNotPrepared,WordPress.DB.PreparedSQLPlaceholders.ReplacementsWrongNumber -- $placeholders contains only sprintf tokens built from array_fill; replacement count matches count($status) + 2.
 					$query = $wpdb->prepare(
 						"SELECT * FROM {$wpdb->posts}
 							WHERE post_type = 'shop_order'
 							AND post_status IN ($placeholders)
 							AND post_date BETWEEN %s AND %s
 							",
-							array_merge( $status, array( "{$date_from} 00:00:00", "{$date_to} 23:59:59" ) )
+						array_merge( $status, array( "{$date_from} 00:00:00", "{$date_to} 23:59:59" ) )
 					);
+					// phpcs:enable WordPress.DB.PreparedSQL.InterpolatedNotPrepared,WordPress.DB.PreparedSQLPlaceholders.ReplacementsWrongNumber
 
 					$cache_key = Wpc_Utilities::get_query_cache( $query );
 					$orders = wp_cache_get( $cache_key, 'wpcafe_order_cache');
@@ -156,7 +159,8 @@ class Hooks {
 			global $woocommerce;
 			$items = $woocommerce->cart->get_cart();
 			// before add to cart product check if location exist.
-			$wpc_location_id = ! empty( $_POST['wpc_location_id'] ) ? sanitize_text_field( $_POST['wpc_location_id'] ) : "";
+			// phpcs:ignore WordPress.Security.NonceVerification.Missing -- WooCommerce handles nonce on add-to-cart action; this is a validation filter callback.
+			$wpc_location_id = ! empty( $_POST['wpc_location_id'] ) ? absint( wp_unslash( $_POST['wpc_location_id'] ) ) : "";
 
 			if ( "" !== $wpc_location_id ) {
 					if ( ! empty( $items ) ) {

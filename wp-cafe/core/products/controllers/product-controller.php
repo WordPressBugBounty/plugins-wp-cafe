@@ -91,6 +91,7 @@ class Product_Controller extends Base_Rest_Controller {
         }
 
         if ($request->get_param('exclude')) {
+            // phpcs:ignore WordPressVIPMinimum.Performance.WPQueryParams.PostNotIn_exclude -- admin/small-list usage, performance acceptable
             $args['exclude'] = $request->get_param('exclude');
         }
 
@@ -450,6 +451,7 @@ class Product_Controller extends Base_Rest_Controller {
                 'default'           => [],
                 'sanitize_callback' => 'wp_parse_id_list',
             ],
+            // phpcs:ignore WordPressVIPMinimum.Performance.WPQueryParams.PostNotIn_exclude -- admin/small-list usage, performance acceptable
             'exclude'  => [
                 'description'       => __('Ensure result set excludes specific IDs.', 'wp-cafe'),
                 'type'              => 'array',

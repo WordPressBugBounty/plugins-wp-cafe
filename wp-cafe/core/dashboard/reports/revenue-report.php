@@ -87,6 +87,7 @@ class Revenue_Report {
         );
         
         // Exclude orders with reservation_id meta (to skip woocommerce orders for reservation)
+        // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_query -- required for report/filter functionality
         $query_args['meta_query'] = array(
             array(
                 'key'     => 'reservation_id',
@@ -95,7 +96,9 @@ class Revenue_Report {
         );
 
         if ( $branch && 'all' !== $branch ) {
+            // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_key -- required for report/filter functionality
             $query_args['meta_key']   = 'wpc_location_id';
+            // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_value -- required for report/filter functionality
             $query_args['meta_value'] = $branch;
         }
 
@@ -142,7 +145,9 @@ class Revenue_Report {
         );
 
         if ( $branch && 'all' !== $branch ) {
-            $args['meta_key']   = 'wpc_location_id';
+            // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_key -- required for report/filter functionality
+            $args['meta_key']   = 'branch_id';
+            // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_value -- required for report/filter functionality
             $args['meta_value'] = $branch;
         }
 

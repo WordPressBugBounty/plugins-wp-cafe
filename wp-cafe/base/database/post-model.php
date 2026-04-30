@@ -196,6 +196,7 @@ abstract class Post_Model implements JsonSerializable {
         $args = wp_parse_args( $args, $default_args );
 
         if ( isset( $args['search'] ) ) {
+            // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_query -- required for report/filter functionality
             $args['meta_query'] = ( new static )->search_query( $args['search'] );
         }
 
@@ -206,6 +207,7 @@ abstract class Post_Model implements JsonSerializable {
                 unset( $args['filters']['status'] );
             }
 
+            // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_query -- required for report/filter functionality
             $args['meta_query'] = ( new static )->filter_query( $args['filters'] );
             unset( $args['filters'] );
         }
@@ -234,6 +236,7 @@ abstract class Post_Model implements JsonSerializable {
         $args = [
             'post_type'     => ( new static )->get_post_type(),
             'post_status'   => 'publish',
+            // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_query -- required for report/filter functionality
             'meta_query'    => [
                 [
                     'key'   => $meta_key,

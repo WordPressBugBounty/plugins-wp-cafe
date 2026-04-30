@@ -138,7 +138,7 @@
         // Filter location wise food
         -----------------------------------*/
         if ($("#filter_location").length !== 0) {
-            getting_location_data($("#filter_location"), true);
+            getting_location_data($("#filter_location"), false);
             $(document.body).on('added_to_cart', function () {
                 $("#filter_location").attr("data-cart_empty", 0);
             });
@@ -158,7 +158,7 @@
                 $("body").addClass("wpc_location_popup");
                 $("#filter_location option[value='" + previous_location.name + "']").attr("selected", true);
             } else {
-                getting_location_data($(this), 1, 0);
+                getting_location_data($(this), 1, 0, true);
             }
         });
 
@@ -179,7 +179,7 @@
                 $("#filter_location option[value='" + previous_location.name + "']").attr("selected", true);
             }
 
-            getting_location_data($("#filter_location"), call_ajax, clear_cart);
+            getting_location_data($("#filter_location"), call_ajax, clear_cart, true);
 
             close_popup("wpc_location_popup", "#wpc_location_modal", ".location_modal");
 
@@ -196,7 +196,7 @@
             $(args[2]).addClass("hide_field")
         }
 
-        function getting_location_data($this, call_ajax = false, clear_cart = 0) {
+        function getting_location_data($this, call_ajax = false, clear_cart = 0, should_reload = false) {
             if (typeof wpc_form_data !== "undefined") {
                 // TODO remove duplicate variables;
                 var location = $this.val();
@@ -205,8 +205,13 @@
 
                 // TODO we can use single key in obj, if key and value is same name.
                 let location_data_obj = { location, clear_cart, action: 'filter_food_location', _wpc_nonce: wpc_form_data._nonces.filter_food_location_nonce };
+                var has_product_data = false;
                 if (location_menu.length !== 0) {
-                    location_data_obj.product_data = location_menu.data('product_data');
+                    var product_data = location_menu.data('product_data');
+                    if (typeof product_data !== 'undefined' && product_data !== null) {
+                        location_data_obj.product_data = product_data;
+                        has_product_data = true;
+                    }
                 }
 
                 if (call_ajax) {
@@ -222,8 +227,10 @@
                         success: function (data) {
                             if (typeof data !== "undefined") {
                                 var response = JSON.parse(data);
-                                var food_location = location_menu.find('.food_location');
-                                food_location.html("").html(response.html);
+                                if (has_product_data) {
+                                    var food_location = location_menu.find('.food_location');
+                                    food_location.html("").html(response.html);
+                                }
 
                                 $("#filter_location").attr("data-cart_empty", response.cart_empty);
                                 if (clear_cart == 1) {
@@ -238,6 +245,9 @@
                                 location_name = location == "" ? "" : location_name;
                                 localStorage.setItem("wpc_location", JSON.stringify({ name: location, value: location_name }));
 
+                                if (!has_product_data && should_reload) {
+                                    window.location.reload();
+                                }
                             }
                         },
 

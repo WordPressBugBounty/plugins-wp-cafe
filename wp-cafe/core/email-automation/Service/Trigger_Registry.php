@@ -2,6 +2,8 @@
 
 namespace WpCafe\Email_Automation\Service;
 
+// phpcs:ignoreFile WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound -- plugin-wpc-prefix, public backward-compat hooks, or third-party (Elementor) hook names.
+
 use WpCafe\Email_Automation\Triggers\Abstract_Trigger;
 use WpCafe\Email_Automation\Triggers\Order_Created_Trigger;
 use WpCafe\Email_Automation\Triggers\Order_Status_Changed_Trigger;
@@ -41,11 +43,29 @@ class Trigger_Registry {
 		$available_triggers = [];
 		$available_triggers = apply_filters( 'wpc_available_email_triggers', $available_triggers );
 
-		// Register all available triggers
 		foreach ( $available_triggers as $trigger_class ) {
-			if ( class_exists( $trigger_class ) ) {
+			if ( $this->is_trigger_class_available( $trigger_class ) ) {
 				$this->register( new $trigger_class() );
 			}
+		}
+	}
+    
+	/**
+	 * Check if a trigger class is available
+	 * 
+	 * @param string $class_name The trigger class name
+	 * @return bool True if the class is available, false otherwise
+	 */
+	private function is_trigger_class_available( $class_name ) {
+		if ( class_exists( $class_name, false ) ) {
+			return true;
+		}
+
+		try {
+			return class_exists( $class_name, true );
+		} catch ( \Throwable $e ) {
+			// Tigger class could not be loaded, file may be missing.
+			return false;
 		}
 	}
 

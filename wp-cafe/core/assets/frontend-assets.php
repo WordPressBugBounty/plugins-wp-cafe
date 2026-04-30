@@ -69,13 +69,14 @@ class Frontend_Assets extends Base_Assets {
 
         wp_localize_script( 'wpc-location-selector', 'wpcLocation', [
             'ajaxUrl'          => admin_url('admin-ajax.php'),
+            'nonce'            => wp_create_nonce( 'wpc_location_nonce' ),
             'selectedLocation' => Session::get('selected_location'),
             'wc_cart_url'      => function_exists( 'wc_get_cart_url' ) ? wc_get_cart_url() : '',
             'require_location'          => wpc_get_option('require_location'),
             'location_selector'         => wpc_get_option('display_location_selector', 'dont_show'),
             'location_selector_pages'   => wpc_get_option('location_selector_pages'),
             'current_page_id'           => get_the_ID(),
-            'wc_cart_empty'             => function_exists( 'WC' ) ? WC()->cart->is_empty() : false,
+            'wc_cart_empty'             => function_exists( 'WC' ) && WC()->cart ? WC()->cart->is_empty() : true,
         ] );
 
         wp_set_script_translations(

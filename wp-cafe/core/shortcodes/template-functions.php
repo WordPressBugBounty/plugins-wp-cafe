@@ -11,7 +11,19 @@ class Template_Functions {
 	 * Food Menu List Template One
 	 */
 	public static function wpc_food_menu_list_template( $args ){
-			extract( $args );
+			$show_thumbnail     = $args['show_thumbnail'] ?? '';
+			$product            = $args['product'] ?? null;
+			$permalink          = $args['permalink'] ?? '';
+			$class              = $args['class'] ?? '';
+			$col                = $args['col'] ?? '';
+			$show_item_status   = $args['show_item_status'] ?? '';
+			$wpc_price_show     = $args['wpc_price_show'] ?? '';
+			$wpc_show_vendor    = $args['wpc_show_vendor'] ?? '';
+			$wpc_show_desc      = $args['wpc_show_desc'] ?? '';
+			$wpc_desc_limit     = $args['wpc_desc_limit'] ?? '';
+			$wpc_cart_button    = $args['wpc_cart_button'] ?? '';
+			$unique_id          = $args['unique_id'] ?? '';
+			$customization_icon = $args['customization_icon'] ?? '';
 			// Get cart icon configuration from settings
 			$cart_icon_config = wpc_get_option('cart_icon');
 			?>
@@ -49,7 +61,7 @@ class Template_Functions {
 									</div>
 
 									<h3 class="wpc-post-title wpc-title-with-border">
-											<a href="<?php echo esc_url($permalink); ?>" class="<?php echo esc_attr($class); ?>"> <?php echo esc_attr( $product->get_name() );  ?> </a>
+											<a href="<?php echo esc_url($permalink); ?>" class="<?php echo esc_attr($class); ?>"> <?php echo esc_html( $product->get_name() );  ?> </a>
 											<span class="wpc-title-border"></span>
 											<?php
 											if( $product->get_type() !== 'variable' && $wpc_price_show !== 'no') {
@@ -131,7 +143,18 @@ class Template_Functions {
 	 * Food Menu List Template Two
 	 */
 	public static function wpc_food_menu_list_template_two( $args ){
-			extract( $args );
+			$show_thumbnail     = $args['show_thumbnail'] ?? '';
+			$product            = $args['product'] ?? null;
+			$permalink          = $args['permalink'] ?? '';
+			$class              = $args['class'] ?? '';
+			$show_item_status   = $args['show_item_status'] ?? '';
+			$wpc_price_show     = $args['wpc_price_show'] ?? '';
+			$wpc_show_vendor    = $args['wpc_show_vendor'] ?? '';
+			$wpc_show_desc      = $args['wpc_show_desc'] ?? '';
+			$wpc_desc_limit     = $args['wpc_desc_limit'] ?? '';
+			$wpc_cart_button    = $args['wpc_cart_button'] ?? '';
+			$unique_id          = $args['unique_id'] ?? '';
+			$customization_icon = $args['customization_icon'] ?? '';
 			// Get cart icon configuration from settings
 			$cart_icon_config = wpc_get_option('cart_icon');
 			?>
@@ -257,7 +280,21 @@ class Template_Functions {
 	 * Food Menu List Template Three
 	 */
 	public static function wpc_food_menu_list_template_three( $args ){
-			extract( $args );
+			$show_thumbnail     = $args['show_thumbnail'] ?? '';
+			$product            = $args['product'] ?? null;
+			$permalink          = $args['permalink'] ?? '';
+			$class              = $args['class'] ?? '';
+			$show_item_status   = $args['show_item_status'] ?? '';
+			$wpc_price_show     = $args['wpc_price_show'] ?? '';
+			$wpc_show_vendor    = $args['wpc_show_vendor'] ?? '';
+			$wpc_show_desc      = $args['wpc_show_desc'] ?? '';
+			$wpc_desc_limit     = $args['wpc_desc_limit'] ?? '';
+			$wpc_cart_button    = $args['wpc_cart_button'] ?? '';
+			$unique_id          = $args['unique_id'] ?? '';
+			$customization_icon = $args['customization_icon'] ?? '';
+			$column_desktop     = $args['column_desktop'] ?? '4';
+			$column_tablet      = $args['column_tablet'] ?? '6';
+			$column_mobile      = $args['column_mobile'] ?? '12';
 			// Get cart icon configuration from settings
 			$cart_icon_config = wpc_get_option('cart_icon');
 			?>
@@ -425,7 +462,11 @@ class Template_Functions {
 	 * @return html markup
 	 */
 	public static function render_food_menu_tab_product_block( $args ){
-			extract( $args );
+			$active_class = $args['active_class'] ?? '';
+			$content_key  = $args['content_key'] ?? 0;
+			$cat_id       = $args['cat_id'] ?? '';
+			$unique_id    = $args['unique_id'] ?? '';
+			$style        = $args['style'] ?? '';
 			?>
 			<div class='wpc-tab <?php echo esc_attr($active_class); ?>' data-id='tab_<?php echo intval($content_key); ?>' data-cat_id='<?php echo  esc_attr($cat_id);?>'>
 					<div class="tab_template_<?php echo esc_attr( $cat_id.'_'.$unique_id );?>"></div>

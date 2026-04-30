@@ -1,9 +1,9 @@
 === WPCafe - Restaurant Menu, Online Food Ordering & Table Booking System ===
 Contributors: arraytics, ehsanriyadh
-Tags: restaurant, food menu, restaurant booking system, online food ordering, food delivery, table reservation, WooCommerce restaurant, food pickup, takeout, online reservations, restaurant management system, food ordering
+Tags: restaurant, reservation, food menu, food delivery, booking, table reservation, WooCommerce, food pickup, takeout, online reservations, restaurant management system, online food ordering
 Requires at least: 6.2
 Tested up to: 6.9.4
-Stable tag: 3.0.8
+Stable tag: 3.0.9
 Requires PHP: 7.4
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
@@ -411,6 +411,16 @@ Yes. WPCafe receives regular updates including new features, performance improve
 Note: WooCommerce is required for online food ordering functionality. It is free and will be prompted during setup if not already installed.
 
 == Changelog ==
+
+
+= 3.0.9 ( April 30, 2026 ) =
+New: Added new email trigger for reservation updates - sends notification when reservation fields are updated.
+New: Added support for custom reservation form fields in email notifications.
+Fix: Fixed PHP fatal error when using woocommerce payment gateways for food order.
+Fix: Fixed end time showing when end time field is configured to be hidden in reservation form customization.
+Fix: Fixed reservation payment process failure on woocommerce payment gateways.
+FIx: Fixed showing both pickup and delivery date/time on thank you page regardless of order type.
+Tweak: Security improvements.
 
 = 3.0.8 ( April 04, 2026 ) =
 Fix: Translation issue fixes.

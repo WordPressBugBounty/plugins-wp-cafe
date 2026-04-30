@@ -185,6 +185,49 @@ class Date_Utility {
     }
 
     /**
+     * Normalize an incoming date string to Y-m-d using multi-format parsing.
+     *
+     * Order of attempts: admin-configured WP date_format, canonical Y-m-d,
+     * common formats (slash/dot/dash variants, named months), strtotime fallback.
+     *
+     * @since 1.0.0
+     * @param string $value    Raw date input.
+     * @param string $fallback Y-m-d fallback when parsing fails (default: today in site tz).
+     * @return string Y-m-d formatted date.
+     */
+    public static function normalize_date( $value, $fallback = '' ) : string {
+        if ( '' === $fallback ) {
+            $fallback = current_time( 'Y-m-d' );
+        }
+        if ( empty( $value ) ) {
+            return $fallback;
+        }
+        $value = trim( (string) $value );
+
+        $formats = array_unique( array_filter( array(
+            get_option( 'date_format' ),
+            'Y-m-d',
+        ) ) );
+
+        foreach ( $formats as $fmt ) {
+            $dt        = \DateTime::createFromFormat( '!' . $fmt, $value, wp_timezone() );
+            $errors    = \DateTime::getLastErrors();
+            $err_count = is_array( $errors ) ? ( $errors['warning_count'] + $errors['error_count'] ) : 0;
+            if ( $dt && 0 === $err_count && $dt->format( $fmt ) === $value ) {
+                return $dt->format( 'Y-m-d' );
+            }
+        }
+
+        // Last-resort: strtotime handles natural language ("next Monday") and ISO inputs.
+        $ts = strtotime( $value );
+        if ( false !== $ts ) {
+            return wp_date( 'Y-m-d', $ts );
+        }
+
+        return $fallback;
+    }
+
+    /**
      * Get available period options for the frontend.
      *
      * @since 1.0.0

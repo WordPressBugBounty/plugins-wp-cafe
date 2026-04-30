@@ -112,11 +112,27 @@ class Checkout_Process implements Hookable_Service_Contract {
     public function handle_order_status_changed( $order_id, $old_status, $new_status ) {
         $order          = wc_get_order( $order_id );
         $reservation_id = $order->get_meta( 'reservation_id' );
-        $reservation    = new Reservation_Model( $reservation_id );
-        $reservation->update( [ 'status' => $new_status ] );
 
-        if ( $new_status === 'completed' ) {
-            $reservation->update( [ 'status' => 'confirmed' ] );
+        if ( empty( $reservation_id ) ) {
+            return;
+        }
+
+        $reservation = new Reservation_Model( $reservation_id );
+
+        $status_map = [
+            'pending'    => 'pending',
+            'on-hold'    => 'pending',
+            'processing' => 'pending',
+            'completed'  => 'confirmed',
+            'cancelled'  => 'cancelled',
+            'refunded'   => 'cancelled',
+            'failed'     => 'cancelled',
+        ];
+
+        $mapped_status = $status_map[ $new_status ] ?? null;
+
+        if ( $mapped_status ) {
+            $reservation->update( [ 'status' => $mapped_status ] );
         }
 
         if ( 'cancelled' === $new_status ) {
@@ -131,15 +147,17 @@ class Checkout_Process implements Hookable_Service_Contract {
      * @return array
      */
     public function prefill_checkout_fields( $fields ) {
-        foreach ( WC()->cart->get_cart() as $cart_item ) {
-            if ( ! empty( $cart_item['reservation_id'] ) ) {
-                $reservation                                        = new Reservation_Model( $cart_item['reservation_id'] );
+        if ( WC()->cart && ! empty( WC()->cart->get_cart() ) ) {
+            foreach ( WC()->cart->get_cart() as $cart_item ) {
+                if ( ! empty( $cart_item['reservation_id'] ) ) {
+                    $reservation = new Reservation_Model( $cart_item['reservation_id'] );
 
-                $fields['billing']['billing_first_name']['default'] = $reservation->name;
-                $fields['billing']['billing_last_name']['default']  = $reservation->name;
-                $fields['billing']['billing_email']['default']      = $reservation->email;
-                $fields['billing']['billing_phone']['default']      = $reservation->phone;
-                break;
+                    $fields['billing']['billing_first_name']['default'] = $reservation->name;
+                    $fields['billing']['billing_last_name']['default']  = $reservation->name;
+                    $fields['billing']['billing_email']['default']      = $reservation->email;
+                    $fields['billing']['billing_phone']['default']      = $reservation->phone;
+                    break;
+                }
             }
         }
 

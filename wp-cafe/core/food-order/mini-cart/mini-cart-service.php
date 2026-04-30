@@ -1,6 +1,8 @@
 <?php
 namespace WpCafe\FoodOrder\Mini_Cart;
 
+// phpcs:ignoreFile WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound -- plugin-wpc-prefix, public backward-compat hooks, or third-party (Elementor) hook names.
+
 use WpCafe\Contracts\Hookable_Service_Contract;
 use WpCafe\Contracts\Switchable_Service_Contract;
 use WpCafe\FoodOrder\Mini_Cart\Mini_Cart;

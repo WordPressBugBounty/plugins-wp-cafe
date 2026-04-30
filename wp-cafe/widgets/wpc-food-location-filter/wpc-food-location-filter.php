@@ -7,6 +7,7 @@ use Elementor\Widget_Base;
 use \WpCafe\Utils\Wpc_Utilities as Wpc_Utilities;
 
 defined( "ABSPATH" ) || exit;
+// phpcs:ignoreFile WordPress.NamingConventions.PrefixAllGlobals -- widget/template scope; locally-extracted variables and Elementor-owned hook names (elementor/control/search_control, elementor/control/search_data).
 
 class Wpc_Food_Location_Filter extends Widget_Base {
 
@@ -109,7 +110,7 @@ class Wpc_Food_Location_Filter extends Widget_Base {
         $settings             = $this->get_settings();
         $location_alignment = $settings["location_alignment"];
 
-        echo do_shortcode( "[food_location_filter location_alignment='$location_alignment']" );
+        echo do_shortcode( "[food_location_filter location_alignment='" . esc_attr( $location_alignment ) . "']" );
 
     }
 

@@ -2,6 +2,8 @@
 
 namespace WpCafe\Email_Automation\Triggers;
 
+// phpcs:ignoreFile WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound -- plugin-wpc-prefix, public backward-compat hooks, or third-party (Elementor) hook names.
+
 /**
  * Abstract Trigger Base Class
  *
@@ -54,10 +56,15 @@ abstract class Abstract_Trigger {
 	 * @return array
 	 */
 	public function build_configuration() {
+		$trigger_data = $this->get_trigger_data();
+		
+		// Allow custom fields to be added to trigger data for SDK UI
+		$trigger_data = apply_filters( 'wpc_trigger_custom_fields', $trigger_data, $this->get_trigger_value() );
+		
 		return array(
 			'trigger_label'      => $this->get_trigger_label(),
 			'trigger_value'      => $this->get_trigger_value(),
-			'trigger_data'       => $this->get_trigger_data(),
+			'trigger_data'       => $trigger_data,
 			'delay_dependencies' => $this->get_delay_dependencies(),
 			'email_receivers'    => $this->get_email_receivers(),
 		);

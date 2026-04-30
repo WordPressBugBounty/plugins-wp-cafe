@@ -138,7 +138,7 @@ class Version_Controller extends Base_Rest_Controller {
 
         $versions = get_transient( 'wpcafe_rollback_versions_' . WPCAFE_VERSION );
 
-        if ( empty( $versions ) || ! in_array($version, $versions)) {
+        if ( empty( $versions ) || ! in_array( $version, $versions, true ) ) {
             return $this->error(__( 'Invalid version provided', 'wp-cafe' ));
         }
 

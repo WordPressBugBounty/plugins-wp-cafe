@@ -233,7 +233,8 @@ class Hooks{
                 'post_type'         => 'wpc_reservation',
                 'numberposts'       => -1,
                 'post_status'       => 'publish',
-                'meta_query'        => $meta_query 
+                // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_query -- required for report/filter functionality
+                'meta_query'        => $meta_query
             )
         );
 

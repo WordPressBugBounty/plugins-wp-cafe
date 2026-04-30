@@ -3,9 +3,10 @@
 use WpCafe\Utils\Wpc_Utilities;
 
 defined( 'ABSPATH' ) || exit;
+// phpcs:ignoreFile WordPress.NamingConventions.PrefixAllGlobals -- locally-scoped template variables and public hook names (wpc_before_minicart / wpc_after_minicart are wpc-prefixed but flagged before phpcs.xml.dist loads).
 
 
-do_action( 'woocommerce_before_mini_cart' ); 
+do_action( 'woocommerce_before_mini_cart' );
 $settings       = $this->settings_obj;
 $min_order_amount = !empty($settings['min_order_amount']) ? floatval( $settings['min_order_amount'] ) : 0 ;
 $cart_link 		= !empty($settings['wpc_mini_empty_cart_link']) ? $settings['wpc_mini_empty_cart_link'] : get_permalink( wc_get_page_id( 'shop' ) );

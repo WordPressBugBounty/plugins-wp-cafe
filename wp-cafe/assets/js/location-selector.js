@@ -107,7 +107,8 @@
             url: wpcLocation.ajaxUrl,
             data: {
                 action: 'save_location',
-                location_id: locationId
+                location_id: locationId,
+                nonce: wpcLocation.nonce
             },
             success(response) {
 

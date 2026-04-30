@@ -1,6 +1,8 @@
 <?php
 namespace WpCafe\Reservation\Email\Handlers;
 
+// phpcs:ignoreFile WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound -- plugin-wpc-prefix, public backward-compat hooks, or third-party (Elementor) hook names.
+
 if ( ! defined( 'ABSPATH' ) ) exit;
 
 use WpCafe\Contracts\Hookable_Service_Contract;
@@ -24,6 +26,7 @@ class Reservation_Email_Handler implements Hookable_Service_Contract {
 		add_action( 'wpcafe_after_reservation_create', [ $this, 'send_reservation_created_notification' ], 10, 1 );
 		add_action( 'wpcafe_after_reservation_cancelled', [ $this, 'send_reservation_cancelled_notification' ], 10, 1 );
 		add_action( 'wpcafe_after_reservation_status_changed', [ $this, 'send_reservation_status_update_notification' ], 10, 2 );
+		add_action( 'wpcafe_after_reservation_update', [ $this, 'send_reservation_updated_notification' ], 10, 2 );
 	}
 
 	/**
@@ -144,9 +147,13 @@ class Reservation_Email_Handler implements Hookable_Service_Contract {
 			'reservation_seat_names'    => '',
 		);
 
+		// Add custom field data to notification
+		$custom_fields_data = $this->get_custom_field_data( $reservation );
+		$notification_data = array_merge( $notification_data, $custom_fields_data );
+
 		$notification_data = apply_filters( 'wpc_reservation_created_notification_data', $notification_data, $reservation );
 
-		do_action( 'global_notification_hook', 'reservation_created', $notification_data );
+		do_action( 'wpcafe_gln_hook', 'reservation_created', $notification_data );
 	}
 
 	/**
@@ -200,9 +207,13 @@ class Reservation_Email_Handler implements Hookable_Service_Contract {
 			'reservation_seat_names'    => '',
 		);
 
+		// Add custom field data to notification
+		$custom_fields_data = $this->get_custom_field_data( $reservation );
+		$notification_data = array_merge( $notification_data, $custom_fields_data );
+
 		$notification_data = apply_filters( 'wpc_reservation_cancelled_notification_data', $notification_data, $reservation );
 
-		do_action( 'global_notification_hook', 'reservation_cancelled', $notification_data );
+		do_action( 'wpcafe_gln_hook', 'reservation_cancelled', $notification_data );
 	}
 
 	/**
@@ -269,7 +280,112 @@ class Reservation_Email_Handler implements Hookable_Service_Contract {
 			'reservation_seat_names'         => '',
 		);
 
+		// Add custom field data to notification
+		$custom_fields_data = $this->get_custom_field_data( $reservation );
+		$notification_data = array_merge( $notification_data, $custom_fields_data );
+
 		$notification_data = apply_filters( 'wpc_reservation_status_changed_notification_data', $notification_data, $reservation, $old_status );
-		do_action( 'global_notification_hook', $trigger_event, $notification_data );
+		do_action( 'wpcafe_gln_hook', $trigger_event, $notification_data );
+	}
+
+	/**
+	 * Send reservation updated notification via email automation.
+	 *
+	 * @param Reservation_Model $reservation         The reservation model instance.
+	 * @param array              $old_reservation_data The old reservation data before update.
+	 * @return void
+	 */
+	public function send_reservation_updated_notification( $reservation, $old_reservation_data ) {
+		if ( ! $reservation instanceof Reservation_Model ) {
+			return;
+		}
+
+		$branch_address = '';
+		if ( ! empty( $reservation->branch_id ) ) {
+			$location = \WpCafe\Models\Location_Model::find( $reservation->branch_id );
+			if ( $location && ! empty( $location->location ) ) {
+				$location_data = $location->location;
+				if ( is_string( $location_data ) ) {
+					$decoded = json_decode( $location_data, true );
+					$branch_address = ( is_array( $decoded ) && isset( $decoded['address'] ) ) ? $decoded['address'] : $location_data;
+				}
+			}
+		}
+
+		$notification_data = array(
+			'admin_email'                    => get_option( 'admin_email' ),
+			'customer_email'                 => $reservation->email ?? '',
+			'reservation_id'                 => $reservation->id ?? '',
+			'reservation_name'               => $reservation->name ?? '',
+			'reservation_email'              => $reservation->email ?? '',
+			'reservation_phone'              => $reservation->phone ?? '',
+			'reservation_date'               => $this->format_reservation_date( $reservation->date ?? '' ),
+			'reservation_date_timestamp'     => (string) $this->get_reservation_datetime_timestamp( $reservation->date ?? '', $reservation->start_time ?? '' ),
+			'reservation_start_time'         => $this->format_reservation_time( $reservation->start_time ?? '' ),
+			'reservation_end_time'           => $this->format_reservation_time( $reservation->end_time ?? '' ),
+			'reservation_total_guests'       => (string) ( $reservation->total_guest ?? '' ),
+			'reservation_table_name'         => $reservation->table_name ?? '',
+			'reservation_branch_name'        => $reservation->branch_name ?? '',
+			'reservation_branch_address'     => $branch_address,
+			'reservation_branch_id'          => (string) ( $reservation->branch_id ?? '' ),
+			'reservation_status'             => $reservation->status ?? '',
+			'reservation_notes'              => $reservation->notes ?? '',
+			'reservation_booking_amount'     => (string) ( $reservation->booking_amount ?? '' ),
+			'reservation_total_price'        => (string) ( $reservation->total_price ?? '' ),
+			'reservation_currency'           => $reservation->currency ?? '',
+			'reservation_payment_method'     => $reservation->payment_method ?? '',
+			'reservation_food_order'         => $reservation->food_order ?? '',
+			'reservation_invoice'            => $reservation->invoice ?? '',
+			'reservation_seat_names'         => '',
+		);
+
+		// Add custom field data to notification
+		$custom_fields_data = $this->get_custom_field_data( $reservation );
+		$notification_data = array_merge( $notification_data, $custom_fields_data );
+
+		$notification_data = apply_filters( 'wpc_reservation_updated_notification_data', $notification_data, $reservation, $old_reservation_data );
+		do_action( 'wpcafe_gln_hook', 'reservation_updated', $notification_data );
+	}
+
+	/**
+	 * Get custom field data from reservation and settings
+	 *
+	 * Retrieves user-added custom fields (where notDeletable is false or not set)
+	 * and builds notification data with keys custom_{field_id}
+	 *
+	 * @param Reservation_Model $reservation
+	 * @return array Custom field data with keys custom_{field_id}
+	 */
+	private function get_custom_field_data( $reservation ) {
+		$custom_field_data = [];
+		$custom_fields = $reservation->custom_fields ?? [];
+
+		$customization_settings = wpc_get_option( 'reservation_form_customization', [] );
+
+		$user_field_ids = [];
+		foreach ( $customization_settings as $step ) {
+			if ( empty( $step['fields'] ) ) {
+				continue;
+			}
+
+			foreach ( $step['fields'] as $field ) {
+				$field_id = $field['id'] ?? '';
+
+				// Custom field = BOTH notDeletable AND inGroup do NOT exist in field definition
+				if ( $field_id && ! array_key_exists( 'notDeletable', $field ) && ! array_key_exists( 'inGroup', $field ) ) {
+					$user_field_ids[] = $field_id;
+				}
+			}
+		}
+
+		foreach ( $user_field_ids as $field_id ) {
+			// Only include if value actually exists in custom_fields
+			if ( isset( $custom_fields[ $field_id ] ) && ! empty( $custom_fields[ $field_id ] ) ) {
+				$key = 'custom_' . $field_id;
+				$custom_field_data[ $key ] = $custom_fields[ $field_id ];
+			}
+		}
+
+		return $custom_field_data;
 	}
 }

@@ -1,5 +1,6 @@
 <?php
 if ( ! defined( 'ABSPATH' ) ) exit;
+// phpcs:ignoreFile WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedVariableFound -- template scope; variables are locally extracted/passed, not globals.
 
         $wpc_custom_css = '';
 
@@ -174,6 +175,6 @@ if ( ! defined( 'ABSPATH' ) ) exit;
 
     
         // add inline css
-        wp_register_style('wpc-cart-css', false);
+        wp_register_style('wpc-cart-css', false, [], WPCAFE_VERSION);
         wp_enqueue_style('wpc-cart-css');
         wp_add_inline_style('wpc-cart-css', $wpc_custom_css);

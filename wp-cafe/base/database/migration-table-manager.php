@@ -45,10 +45,12 @@ class Migration_Table_Manager {
         global $wpdb;
         $table = $wpdb->prefix . self::$table_name;
 
+        // phpcs:disable WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching,WordPress.DB.PreparedSQL.InterpolatedNotPrepared,PluginCheck.Security.DirectDB.UnescapedDBParameter -- plugin-owned table name, built from $wpdb->prefix + class constant
         return (bool) $wpdb->get_var($wpdb->prepare(
             "SELECT COUNT(*) FROM {$table} WHERE migration = %s",
             $migration_name
         ));
+        // phpcs:enable WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching,WordPress.DB.PreparedSQL.InterpolatedNotPrepared,PluginCheck.Security.DirectDB.UnescapedDBParameter
     }
 
     /**
@@ -62,6 +64,7 @@ class Migration_Table_Manager {
         global $wpdb;
         $table = $wpdb->prefix . self::$table_name;
 
+        // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching,WordPress.DB.PreparedSQL.InterpolatedNotPrepared,PluginCheck.Security.DirectDB.UnescapedDBParameter -- plugin-owned table name, built from $wpdb->prefix + class constant
         $wpdb->insert($table, [
             'migration'   => $migration_name,
             'batch'       => $batch,
@@ -79,6 +82,7 @@ class Migration_Table_Manager {
         global $wpdb;
         $table = $wpdb->prefix . self::$table_name;
 
+        // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching,WordPress.DB.PreparedSQL.InterpolatedNotPrepared,PluginCheck.Security.DirectDB.UnescapedDBParameter -- plugin-owned table name, built from $wpdb->prefix + class constant
         $wpdb->delete($table, ['migration' => $migration_name]);
     }
 
@@ -91,6 +95,7 @@ class Migration_Table_Manager {
         global $wpdb;
         $table = $wpdb->prefix . self::$table_name;
 
+        // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching,WordPress.DB.PreparedSQL.InterpolatedNotPrepared,PluginCheck.Security.DirectDB.UnescapedDBParameter -- plugin-owned table name, built from $wpdb->prefix + class constant
         return (int) $wpdb->get_var("SELECT MAX(batch) FROM {$table}") ?: 1;
     }
 
@@ -104,9 +109,11 @@ class Migration_Table_Manager {
         $table = $wpdb->prefix . self::$table_name;
         $latest_batch = self::get_latest_batch();
 
+        // phpcs:disable WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching,WordPress.DB.PreparedSQL.InterpolatedNotPrepared,PluginCheck.Security.DirectDB.UnescapedDBParameter -- plugin-owned table name, built from $wpdb->prefix + class constant
         return $wpdb->get_results($wpdb->prepare(
             "SELECT * FROM {$table} WHERE batch = %d ORDER BY id DESC",
             $latest_batch
         ));
+        // phpcs:enable WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching,WordPress.DB.PreparedSQL.InterpolatedNotPrepared,PluginCheck.Security.DirectDB.UnescapedDBParameter
     }
 }

@@ -1,6 +1,8 @@
 <?php
 namespace WpCafe\Core\Blocks;
 
+// phpcs:ignoreFile WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound -- plugin-wpc-prefix, public backward-compat hooks, or third-party (Elementor) hook names.
+
 defined( 'ABSPATH' ) || exit;
 
 /**

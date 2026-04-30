@@ -54,7 +54,7 @@ return [
         'demo_link' => '',
         'settings_link' => '',
         'doc_link' => 'https://support.themewinter.com/docs/plugins/plugin-docs/integrations/pabbly-integration/',
-        'icon' =>'<svg width="40" height="40" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+        'icon' => '<svg width="40" height="40" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
 <g clip-path="url(#clip0_6753_1362)">
 <path d="M40 19.9994C40 31.0417 31.0455 39.993 20 39.993C16.5368 39.993 13.2792 39.1134 10.4388 37.5648C4.2196 34.1742 0 27.5797 0 19.9994C0 8.95737 8.9543 0.00585938 19.9998 0.00585938C31.0455 0.00585938 40 8.95737 40 19.9994Z" fill="#20B276"/>
 <path d="M27.9785 25.6892C25.862 27.8692 23.2931 28.9601 20.2729 28.9601C18.4295 28.9601 16.7168 28.6483 15.1113 27.7424L15.0919 39.3507L14.9398 39.3097L14.8456 39.2856L14.7345 39.2251L14.682 39.1303L14.6338 39.0234L14.6873 38.9563L9.39062 32.6447L9.39217 17.7247C9.39217 14.6159 10.4504 11.9756 12.5672 9.80332C14.6836 7.63089 17.2522 6.54492 20.2729 6.54492C23.2931 6.54492 25.8618 7.63476 27.9785 9.81523C30.0949 11.9954 31.1535 14.6412 31.1535 17.7524C31.1535 20.8639 30.0949 23.5092 27.9785 25.6892ZM23.9382 13.9736C22.9333 12.9375 21.7114 12.4197 20.2729 12.4197C18.8338 12.4197 17.612 12.9375 16.6073 13.9736C15.6023 15.0096 15.0998 16.269 15.0998 17.7527C15.0998 19.236 15.6022 20.4954 16.6073 21.5313C17.612 22.5676 18.8338 23.0857 20.2729 23.0857C21.7114 23.0857 22.9333 22.5676 23.9382 21.5313C24.9432 20.4954 25.4457 19.236 25.4457 17.7527C25.4457 16.269 24.9432 15.0095 23.9382 13.9736Z" fill="#147F52"/>
@@ -90,6 +90,25 @@ return [
 <rect width="40" height="40" fill="white"/>
 </clipPath>
 </defs>
+</svg>
+',
+    ],
+    'whatsapp' => [
+        'name' => 'whatsapp',
+        'slug' => 'whatsapp',
+        'type' => 'integration',
+        'status' => 'on',
+        'is_pro' => true,
+        'title' => __('WhatsApp', 'wp-cafe'),
+        'description' => __('Enable real-time WhatsApp notifications for new orders and reservations, improving communication with customers.', 'wp-cafe'),
+        'notice' => '',
+        'demo_link' => '',
+        'settings_link' => '',
+        'doc_link' => 'https://support.themewinter.com/docs/plugins/plugin-docs/integrations/whatsapp-integration/',
+        'icon' => '<svg xmlns="http://www.w3.org/2000/svg" aria-label="WhatsApp" role="img" viewBox="0 0 512 512">
+  <rect width="512" height="512" rx="15%" fill="#25d366"/>
+  <path fill="#25d366" stroke="#fff" stroke-width="26" d="M123 393l14-65a138 138 0 1150 47z"/>
+  <path fill="#fff" d="M308 273c-3-2-6-3-9 1l-12 16c-3 2-5 3-9 1-15-8-36-17-54-47-1-4 1-6 3-8l9-14c2-2 1-4 0-6l-12-29c-3-8-6-7-9-7h-8c-2 0-6 1-10 5-22 22-13 53 3 73 3 4 23 40 66 59 32 14 39 12 48 10 11-1 22-10 27-19 1-3 6-16 2-18"/>
 </svg>
 ',
     ],

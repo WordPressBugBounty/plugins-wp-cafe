@@ -11,6 +11,7 @@
 use WpCafe\Utils\Wpc_Utilities;
 
 defined( 'ABSPATH' ) || exit;
+// phpcs:ignoreFile WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedVariableFound -- template scope; variables are locally extracted/passed, not globals.
 
 if ( wpc_is_module_enable( 'mini_cart') ) {
     wp_enqueue_script( 'wpc-mini-cart' );
@@ -53,7 +54,7 @@ $cart_link        = wpc_get_option('mini_cart_empty_button_link', get_permalink(
                             'woocommerce_cart_item_remove_link',
                             sprintf(
                                 '<a href="%s" class="remove remove_from_cart_button" aria-label="%s" data-product_id="%s" data-cart_item_key="%s" data-product_sku="%s">
-                                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" xmlns:v="https://vecta.io/nano"><path fill-rule="evenodd" d="M13.19 1.137a.75.75 0 0 0-1.062 1.059l1.924 1.929H5.95l1.923-1.929a.75.75 0 1 0-1.062-1.059l-2.98 2.988h-.315c-.489 0-1.178.015-1.727.382-.629.422-.873 1.141-.873 2.035 0 .964.217 1.752.916 2.155a1.76 1.76 0 0 0 .411.17l1.108 6.788v.001c.141.853.4 1.744 1.058 2.411.68.688 1.66 1.017 2.973 1.017h5.025c1.39 0 2.379-.303 3.039-.995.628-.659.825-1.547.972-2.314l1.324-6.905c.14-.038.284-.093.423-.173.699-.403.916-1.191.916-2.155 0-.894-.244-1.613-.873-2.035-.549-.367-1.237-.382-1.727-.382h-.314l-2.98-2.988zm3.01 7.821H3.779l1.053 6.453v.001c.126.764.321 1.272.646 1.601.304.308.836.571 1.906.571h5.025c1.202 0 1.7-.264 1.954-.53.286-.3.431-.761.584-1.561h0L16.2 8.958zM2.625 5.753c-.039.026-.208.141-.208.788 0 .4.048.625.094.745.036.094.065.108.07.11h.001c.025.014.094.042.268.055.134.01.27.009.446.008h0 0 0 0l.221-.001h12.967l.221.001.446-.008c.175-.013.243-.04.268-.055h.001c.006-.003.034-.017.07-.11.046-.12.094-.344.094-.745 0-.648-.169-.762-.208-.788-.12-.08-.356-.128-.892-.128H3.517c-.536 0-.772.048-.892.128zm6.259 5.913a.75.75 0 0 0-1.5 0v2.958a.75.75 0 0 0 1.5 0v-2.958zm3.083-.75a.75.75 0 0 1 .75.75v2.958a.75.75 0 1 1-1.5 0v-2.958a.75.75 0 0 1 .75-.75z" fill="#e7272d"/></svg>
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#e7272d" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/><line x1="10" y1="11" x2="10" y2="17"/><line x1="14" y1="11" x2="14" y2="17"/></svg>
                                 </a>',
                                 esc_url( wc_get_cart_remove_url( $cart_item_key ) ),
                                 esc_attr__( 'Remove this item', 'wp-cafe' ),

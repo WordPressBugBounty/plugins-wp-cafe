@@ -1,6 +1,8 @@
 <?php
 namespace WpCafe\Email_Automation\Handlers;
 
+// phpcs:ignoreFile WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound -- plugin-wpc-prefix, public backward-compat hooks, or third-party (Elementor) hook names.
+
 if ( ! defined( 'ABSPATH' ) ) exit;
 
 use WpCafe\Contracts\Hookable_Service_Contract;
@@ -52,7 +54,7 @@ class Order_Email_Handler implements Hookable_Service_Contract {
 		$notification_data = $this->get_order_notification_data( $order, 'created' );
 		$notification_data = apply_filters( 'wpc_order_created_notification_data', $notification_data, $order );
 
-		do_action( 'global_notification_hook', 'order_created', $notification_data );
+		do_action( 'wpcafe_gln_hook', 'order_created', $notification_data );
 	}
 
 	/**
@@ -81,7 +83,7 @@ class Order_Email_Handler implements Hookable_Service_Contract {
 
 		$notification_data = apply_filters( 'wpc_order_status_changed_notification_data', $notification_data, $order, $old_status, $new_status );
 
-		do_action( 'global_notification_hook', 'order_status_changed', $notification_data );
+		do_action( 'wpcafe_gln_hook', 'order_status_changed', $notification_data );
 	}
 
 	/**
@@ -107,7 +109,7 @@ class Order_Email_Handler implements Hookable_Service_Contract {
 
 		$notification_data = apply_filters( 'wpc_order_cancelled_notification_data', $notification_data, $order );
 
-		do_action( 'global_notification_hook', 'order_cancelled', $notification_data );
+		do_action( 'wpcafe_gln_hook', 'order_cancelled', $notification_data );
 	}
 
 	/**

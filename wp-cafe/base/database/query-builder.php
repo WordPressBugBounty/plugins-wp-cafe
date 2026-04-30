@@ -175,6 +175,7 @@ class Query_Builder {
      */
     public function orderBy( $field, $direction = 'ASC' ) {
         $this->args['orderby']  = 'meta_value';
+        // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_key -- required for report/filter functionality
         $this->args['meta_key'] = $field;
         $this->args['order']    = $direction;
 
@@ -190,10 +191,12 @@ class Query_Builder {
         $this->args['numberposts'] = -1;
 
         if ( $meta = $this->buildMetaQuery() ) {
+            // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_query -- required for report/filter functionality
             $this->args['meta_query'] = $meta;
         }
 
         if ( $this->tax_query ) {
+            // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_tax_query -- required for report/filter functionality
             $this->args['tax_query'] = count( $this->tax_query ) > 1
                 ? array_merge(['relation' => 'AND'], $this->tax_query)
                 : $this->tax_query;
@@ -217,10 +220,12 @@ class Query_Builder {
         $this->args['paged'] = $page;
 
         if ( $meta = $this->buildMetaQuery() ) {
+            // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_query -- required for report/filter functionality
             $this->args['meta_query'] = $meta;
         }
 
         if ( $this->tax_query ) {
+            // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_tax_query -- required for report/filter functionality
             $this->args['tax_query'] = count($this->tax_query) > 1
                 ? array_merge(['relation' => 'AND'], $this->tax_query)
                 : $this->tax_query;
@@ -246,10 +251,12 @@ class Query_Builder {
         $this->args['numberposts'] = 1;
 
         if ( $meta = $this->buildMetaQuery() ) {
+            // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_query -- required for report/filter functionality
             $this->args['meta_query'] = $meta;
         }
 
         if ( $this->tax_query ) {
+            // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_tax_query -- required for report/filter functionality
             $this->args['tax_query'] = $this->tax_query;
         }
 
@@ -268,10 +275,12 @@ class Query_Builder {
         $this->args['fields'] = 'ids';
 
         if ( $meta = $this->buildMetaQuery() ) {
+            // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_query -- required for report/filter functionality
             $this->args['meta_query'] = $meta;
         }
 
         if ( $this->tax_query ) {
+            // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_tax_query -- required for report/filter functionality
             $this->args['tax_query'] = $this->tax_query;
         }
 

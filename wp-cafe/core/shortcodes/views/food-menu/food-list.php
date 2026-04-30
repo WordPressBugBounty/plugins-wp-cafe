@@ -1,5 +1,6 @@
 <?php
 if ( ! defined( 'ABSPATH' ) ) exit;
+// phpcs:ignoreFile WordPress.NamingConventions.PrefixAllGlobals -- template scope; locally-extracted variables and third-party/public hook names.
 
     use WpCafe\Utils\Wpc_Utilities;
     $style               = $settings["food_menu_style"];

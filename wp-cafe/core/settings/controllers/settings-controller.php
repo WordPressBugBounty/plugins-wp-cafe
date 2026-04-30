@@ -37,6 +37,8 @@ class Settings_Controller extends Base_Rest_Controller {
         'block_timeslot_statuses',
         'slot_interval',
         'restaurant_schedule',
+        'enable_local_payment',
+        'enable_woocommerce_payments',
     ];
 
     /**
@@ -82,7 +84,7 @@ class Settings_Controller extends Base_Rest_Controller {
             [
                 'methods'             => WP_REST_Server::READABLE,
                 'callback'            => [ $this, 'get_public_settings' ],
-                'permission_callback' => '__return_true',
+                'permission_callback' => [ $this, 'get_public_settings_permissions_check' ],
             ]
         );
     }
@@ -111,6 +113,16 @@ class Settings_Controller extends Base_Rest_Controller {
     }
 
     /**
+     * Permission check for public settings endpoint.
+     * Intentionally public — only keys in PUBLIC_SETTING_KEYS are exposed.
+     *
+     * @return bool
+     */
+    public function get_public_settings_permissions_check(): bool {
+        return true;
+    }
+
+    /**
      * Get public (whitelisted) settings safe for unauthenticated access.
      *
      * @param \WP_REST_Request $request
@@ -130,6 +142,12 @@ class Settings_Controller extends Base_Rest_Controller {
      */
     public function update_settings( $request ) {
         $params = $request->get_params();
+
+        // Strip WP REST API internal parameters — not settings data.
+        foreach ( [ '_locale', '_fields', '_embed', '_jsonp', '_method' ] as $internal ) {
+            unset( $params[ $internal ] );
+        }
+
         Settings::update( $params );
 
         return $this->get_item( $request );

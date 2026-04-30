@@ -7,6 +7,7 @@ use Elementor\Widget_Base;
 use \WpCafe\Utils\Wpc_Utilities as Wpc_Utilities;
 
 defined( "ABSPATH" ) || exit;
+// phpcs:ignoreFile WordPress.NamingConventions.PrefixAllGlobals -- widget/template scope; locally-extracted variables and Elementor-owned hook names (elementor/control/search_control, elementor/control/search_data).
 
 class Wpc_Menus_List extends Widget_Base {
 

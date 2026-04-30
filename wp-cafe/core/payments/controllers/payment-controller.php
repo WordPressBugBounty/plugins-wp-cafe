@@ -66,6 +66,7 @@ class Payment_Controller extends Base_Rest_Controller {
         $data           = json_decode( $request->get_body(), true );
         $payment_method = sanitize_text_field( $data['payment_method'] ?? '' );
         $reservation_id = absint( $data['reservation_id'] ?? 0 );
+        $payment_token  = preg_replace( '/[^a-f0-9]/i', '', (string) ( $data['payment_token'] ?? '' ) );
 
         if ( empty( $payment_method ) ) {
             return $this->error( __( 'Payment method is required', 'wp-cafe' ) );
@@ -81,21 +82,11 @@ class Payment_Controller extends Base_Rest_Controller {
         }
 
         $current_user_id = get_current_user_id();
-        if ( $current_user_id ) {
-            if ( (int) $reservation->user_id !== $current_user_id ) {
-                return $this->error( __( 'You do not have permission to pay for this reservation.', 'wp-cafe' ), 403 );
-            }
-        } else {
-            $session_data        = ( function_exists( 'WC' ) && WC()->session )
-                ? WC()->session->get( 'wpc_reservation_data' )
-                : null;
-            $session_reservation = isset( $session_data['reservation_id'] )
-                ? (int) $session_data['reservation_id']
-                : 0;
+        $is_owner        = $current_user_id && (int) get_post_field( 'post_author', $reservation_id ) === $current_user_id;
+        $token_valid     = $this->verify_payment_token( $reservation_id, $payment_token );
 
-            if ( $session_reservation !== $reservation_id ) {
-                return $this->error( __( 'You do not have permission to pay for this reservation.', 'wp-cafe' ), 403 );
-            }
+        if ( ! $is_owner && ! $token_valid ) {
+            return $this->error( __( 'You do not have permission to pay for this reservation.', 'wp-cafe' ), 403 );
         }
 
         $payment_procce = new Payment_Processor( $payment_method );
@@ -103,7 +94,41 @@ class Payment_Controller extends Base_Rest_Controller {
             'reservation_id' => $reservation_id,
         ] );
 
+        if ( ! is_wp_error( $response ) ) {
+            delete_post_meta( $reservation_id, '_wpc_payment_token' );
+            delete_post_meta( $reservation_id, '_wpc_payment_token_expires' );
+        }
+
         return $this->response( $response );
+    }
+
+    /**
+     * Verify a supplied payment token against the reservation's stored hash.
+     *
+     * Constant-time compare via hash_equals; rejects empty input, missing
+     * stored hash, or expired tokens.
+     *
+     * @param int    $reservation_id Reservation post ID.
+     * @param string $supplied       Sanitized hex token from request body.
+     * @return bool
+     */
+    private function verify_payment_token( int $reservation_id, string $supplied ): bool {
+        if ( '' === $supplied ) {
+            return false;
+        }
+
+        $stored_hash = get_post_meta( $reservation_id, '_wpc_payment_token', true );
+        $expires_at  = (int) get_post_meta( $reservation_id, '_wpc_payment_token_expires', true );
+
+        if ( empty( $stored_hash ) || $expires_at <= 0 ) {
+            return false;
+        }
+
+        if ( time() > $expires_at ) {
+            return false;
+        }
+
+        return hash_equals( (string) $stored_hash, hash( 'sha256', $supplied ) );
     }
 
     /**

@@ -179,11 +179,34 @@ class Reservation_Controller extends Base_Rest_Controller {
         }
         $this->set_reservation_data_in_woocommerce_session( $reservation );
 
+        $payment_token = $this->issue_reservation_payment_token( $reservation->id );
+
         $response = new Reservation_Resource( $reservation );
 
         do_action( 'wpcafe_after_reservation_create', $reservation );
 
-        return $this->response( $response, __( 'Reservation created successfully.', 'wp-cafe' ) );
+        $payload = array_merge( $response->to_array(), [ 'payment_token' => $payment_token ] );
+
+        return $this->response( $payload, __( 'Reservation created successfully.', 'wp-cafe' ) );
+    }
+
+    /**
+     * Issue a one-time, short-lived payment token for the reservation.
+     *
+     * Returns the raw token to the caller and stores only its SHA-256 hash
+     * plus expiry as post meta so the payment endpoint can verify ownership
+     * for guest flows without relying on WC session cookie continuity.
+     *
+     * @param int $reservation_id Reservation post ID.
+     * @return string Raw token (64 hex chars).
+     */
+    private function issue_reservation_payment_token( int $reservation_id ): string {
+        $token = bin2hex( random_bytes( 32 ) );
+
+        update_post_meta( $reservation_id, '_wpc_payment_token', hash( 'sha256', $token ) );
+        update_post_meta( $reservation_id, '_wpc_payment_token_expires', time() + ( 2 * HOUR_IN_SECONDS ) );
+
+        return $token;
     }
 
     /**
@@ -279,19 +302,19 @@ class Reservation_Controller extends Base_Rest_Controller {
         $filter = [];
 
         if ( isset( $request['status'] ) ) {
-            $filter['status'] = $request['status'];
+            $filter['status'] = sanitize_text_field( $request['status'] );
         }
 
         if ( isset( $request['branch'] ) ) {
-            $filter['branch'] = $request['branch'];
+            $filter['branch'] = sanitize_text_field( $request['branch'] );
         }
 
         if ( isset( $request['food_order'] ) ) {
-            $filter['food_order'] = $request['food_order'];
+            $filter['food_order'] = sanitize_text_field( $request['food_order'] );
         }
 
         if ( isset( $request['date_range'] ) ) {
-            $filter['date_range'] = $request['date_range'];
+            $filter['date_range'] = sanitize_text_field( $request['date_range'] );
         }
 
         $args = [
@@ -379,6 +402,26 @@ class Reservation_Controller extends Base_Rest_Controller {
         }
 
         $old_status = $reservation->status;
+        $old_reservation_data = [
+            'name'          => $reservation->name,
+            'email'         => $reservation->email,
+            'phone'         => $reservation->phone,
+            'date'          => $reservation->date,
+            'start_time'    => $reservation->start_time,
+            'end_time'      => $reservation->end_time,
+            'total_guest'   => $reservation->total_guest,
+            'table_name'    => $reservation->table_name,
+            'branch_id'     => $reservation->branch_id,
+            'branch_name'   => $reservation->branch_name,
+            'status'        => $reservation->status,
+            'notes'         => $reservation->notes,
+            'booking_amount'=> $reservation->booking_amount,
+            'total_price'   => $reservation->total_price,
+            'currency'      => $reservation->currency,
+            'payment_method'=> $reservation->payment_method,
+            'food_order'    => $reservation->food_order,
+            'invoice'       => $reservation->invoice,
+        ];
         $updated = $reservation->update($data);
 
         if ( ! $updated ) {
@@ -395,7 +438,10 @@ class Reservation_Controller extends Base_Rest_Controller {
             do_action( 'wpcafe_after_reservation_status_changed', $reservation, $old_status );
         }
 
-        do_action('wpcafe_after_reservation_update', $reservation);
+        // Trigger updated hook only when non-status fields have actually changed
+        if ( $this->has_reservation_field_changes( $old_reservation_data, $data ) ) {
+            do_action( 'wpcafe_after_reservation_update', $reservation, $old_reservation_data );
+        }
 
         $response = new Reservation_Resource( $reservation );
 
@@ -535,6 +581,50 @@ class Reservation_Controller extends Base_Rest_Controller {
             }
         }
 
+        // Sanitize user-supplied fields before validation and storage.
+        if ( isset( $data['name'] ) ) {
+            $data['name'] = sanitize_text_field( $data['name'] );
+        }
+        if ( isset( $data['phone'] ) ) {
+            $data['phone'] = sanitize_text_field( $data['phone'] );
+        }
+        if ( isset( $data['email'] ) ) {
+            $data['email'] = sanitize_email( $data['email'] );
+        }
+        if ( isset( $data['notes'] ) ) {
+            $data['notes'] = sanitize_textarea_field( $data['notes'] );
+        }
+        if ( isset( $data['table_name'] ) ) {
+            $data['table_name'] = sanitize_text_field( $data['table_name'] );
+        }
+        if ( isset( $data['date'] ) ) {
+            $data['date'] = sanitize_text_field( $data['date'] );
+        }
+        if ( isset( $data['branch_name'] ) ) {
+            $data['branch_name'] = sanitize_text_field( $data['branch_name'] );
+        }
+        if ( isset( $data['status'] ) ) {
+            $data['status'] = sanitize_text_field( $data['status'] );
+        }
+        if ( isset( $data['total_guest'] ) ) {
+            $data['total_guest'] = intval( $data['total_guest'] );
+        }
+        if ( isset( $data['branch_id'] ) ) {
+            $data['branch_id'] = absint( $data['branch_id'] );
+        }
+        if ( isset( $data['booking_amount'] ) ) {
+            $data['booking_amount'] = floatval( $data['booking_amount'] );
+        }
+        if ( isset( $data['total_price'] ) ) {
+            $data['total_price'] = floatval( $data['total_price'] );
+        }
+        if ( isset( $data['seats'] ) && is_array( $data['seats'] ) ) {
+            $data['seats'] = array_values( array_filter( array_map(
+                'sanitize_text_field',
+                array_map( 'wp_unslash', $data['seats'] )
+            ) ) );
+        }
+
         $validate = wpcafe_validate( $data , [
             'name' => [
                 'required',
@@ -570,13 +660,14 @@ class Reservation_Controller extends Base_Rest_Controller {
      */
     private function separate_custom_fields_from_data( array $data ): array {
         $fillable_keys = $this->get_fillable_keys(); // Get fillable keys from Reservation_Model
-        $custom_field_ids = $this->get_custom_field_ids(); // Get custom field IDs from settings
+        $custom_field_types = $this->get_custom_field_types(); // Get custom field ID => type map
 
         $custom_fields = [];
 
         foreach ( $data as $key => $value ) {
-            if ( $this->is_custom_field( $key, $fillable_keys, $custom_field_ids ) ) {
-                $custom_fields[ $key ] = $value;
+            if ( $this->is_custom_field( $key, $fillable_keys, array_keys( $custom_field_types ) ) ) {
+                $field_type = $custom_field_types[ $key ] ?? 'text';
+                $custom_fields[ $key ] = $this->sanitize_custom_field_value( $value, $field_type );
                 unset( $data[ $key ] );
             }
         }
@@ -612,6 +703,30 @@ class Reservation_Controller extends Base_Rest_Controller {
     }
 
     /**
+     * Sanitizes a custom field value based on its type.
+     *
+     * @param mixed  $value The field value to sanitize.
+     * @param string $type  The field type (text, select, textarea, radio, checkbox).
+     *
+     * @return mixed Sanitized value.
+     */
+    private function sanitize_custom_field_value( $value, string $type ) {
+        switch ( $type ) {
+            case 'textarea':
+                return is_string( $value ) ? sanitize_textarea_field( $value ) : '';
+
+            case 'checkbox':
+                return is_array( $value ) ? array_map( 'sanitize_text_field', $value ) : [];
+
+            case 'text':
+            case 'select':
+            case 'radio':
+            default:
+                return is_string( $value ) ? sanitize_text_field( $value ) : sanitize_text_field( (string) $value );
+        }
+    }
+
+    /**
      * Gets fillable keys from the Reservation Model.
      *
      * @return array Array of fillable key names.
@@ -624,17 +739,26 @@ class Reservation_Controller extends Base_Rest_Controller {
     /**
      * Gets custom field IDs from customization settings.
      *
-     * Extracts all field IDs defined in the reservation form
-     * customization settings across all steps.
-     *
      * @return array Array of custom field IDs.
      */
     private function get_custom_field_ids(): array {
-        $custom_field_ids = [];
+        return array_keys( $this->get_custom_field_types() );
+    }
+
+    /**
+     * Gets custom field ID-to-type map from customization settings.
+     *
+     * Extracts all field IDs and their types defined in the reservation
+     * form customization settings across all steps.
+     *
+     * @return array Associative array of field ID => field type.
+     */
+    private function get_custom_field_types(): array {
+        $custom_field_types = [];
         $customization_settings = wpc_get_option( 'reservation_form_customization', [] );
 
         if ( empty( $customization_settings ) ) {
-            return $custom_field_ids;
+            return $custom_field_types;
         }
 
         foreach ( $customization_settings as $step ) {
@@ -644,12 +768,12 @@ class Reservation_Controller extends Base_Rest_Controller {
 
             foreach ( $step['fields'] as $field ) {
                 if ( ! empty( $field['id'] ) ) {
-                    $custom_field_ids[] = $field['id'];
+                    $custom_field_types[ $field['id'] ] = $field['type'] ?? 'text';
                 }
             }
         }
 
-        return $custom_field_ids;
+        return $custom_field_types;
     }
 
     /**
@@ -728,7 +852,30 @@ class Reservation_Controller extends Base_Rest_Controller {
             return $this->error(__('Schedules did not set', 'wp-cafe'), 409);
         }
 
-        $scheduler = new Scheduler($schedules, $start_date, $end_date, $total_capacity, $location_id);
+        // Get reservation settings for date range validation
+        $reservation_advanced = wpc_get_reservation_advanced( $location_id );
+        $early_booking_time  = wpc_get_reservation_early_booking_time( $location_id );
+
+        // Validate and adjust date range based on settings
+        $date_range = $this->validate_and_adjust_date_range(
+            $start_date,
+            $end_date,
+            $reservation_advanced,
+            $early_booking_time
+        );
+
+        // If no valid dates in range, return empty response
+        if ( empty( $date_range ) ) {
+            return $this->response( [] );
+        }
+
+        $scheduler = new Scheduler(
+            $schedules,
+            $date_range['start_date'],
+            $date_range['end_date'],
+            $total_capacity,
+            $location_id
+        );
 
         $slots = $scheduler->generate();
 
@@ -736,12 +883,150 @@ class Reservation_Controller extends Base_Rest_Controller {
     }
 
     /**
+     * Validate and adjust date range based on reservation settings
+     *
+     * @param string $start_date Requested start date (Y-m-d)
+     * @param string $end_date Requested end date (Y-m-d)
+     * @param array $reservation_advanced Minimum lead time setting
+     * @param string|array $early_booking_time Maximum booking horizon setting
+     * @return array Adjusted date range or empty array if no valid dates
+     */
+    private function validate_and_adjust_date_range( $start_date, $end_date, $reservation_advanced, $early_booking_time ) {
+        $timezone = wp_timezone();
+        $now = new \DateTime( 'now', $timezone );
+        $now->setTime( 0, 0, 0 );
+
+        $start = new \DateTime( $start_date, $timezone );
+        $end   = new \DateTime( $end_date, $timezone );
+
+        // Calculate minimum allowed datetime based on reservation_advanced
+        $minimum_datetime = $this->calculate_minimum_booking_datetime( $reservation_advanced, $now );
+
+        // Adjust start_date if before minimum allowed
+        if ( $start < $minimum_datetime ) {
+            $start = clone $minimum_datetime;
+        }
+
+        // Calculate maximum allowed date based on early_booking_time
+        $maximum_date = $this->calculate_maximum_booking_date( $early_booking_time, $now );
+
+        // Adjust end_date if after maximum allowed
+        if ( $end > $maximum_date ) {
+            $end = clone $maximum_date;
+        }
+
+        // Ensure start is before end after adjustments
+        if ( $start >= $end ) {
+            return [];
+        }
+
+        return [
+            'start_date' => $start->format( 'Y-m-d' ),
+            'end_date'   => $end->format( 'Y-m-d' ),
+        ];
+    }
+
+    /**
+     * Calculate minimum booking datetime from advance reservation setting
+     *
+     * @param array $reservation_advanced Advance reservation setting
+     * @param DateTime $now Current datetime (start of day in WP timezone)
+     * @return DateTime Minimum allowed booking datetime
+     */
+    private function calculate_minimum_booking_datetime( $reservation_advanced, $now ) {
+        $minimum = clone $now;
+
+        if ( empty( $reservation_advanced ) || ! is_array( $reservation_advanced ) ) {
+            return $minimum;
+        }
+
+        $value = intval( $reservation_advanced['value'] ?? 0 );
+        $unit  = $reservation_advanced['unit'] ?? 'minutes';
+
+        switch ( $unit ) {
+            case 'minutes':
+                $minimum->add( new \DateInterval( "PT{$value}M" ) );
+                break;
+            case 'hours':
+                $minimum->add( new \DateInterval( "PT{$value}H" ) );
+                break;
+            case 'days':
+                $minimum->add( new \DateInterval( "P{$value}D" ) );
+                break;
+        }
+
+        return $minimum;
+    }
+
+    /**
+     * Calculate maximum booking date from early booking time limit
+     *
+     * @param string|array $early_booking_time Early booking time setting
+     * @param DateTime $now Current datetime (start of day in WP timezone)
+     * @return DateTime Maximum allowed booking date
+     */
+    private function calculate_maximum_booking_date( $early_booking_time, $now ) {
+        $maximum = clone $now;
+
+        // "any_time" means no restriction - use 1 year ahead as practical limit
+        if ( $early_booking_time === 'any_time' || empty( $early_booking_time ) ) {
+            $maximum->add( new \DateInterval( "P1Y" ) );
+            return $maximum;
+        }
+
+        if ( ! is_array( $early_booking_time ) ) {
+            return $maximum;
+        }
+
+        $value = intval( $early_booking_time['value'] ?? 0 );
+        $unit  = $early_booking_time['unit'] ?? 'days';
+
+        switch ( $unit ) {
+            case 'days':
+                $maximum->add( new \DateInterval( "P{$value}D" ) );
+                break;
+            case 'weeks':
+                $maximum->add( new \DateInterval( "P" . ( $value * 7 ) . "D" ) );
+                break;
+            case 'months':
+                $maximum->add( new \DateInterval( "P{$value}M" ) );
+                break;
+        }
+
+        return $maximum;
+    }
+
+    /**
+     * Transient-based IP rate limiter for public endpoints.
+     * Returns true if the request is within the allowed limit, false otherwise.
+     *
+     * @param int $limit  Max requests allowed within $window seconds.
+     * @param int $window Time window in seconds.
+     * @return bool
+     */
+    private function check_rate_limit( int $limit = 30, int $window = 60 ): bool {
+        $ip    = sanitize_text_field( wp_unslash( $_SERVER['REMOTE_ADDR'] ?? '' ) );
+        $key   = 'wpc_rate_' . md5( $ip );
+        $count = (int) get_transient( $key );
+
+        if ( $count >= $limit ) {
+            return false;
+        }
+
+        set_transient( $key, $count + 1, $window );
+        return true;
+    }
+
+    /**
      * Permission check for getting time slots
      *
      * @param \WP_REST_Request $request
-     * @return bool
+     * @return bool|\WP_Error
      */
-    public function get_slots_permissions_check($request): bool {
+    public function get_slots_permissions_check($request) {
+        if ( ! $this->check_rate_limit() ) {
+            return new \WP_Error( 'rate_limited', __( 'Too many requests. Please try again later.', 'wp-cafe' ), [ 'status' => 429 ] );
+        }
         return true;
     }
 
@@ -794,9 +1079,12 @@ class Reservation_Controller extends Base_Rest_Controller {
      * Permission check for getting reservation capacity
      *
      * @param \WP_REST_Request $request
-     * @return bool
+     * @return bool|\WP_Error
      */
-    public function get_reservation_capacity_permissions_check($request): bool {
+    public function get_reservation_capacity_permissions_check($request) {
+        if ( ! $this->check_rate_limit() ) {
+            return new \WP_Error( 'rate_limited', __( 'Too many requests. Please try again later.', 'wp-cafe' ), [ 'status' => 429 ] );
+        }
         return true;
     }
 
@@ -815,6 +1103,7 @@ class Reservation_Controller extends Base_Rest_Controller {
         $args = [
             'post_type' => 'wpc_reservation',
             'post_status' => ['confirmed', 'pending', 'cancelled'],
+            // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_query -- required for report/filter functionality
             'meta_query' => [
                 'relation' => 'AND',
                 [
@@ -852,10 +1141,10 @@ class Reservation_Controller extends Base_Rest_Controller {
             return $this->error( __( 'Security check failed. Please try again.', 'wp-cafe' ), 403 );
         }
 
-        $invoice = $request->get_param('invoice');
-        $email   = $request->get_param('email');
-        $notes   = $request->get_param('notes');
-        $phone   = $request->get_param('phone');
+        $invoice = sanitize_text_field( $request->get_param('invoice') ?? '' );
+        $email   = sanitize_email( $request->get_param('email') ?? '' );
+        $notes   = sanitize_textarea_field( $request->get_param( 'notes' ) ?? '' );
+        $phone   = sanitize_text_field( $request->get_param('phone') ?? '' );
 
         if ( empty( $invoice ) ) {
             return $this->error( __( 'Please enter invoice', 'wp-cafe' ) );
@@ -1001,9 +1290,12 @@ class Reservation_Controller extends Base_Rest_Controller {
     /**
      * Permission check for getting food list
      *
-     * @return bool
+     * @return bool|\WP_Error
      */
-    public function get_food_list_permissions_check(): bool {
+    public function get_food_list_permissions_check() {
+        if ( ! $this->check_rate_limit() ) {
+            return new \WP_Error( 'rate_limited', __( 'Too many requests. Please try again later.', 'wp-cafe' ), [ 'status' => 429 ] );
+        }
         return true;
     }
 
@@ -1047,9 +1339,12 @@ class Reservation_Controller extends Base_Rest_Controller {
     /**
      * Permission check for checking cart items
      *
-     * @return bool
+     * @return bool|\WP_Error
      */
-    public function check_cart_has_items_permissions_check(): bool {
+    public function check_cart_has_items_permissions_check() {
+        if ( ! $this->check_rate_limit() ) {
+            return new \WP_Error( 'rate_limited', __( 'Too many requests. Please try again later.', 'wp-cafe' ), [ 'status' => 429 ] );
+        }
         return true;
     }
 
@@ -1096,6 +1391,37 @@ class Reservation_Controller extends Base_Rest_Controller {
         $timestamp = strtotime( $date_string );
         if ( $timestamp !== false ) {
             return gmdate( 'Y-m-d', $timestamp );
+        }
+
+        return false;
+    }
+
+    /**
+     * Check if any non-status fields have actually changed
+     *
+     * @param array $old_data Old reservation data
+     * @param array $new_data New data being updated
+     * @return bool True if any field value is different
+     */
+    private function has_reservation_field_changes( $old_data, $new_data ) {
+        $fields_to_check = ['name', 'email', 'phone', 'date', 'start_time', 'end_time',
+            'total_guest', 'table_name', 'branch_id', 'branch_name',
+            'notes', 'booking_amount', 'total_price', 'currency',
+            'payment_method', 'food_order', 'invoice'];
+
+        foreach ( $fields_to_check as $field ) {
+            if ( isset( $new_data[ $field ] ) ) {
+                $old_value = $old_data[ $field ] ?? '';
+                $new_value = $new_data[ $field ];
+
+                if ( is_array( $new_value ) ) {
+                    if ( json_encode( $old_value ) !== json_encode( $new_value ) ) {
+                        return true;
+                    }
+                } elseif ( (string) $old_value !== (string) $new_value ) {
+                    return true;
+                }
+            }
         }
 
         return false;

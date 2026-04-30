@@ -46,6 +46,7 @@ class Email_Notification implements Hookable_Service_Contract {
 						'plugin_name'          => 'Wp Cafe',
 						'plugin_slug'          => 'wp-cafe',
 						'general_prefix'       => 'wpc',
+						'hook_prefix'          => 'wpcafe',
 						'text_domain'          => 'wp-cafe',
 						'admin_script_handler' => 'wpcafe-dashboard-scripts',
 						'sub_menu_filter_hook' => 'wpcafe_menu',

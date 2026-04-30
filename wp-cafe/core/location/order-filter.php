@@ -44,6 +44,7 @@ class Order_Filter implements Hookable_Service_Contract {
      */
     public function display_order_filter() { 
         $locations         = Location_Model::all();
+        // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- admin list-table filter, capability-gated
         $location_selected = empty( $_GET['wpc_location'] ) ? false : sanitize_text_field( wp_unslash( $_GET['wpc_location'] ) );
         ?>
         <select name="wpc_location">
@@ -73,9 +74,12 @@ class Order_Filter implements Hookable_Service_Contract {
      */
     public function update_query_to_filter_orders_by_location( $query_args ) {
 
+        // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- admin list-table filter, capability-gated
         if ( isset( $_GET['wpc_location'] ) ) {
+            // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_key -- required for report/filter functionality
             $query_args['meta_key']   = 'wpc_location_id';
-            $query_args['meta_value'] = $_GET['wpc_location'];
+            // phpcs:ignore WordPress.Security.NonceVerification.Recommended,WordPress.DB.SlowDBQuery.slow_db_query_meta_value -- admin list-table filter, capability-gated; required for report/filter functionality
+            $query_args['meta_value'] = absint( $_GET['wpc_location'] );
         }
 
         return $query_args;
