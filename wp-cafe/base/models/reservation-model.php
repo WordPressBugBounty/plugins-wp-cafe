@@ -167,6 +167,15 @@ class Reservation_Model extends Post_Model {
     public function filter_query( $filters ) {
         $meta_query = [ 'relation' => 'AND' ];
 
+        // email filter (used to scope reservations to current logged-in customer)
+        if ( ! empty( $filters['email'] ) ) {
+            $meta_query[] = [
+                'key'     => 'email',
+                'value'   => $filters['email'],
+                'compare' => '=',
+            ];
+        }
+
         // branch filter
         if ( ! empty( $filters['branch'] ) ) {
             $meta_query[] = [

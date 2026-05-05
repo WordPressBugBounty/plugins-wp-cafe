@@ -128,7 +128,57 @@ class Reservation_Controller extends Base_Rest_Controller {
         ] );
     }
 
-    
+    /**
+     * Check whether user has legacy admin reservation access.
+     *
+     * @return bool
+     */
+    private function has_legacy_reservation_access(): bool {
+        return current_user_can( 'manage_options' ) || current_user_can( 'manage_woocommerce' );
+    }
+
+    /**
+     * Check whether user can view all reservations.
+     *
+     * @return bool
+     */
+    private function can_view_all_reservations(): bool {
+        return $this->has_legacy_reservation_access()
+            || current_user_can( 'wpcafe_view_all_reservations' )
+            || current_user_can( 'wpcafe_manage_reservations' );
+    }
+
+    /**
+     * Check whether user can view reservations.
+     *
+     * @return bool
+     */
+    private function can_view_reservations(): bool {
+        return $this->can_view_all_reservations()
+            || current_user_can( 'wpcafe_view_own_reservations' );
+    }
+
+    /**
+     * Check whether user can manage reservations.
+     *
+     * @return bool
+     */
+    private function can_manage_reservations(): bool {
+        return $this->has_legacy_reservation_access()
+            || current_user_can( 'wpcafe_manage_reservations' );
+    }
+
+    /**
+     * Check whether current user can only view own reservations.
+     *
+     * @return bool
+     */
+    private function view_own_reservations_only(): bool {
+        return ! $this->can_view_all_reservations()
+            && current_user_can( 'wpcafe_view_own_reservations' );
+    }
+
+
     /**
      * Create a new reservation item
      *
@@ -163,6 +213,10 @@ class Reservation_Controller extends Base_Rest_Controller {
         }
 
         $data['invoice'] = 'WPC' . wp_rand( 1000, 9999 );
+
+        if ( empty( $data['status'] ) ) {
+            $data['status'] = wpc_get_option( 'reservation_status', 'pending' );
+        }
 
         $reservation = Reservation_Model::create( $data );
 
@@ -323,6 +377,10 @@ class Reservation_Controller extends Base_Rest_Controller {
             'paged'          => $paged,
         ];
 
+        if ( $this->view_own_reservations_only() ) {
+            $filter['email'] = wp_get_current_user()->user_email;
+        }
+
         if ( ! empty( $search ) ) {
             $args['search'] = $search;
         }
@@ -351,7 +409,7 @@ class Reservation_Controller extends Base_Rest_Controller {
      * @return bool
      */
     public function get_items_permissions_check($request): bool {
-        return current_user_can('manage_options');
+        return $this->can_view_reservations();
     }
 
     /**
@@ -368,6 +426,15 @@ class Reservation_Controller extends Base_Rest_Controller {
         if ( ! $reservation ) {
             return $this->error(__('Reservation not found', 'wp-cafe'), 404);
         }
+
+        if ( $this->view_own_reservations_only() ) {
+            $reservation_email  = (string) get_post_meta( $id, 'email', true );
+            $current_user_email = (string) wp_get_current_user()->user_email;
+
+            if ( '' === $current_user_email || strcasecmp( $reservation_email, $current_user_email ) !== 0 ) {
+                return $this->error( __( 'You do not have permission to view this reservation.', 'wp-cafe' ), 403 );
+            }
+        }
         
         $response = new Reservation_Resource( $reservation );
 
@@ -381,7 +448,7 @@ class Reservation_Controller extends Base_Rest_Controller {
      * @return bool
      */
     public function get_item_permissions_check($request): bool {
-        return current_user_can( 'manage_options' );
+        return $this->can_view_reservations();
     }
 
     /**
@@ -455,7 +522,7 @@ class Reservation_Controller extends Base_Rest_Controller {
      * @return bool
      */
     public function update_item_permissions_check($request): bool {
-        return current_user_can('manage_options');
+        return $this->can_manage_reservations();
     }   
 
     /**
@@ -495,7 +562,7 @@ class Reservation_Controller extends Base_Rest_Controller {
      * @return bool
      */
     public function delete_item_permissions_check( $request ): bool {
-        return current_user_can( 'manage_options' );
+        return $this->can_manage_reservations();
     }
 
     /**

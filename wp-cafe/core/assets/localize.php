@@ -43,6 +43,7 @@ class Localize {
     public static function get_frontend() {
         $data = [
             'site_url'            => site_url(),
+            'admin_url'           => admin_url(),
             'nonce'               => wp_create_nonce( 'wp_rest' ),
             'date_format'         => get_option( 'date_format' ),
             'time_format'         => get_option( 'time_format' ),

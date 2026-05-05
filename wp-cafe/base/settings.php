@@ -145,7 +145,6 @@ class Settings {
             // String arrays
             'block_timeslot_statuses'                  => 'string_array',
             'restaurant_type'                          => 'string_array',
-            'location_selector_pages'                  => 'string_array',
             'custom_holidays'                          => 'string_array',
 
             // Schedules

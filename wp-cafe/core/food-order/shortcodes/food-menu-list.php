@@ -23,7 +23,7 @@ class Food_Menu_List extends Base_Shortcode {
      * @param   array  $atts     Shortcode attributes
      * @param   string  $content  content
      *
-     * @return  []                [return description]
+     * @return  []  [return description]
      */
     public function render($atts = [], $content = null) {
         if (!class_exists('Woocommerce')) { return; }
@@ -66,10 +66,6 @@ class Food_Menu_List extends Base_Shortcode {
         ob_start();
         // category sorting from backend
         $wpc_cat_arr      = explode(',', $wpc_food_categories);
-
-        $wpc_menu_col           = 4;
-        $wpc_menu_col_tablet    = 3;
-        $wpc_menu_col_mobile    = 2;
 
         // Show all products if no categories provided, or only specified categories
         $has_categories = is_array($wpc_cat_arr) && count($wpc_cat_arr) > 0 && !empty($wpc_cat_arr[0]);

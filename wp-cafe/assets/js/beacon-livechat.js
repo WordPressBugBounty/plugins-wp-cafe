@@ -1,9 +1,1 @@
-
-!function(e,t,n){function a(){var e=t.getElementsByTagName("script")[0],n=t.createElement("script");n.type="text/javascript",n.async=!0,n.src="https://beacon-v2.helpscout.net",e.parentNode.insertBefore(n,e)}if(e.Beacon=n=function(t,n,a){e.Beacon.readyQueue.push({method:t,options:n,data:a})},n.readyQueue=[],"complete"===t.readyState)return a();e.attachEvent?e.attachEvent("onload",a):e.addEventListener("load",a,!1)}(window,document,window.Beacon||function(){});
-window.Beacon('config', {
-    color: "#f45925",
-});
-window.Beacon('init', 'a770cb7a-961c-4454-95c5-2fbd321b69a6');
-window.Beacon('on', 'ready', function(){
-    window.Beacon('close');
-});
+!function(e,n,t){function o(){var e=n.getElementsByTagName("script")[0],t=n.createElement("script");t.type="text/javascript",t.async=!0,t.src="https://beacon-v2.helpscout.net",e.parentNode.insertBefore(t,e)}if(e.Beacon=t=function(n,t,o){e.Beacon.readyQueue.push({method:n,options:t,data:o})},t.readyQueue=[],"complete"===n.readyState)return o();e.attachEvent?e.attachEvent("onload",o):e.addEventListener("load",o,!1)}(window,document,window.Beacon||function(){}),window.Beacon("config",{color:"#f45925"}),window.Beacon("init","a770cb7a-961c-4454-95c5-2fbd321b69a6"),window.Beacon("on","ready",function(){window.Beacon("close")});

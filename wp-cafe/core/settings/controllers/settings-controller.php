@@ -109,7 +109,31 @@ class Settings_Controller extends Base_Rest_Controller {
      * @return bool
      */
     public function get_settings_check_permissions() {
-        return current_user_can( 'manage_options' );
+        if ( current_user_can( 'manage_options' ) ) {
+            return true;
+        }
+
+        // Allow any user with a restaurant panel capability to read settings.
+        // The reservation form (and other panel views) needs settings such as
+        // reservation_form_customization to render correctly. Update is still
+        // restricted to manage_options via update_settings_check_permissions().
+        $panel_caps = [
+            'manage_woocommerce',
+            'wpcafe_view_own_orders',
+            'wpcafe_view_all_orders',
+            'wpcafe_manage_orders',
+            'wpcafe_view_own_reservations',
+            'wpcafe_view_all_reservations',
+            'wpcafe_manage_reservations',
+        ];
+
+        foreach ( $panel_caps as $cap ) {
+            if ( current_user_can( $cap ) ) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     /**

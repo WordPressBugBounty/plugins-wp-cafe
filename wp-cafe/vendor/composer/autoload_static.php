@@ -4,7 +4,7 @@
 
 namespace Composer\Autoload;
 
-class ComposerStaticInitb45f783447c7cd8d1e47479c0b420592
+class ComposerStaticInitbdc3519fc299ae9554f63327562135f0
 {
     public static $files = array (
         '65bd208c04f25e98cf12b5c37b014f1e' => __DIR__ . '/..' . '/themewinter/email-notification-sdk/src/Utils/global-helpers.php',
@@ -146,6 +146,7 @@ class ComposerStaticInitb45f783447c7cd8d1e47479c0b420592
         'WpCafe\\Extensions\\Extension_Service_Provider' => __DIR__ . '/../..' . '/core/extensions/extension-service-provider.php',
         'WpCafe\\Feedback\\Feedback_Hooks' => __DIR__ . '/../..' . '/core/feedback/feedback-hooks.php',
         'WpCafe\\Feedback\\Feedback_Service_Provider' => __DIR__ . '/../..' . '/core/feedback/feedback-service-provider.php',
+        'WpCafe\\FoodOrder\\Controllers\\Food_Order_Controller' => __DIR__ . '/../..' . '/core/food-order/controllers/food-order-controller.php',
         'WpCafe\\FoodOrder\\Controllers\\Qrcode_Controller' => __DIR__ . '/../..' . '/core/food-order/qrcode/controllers/qrcode-controller.php',
         'WpCafe\\FoodOrder\\Food_Order_Service_Provider' => __DIR__ . '/../..' . '/core/food-order/food-order-service-provider.php',
         'WpCafe\\FoodOrder\\LiveOrder\\Assets_Manager' => __DIR__ . '/../..' . '/core/food-order/liver-order/assets-manager.php',
@@ -160,6 +161,7 @@ class ComposerStaticInitb45f783447c7cd8d1e47479c0b420592
         'WpCafe\\FoodOrder\\Shortcodes\\Food_Location_Menu' => __DIR__ . '/../..' . '/core/food-order/shortcodes/food-location-menu.php',
         'WpCafe\\FoodOrder\\Shortcodes\\Food_Menu_List' => __DIR__ . '/../..' . '/core/food-order/shortcodes/food-menu-list.php',
         'WpCafe\\FoodOrder\\Shortcodes\\Food_Menu_Tab' => __DIR__ . '/../..' . '/core/food-order/shortcodes/food-menu-tab.php',
+        'WpCafe\\FoodOrder\\Shortcodes\\Product_Popup_Service' => __DIR__ . '/../..' . '/core/food-order/shortcodes/product-popup-service.php',
         'WpCafe\\FoodOrder\\Shortcodes\\Shortcode_Manager' => __DIR__ . '/../..' . '/core/food-order/shortcodes/food-order-shortcode-manager.php',
         'WpCafe\\FoodOrder\\Tip\\Tipping_Ajax' => __DIR__ . '/../..' . '/core/food-order/tip/tipping-ajax.php',
         'WpCafe\\FoodOrder\\Tip\\Tipping_Assets' => __DIR__ . '/../..' . '/core/food-order/tip/tipping-assets.php',
@@ -220,6 +222,10 @@ class ComposerStaticInitb45f783447c7cd8d1e47479c0b420592
         'WpCafe\\Resources\\Reservation_Dashboard_Resource' => __DIR__ . '/../..' . '/base/resources/reservation-dashboard-resource.php',
         'WpCafe\\Resources\\Reservation_Item_Resource' => __DIR__ . '/../..' . '/base/resources/reservation-item-resource.php',
         'WpCafe\\Resources\\Reservation_Resource' => __DIR__ . '/../..' . '/base/resources/reservation-resource.php',
+        'WpCafe\\RestaurantManagement\\Restaurant_Management_Service_Provider' => __DIR__ . '/../..' . '/core/restaurant-management/restaurant-management-service-provider.php',
+        'WpCafe\\RestaurantManagement\\Roles' => __DIR__ . '/../..' . '/core/restaurant-management/roles.php',
+        'WpCafe\\RestaurantManagement\\Shortcodes\\Restaurant_Management_Dashboard' => __DIR__ . '/../..' . '/core/restaurant-management/shortcodes/restaurant-management-dashboard.php',
+        'WpCafe\\RestaurantManagement\\Shortcodes\\Shortcode_Manager' => __DIR__ . '/../..' . '/core/restaurant-management/shortcodes/shortcode-manager.php',
         'WpCafe\\Rollback\\Rollback' => __DIR__ . '/../..' . '/core/rollback/Rollback.php',
         'WpCafe\\Rollback\\Rollback_Service' => __DIR__ . '/../..' . '/core/rollback/rollback-service.php',
         'WpCafe\\Rollback\\Rollback_Service_Provider' => __DIR__ . '/../..' . '/core/rollback/rollback-service-provider.php',
@@ -252,6 +258,10 @@ class ComposerStaticInitb45f783447c7cd8d1e47479c0b420592
         'WpCafe\\Validation\\Validation_Exception' => __DIR__ . '/../..' . '/base/validation/validation-exception.php',
         'WpCafe\\Validation\\Validator' => __DIR__ . '/../..' . '/base/validation/validator.php',
         'WpCafe\\Version_Guard' => __DIR__ . '/../..' . '/upgrades/upgrade-3-0-0/version-guard.php',
+        'WpCafe\\Wc\\Blocks\\Block_Integration' => __DIR__ . '/../..' . '/core/wc/blocks/block-integration.php',
+        'WpCafe\\Wc\\Blocks\\Block_Service' => __DIR__ . '/../..' . '/core/wc/blocks/block-service.php',
+        'WpCafe\\Wc\\Blocks\\Store_Api_Extension' => __DIR__ . '/../..' . '/core/wc/blocks/store-api-extension.php',
+        'WpCafe\\Wc\\Wc_Integration_Service_Provider' => __DIR__ . '/../..' . '/core/wc/wc-integration-service-provider.php',
         'WpCafe\\Widgets\\Elementor_Widgets_Service_Provider' => __DIR__ . '/../..' . '/core/widgets/elementor-widgets-service-provider.php',
         'WpCafe\\Widgets\\Manifest' => __DIR__ . '/../..' . '/widgets/manifest.php',
         'WpCafe\\Widgets\\Wpc_Food_Location_Filter\\Wpc_Food_Location_Filter' => __DIR__ . '/../..' . '/widgets/wpc-food-location-filter/wpc-food-location-filter.php',
@@ -265,9 +275,9 @@ class ComposerStaticInitb45f783447c7cd8d1e47479c0b420592
     public static function getInitializer(ClassLoader $loader)
     {
         return \Closure::bind(function () use ($loader) {
-            $loader->prefixLengthsPsr4 = ComposerStaticInitb45f783447c7cd8d1e47479c0b420592::$prefixLengthsPsr4;
-            $loader->prefixDirsPsr4 = ComposerStaticInitb45f783447c7cd8d1e47479c0b420592::$prefixDirsPsr4;
-            $loader->classMap = ComposerStaticInitb45f783447c7cd8d1e47479c0b420592::$classMap;
+            $loader->prefixLengthsPsr4 = ComposerStaticInitbdc3519fc299ae9554f63327562135f0::$prefixLengthsPsr4;
+            $loader->prefixDirsPsr4 = ComposerStaticInitbdc3519fc299ae9554f63327562135f0::$prefixDirsPsr4;
+            $loader->classMap = ComposerStaticInitbdc3519fc299ae9554f63327562135f0::$classMap;
 
         }, null, ClassLoader::class);
     }

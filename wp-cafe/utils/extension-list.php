@@ -357,7 +357,7 @@ return [
         'status' => 'install',
         'is_pro' => false,
         'title' => __('Optiontics', 'wp-cafe'),
-        'description' => __('It is a plugin which allows restaurant and e-commerce site owners to add custom options (like extra toppings or size variations) to their products.', 'wp-cafe'),
+        'description' => __('Product add-ons / extras for food items — lets customers pick toppings, sizes and other paid options inside the WP Cafe order popup. Adds them to the WooCommerce cart as priced line-item data.', 'wp-cafe'),
         'notice' => '',
         'demo_link' => '',
         'settings_link' => '',

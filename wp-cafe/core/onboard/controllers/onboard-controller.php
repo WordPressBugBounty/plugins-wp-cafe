@@ -38,6 +38,60 @@ class Onboard_Controller extends Base_Rest_Controller {
                 'permission_callback' => [$this, 'setup_profile_permissions_check'],
             ],
         ] );
+
+        register_rest_route( $this->namespace, $this->base . '/skip', [
+            [
+                'methods'             => WP_REST_Server::CREATABLE,
+                'callback'            => [$this, 'skip_onboarding'],
+                'permission_callback' => [$this, 'manage_onboarding_permissions_check'],
+            ],
+        ] );
+
+        register_rest_route( $this->namespace, $this->base . '/complete', [
+            [
+                'methods'             => WP_REST_Server::CREATABLE,
+                'callback'            => [$this, 'complete_onboarding'],
+                'permission_callback' => [$this, 'manage_onboarding_permissions_check'],
+            ],
+        ] );
+    }
+
+    /**
+     * Skip onboarding and persist completion flags.
+     *
+     * @param \WP_REST_Request $request Request object.
+     * @return \WP_HTTP_Response
+     */
+    public function skip_onboarding( $request ) {
+        Onboarding::complete();
+
+        do_action( 'wpcafe_onboard_skipped' );
+
+        return $this->response( [ 'message' => __( 'Onboarding skipped', 'wp-cafe' ) ] );
+    }
+
+    /**
+     * Mark onboarding as completed.
+     *
+     * @param \WP_REST_Request $request Request object.
+     * @return \WP_HTTP_Response
+     */
+    public function complete_onboarding( $request ) {
+        Onboarding::complete();
+
+        do_action( 'wpcafe_onboard_completed' );
+
+        return $this->response( [ 'message' => __( 'Onboarding completed', 'wp-cafe' ) ] );
+    }
+
+    /**
+     * Permission check for skip/complete onboarding endpoints.
+     *
+     * @param \WP_REST_Request $request Request object.
+     * @return bool
+     */
+    public function manage_onboarding_permissions_check( $request ): bool {
+        return current_user_can( 'manage_options' ) && $this->verify_rest_nonce( $request );
     }
 
     /**

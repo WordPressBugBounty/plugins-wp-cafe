@@ -157,6 +157,20 @@ class Location_Controller extends Base_Rest_Controller {
 	 * @return WP_Error|boolean
 	 */
 	public function get_item_permissions_check( $request ) {
+		if ( ! $this->check_rate_limit() ) {
+			return new \WP_Error( 'rate_limited', __( 'Too many requests.', 'wp-cafe' ), [ 'status' => 429 ] );
+		}
+		return true;
+	}
+
+	private function check_rate_limit( int $limit = 60, int $window = 60 ): bool {
+		$ip    = sanitize_text_field( wp_unslash( $_SERVER['REMOTE_ADDR'] ?? '' ) );
+		$key   = 'wpc_rate_loc_' . md5( $ip );
+		$count = (int) get_transient( $key );
+		if ( $count >= $limit ) {
+			return false;
+		}
+		set_transient( $key, $count + 1, $window );
 		return true;
 	}
 

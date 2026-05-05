@@ -2,8 +2,8 @@
 Contributors: arraytics, ehsanriyadh
 Tags: restaurant, reservation, food menu, food delivery, booking, table reservation, WooCommerce, food pickup, takeout, online reservations, restaurant management system, online food ordering
 Requires at least: 6.2
-Tested up to: 6.9.4
-Stable tag: 3.0.9
+Tested up to: 6.9
+Stable tag: 3.0.10
 Requires PHP: 7.4
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
@@ -385,6 +385,10 @@ Yes. WPCafe includes 34+ pre-built food menu templates with grid, list, tab, and
 
 Yes. WPCafe receives regular updates including new features, performance improvements, and security patches. Version 3.0 (December 2025) was the largest update in the plugin's history. Follow the [roadmap](https://themewinter.com/wpcafe-roadmaps/) to see what's coming next.
 
+= Where do I report security bugs found in this plugin? = 
+
+Please report security bugs found in the source code of the WPCafe plugin through the [Patchstack Vulnerability Disclosure  Program](https://patchstack.com/database/vdp/4a4606b4-ac85-4aba-ba0e-e99cba30c5b1). The Patchstack team will assist you with verification, CVE assignment, and notify the developers of this plugin.
+
 == Installation ==
 
 = From the WordPress Plugin Directory (Recommended) =
@@ -412,6 +416,15 @@ Note: WooCommerce is required for online food ordering functionality. It is free
 
 == Changelog ==
 
+= 3.0.10 ( May 05, 2026 ) =
+New: Restaurant Management – Frontend dashboard panel with orders, reservations, profile management, role-based access control, and authentication flow (login/logout)
+New: Checkout – Support for WooCommerce block-based checkout with location selection block
+Fix: Elementor – Compatibility issue with WPC Menu Tab widget resolved
+Fix: Email – Reservation emails now include status and table number
+Fix: Form – Validation errors now display actual field names instead of generic messages
+Fix: Product – Removed hardcoded overwrite of product attribute values
+Tweak: Integration – Optiontics integration updated
+Tweak: Admin – WooCommerce inactive notice added on shortcode generation page
 
 = 3.0.9 ( April 30, 2026 ) =
 New: Added new email trigger for reservation updates - sends notification when reservation fields are updated.

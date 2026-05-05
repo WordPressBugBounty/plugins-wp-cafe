@@ -18,6 +18,7 @@ use WpCafe\Products\Products_Service_Provider;
 use WpCafe\Settings\Settings_Service_Provider;
 use WpCafe\Onboard\Onboard_Service_Provider;
 use WpCafe\Reservation\Reservation_Service_Provider;
+use WpCafe\RestaurantManagement\Restaurant_Management_Service_Provider;
 use WpCafe\Dashboard\Dashboard_Service_Provider;
 use WpCafe\Payments\Payment_Service_Provider;
 use WpCafe\Integrations\Integration_Service_Provider;
@@ -25,6 +26,7 @@ use WpCafe\Email_Automation\Email_Automation_Service_Provider;
 use WpCafe\Widgets\Elementor_Widgets_Service_Provider;
 use WpCafe\GutenBlock\Guten_Block_Service_Provider;
 use WpCafe\Rollback\Rollback_Service_Provider;
+use WpCafe\Wc\Wc_Integration_Service_Provider;
 /**
  * GlobalService Provider class
  */
@@ -47,6 +49,7 @@ class Global_Service_Provider implements Provider_Contract {
         'settings'      => Settings_Service_Provider::class,
         'onboard'       => Onboard_Service_Provider::class,
         'reservation'   => Reservation_Service_Provider::class,
+        'restaurant-management' => Restaurant_Management_Service_Provider::class,
         'extension'     => Extension_Service_Provider::class,
         'feedback-form' => Feedback_Service_Provider::class,
         'food-order'    => Food_Order_Service_Provider::class,
@@ -58,6 +61,7 @@ class Global_Service_Provider implements Provider_Contract {
         'email-automation' => Email_Automation_Service_Provider::class,
         'elementor-widgets' => Elementor_Widgets_Service_Provider::class,
         'guten-blocks'  => Guten_Block_Service_Provider::class,
+        'wc-integration' => Wc_Integration_Service_Provider::class,
         'rollback'      => Rollback_Service_Provider::class,
     ];
 

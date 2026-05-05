@@ -36,9 +36,20 @@ class Onboard_Setup implements Hookable_Service_Contract {
      * @return  void
      */
     public static function redirect_to_onboarding() {
-        if ( wpc_get_option( 'onboarding_init', false ) ) {
-            Onboarding::redirect_to_onboarding();
+        if ( ! wpc_get_option( 'onboarding_init', false ) ) {
+            return;
         }
+
+        if ( wp_doing_ajax() || ( defined( 'REST_REQUEST' ) && REST_REQUEST ) ) {
+            return;
+        }
+
+        $page = isset( $_GET['page'] ) ? sanitize_text_field( wp_unslash( $_GET['page'] ) ) : '';
+        if ( 'wpcafe' === $page ) {
+            return;
+        }
+
+        Onboarding::redirect_to_onboarding();
     }
 
     /**

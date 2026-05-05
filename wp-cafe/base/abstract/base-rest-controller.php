@@ -60,7 +60,7 @@ abstract class Base_Rest_Controller extends WP_REST_Controller implements Hookab
      *
      * @param   array  $data  Response data
      *
-     * @return  array
+     * @return  WP_HTTP_Response
      */
     public function response( $data = [], $status_code = 200, ) {
         $message = is_array( $data ) && ! empty( $data['message'] ) ? $data['message'] : __( 'Request was successful', 'wp-cafe' );

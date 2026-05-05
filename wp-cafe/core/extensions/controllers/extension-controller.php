@@ -40,9 +40,7 @@ class Extension_Controller extends Base_Rest_Controller {
             [
                 'methods'             => \WP_REST_Server::READABLE,
                 'callback'            => [$this, 'get_items'],
-                'permission_callback' => function () {
-                    return current_user_can( 'manage_options' ) || wpc_user_is_dokan_vendor();
-                },
+                'permission_callback' => [ $this, 'read_permission_check' ],
             ],
         ] );
 
@@ -56,6 +54,36 @@ class Extension_Controller extends Base_Rest_Controller {
             ],
         ] );
 
+    }
+
+    /**
+     * Permission check for read endpoint. Allow admins, dokan vendors, and any
+     * user with restaurant panel access capabilities (manager, staff, customer).
+     *
+     * @return bool
+     */
+    public function read_permission_check(): bool {
+        if ( current_user_can( 'manage_options' ) || wpc_user_is_dokan_vendor() ) {
+            return true;
+        }
+
+        $panel_caps = [
+            'manage_woocommerce',
+            'wpcafe_view_own_orders',
+            'wpcafe_view_all_orders',
+            'wpcafe_manage_orders',
+            'wpcafe_view_own_reservations',
+            'wpcafe_view_all_reservations',
+            'wpcafe_manage_reservations',
+        ];
+
+        foreach ( $panel_caps as $cap ) {
+            if ( current_user_can( $cap ) ) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     /**

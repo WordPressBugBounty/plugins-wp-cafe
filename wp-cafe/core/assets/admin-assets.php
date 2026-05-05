@@ -36,7 +36,9 @@ class Admin_Assets extends Base_Assets {
         wp_enqueue_script( 'wpcafe-dashboard-scripts' );
 
         // Enqueue beacon livechat script
-        wp_enqueue_script( 'wpcafe-beacon-livechat' );
+        if ( ! $this->is_aisentic_integrated() ) {
+            wp_enqueue_script( 'wpcafe-beacon-livechat' );
+        }
 
         wp_localize_script( 'wpcafe-dashboard-scripts', 'wpCafe', Localize::get_admin() );
 
@@ -56,6 +58,19 @@ class Admin_Assets extends Base_Assets {
 
         $this->enqueue_i18n_loader();
   
+    }
+
+    /**
+     * Skip beacon when Aisentic plugin is active and has a WP Cafe integration entry.
+     */
+    private function is_aisentic_integrated(): bool {
+        if ( ! class_exists( 'Aisentic\Init' ) ) {
+            return false;
+        }
+
+        $settings = get_option( 'aisentic_integration_settings', [] );
+
+        return isset( $settings['wpcafe']['status'] ) && 'connected' === $settings['wpcafe']['status'];
     }
 
     /**

@@ -1,6 +1,8 @@
 <?php
 namespace WpCafe;
 
+use WpCafe\RestaurantManagement\Roles;
+
 /**
  * Class Deactivation
  * 
@@ -13,6 +15,6 @@ class Deactivate {
      * @return  void
      */
     public static function run(): void {
-        // todo: Add deactivation logic.
+        Roles::deregister();
     }
 }

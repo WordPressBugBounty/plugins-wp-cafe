@@ -462,11 +462,21 @@ class Template_Functions {
 	 * @return html markup
 	 */
 	public static function render_food_menu_tab_product_block( $args ){
-			$active_class = $args['active_class'] ?? '';
-			$content_key  = $args['content_key'] ?? 0;
-			$cat_id       = $args['cat_id'] ?? '';
-			$unique_id    = $args['unique_id'] ?? '';
-			$style        = $args['style'] ?? '';
+			$active_class     = $args['active_class']     ?? '';
+			$content_key      = $args['content_key']      ?? 0;
+			$cat_id           = $args['cat_id']           ?? '';
+			$unique_id        = $args['unique_id']        ?? '';
+			$style            = $args['style']            ?? 'style-1';
+			$products         = $args['products']         ?? array();
+			$wpc_cart_button  = $args['wpc_cart_button']  ?? 'yes';
+			$wpc_price_show   = $args['wpc_price_show']   ?? 'yes';
+			$wpc_show_desc    = $args['wpc_show_desc']    ?? 'yes';
+			$show_thumbnail   = $args['show_thumbnail']   ?? 'yes';
+			$title_link_show  = $args['title_link_show']  ?? 'yes';
+			$show_item_status = $args['show_item_status'] ?? 'yes';
+			$wpc_desc_limit   = $args['wpc_desc_limit']   ?? 15;
+			$wpc_show_vendor  = $args['wpc_show_vendor']  ?? 'no';
+			$wpc_menu_col     = $args['wpc_menu_col']     ?? 6;
 			?>
 			<div class='wpc-tab <?php echo esc_attr($active_class); ?>' data-id='tab_<?php echo intval($content_key); ?>' data-cat_id='<?php echo  esc_attr($cat_id);?>'>
 					<div class="tab_template_<?php echo esc_attr( $cat_id.'_'.$unique_id );?>"></div>

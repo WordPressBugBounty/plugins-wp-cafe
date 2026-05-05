@@ -301,7 +301,7 @@ class Dashboard_Controller extends Base_Rest_Controller {
      * @return bool|WP_Error True if user has permission, WP_Error otherwise.
      */
     public function get_overview_permissions_check( $request ) {
-        return current_user_can( 'manage_woocommerce' );
+        return current_user_can( 'manage_woocommerce' ) || current_user_can( 'manage_options' );
     }
 
     /**
@@ -312,7 +312,7 @@ class Dashboard_Controller extends Base_Rest_Controller {
      * @return bool|WP_Error True if user has permission, WP_Error otherwise.
      */
     public function get_food_orders_permissions_check( $request ) {
-        return current_user_can( 'manage_woocommerce' );
+        return current_user_can( 'manage_woocommerce' ) || current_user_can( 'manage_options' );
     }
 
     /**
@@ -323,7 +323,7 @@ class Dashboard_Controller extends Base_Rest_Controller {
      * @return bool|WP_Error True if user has permission, WP_Error otherwise.
      */
     public function get_reservations_permissions_check( $request ) {
-        return current_user_can( 'manage_woocommerce' );
+        return current_user_can( 'manage_woocommerce' ) || current_user_can( 'manage_options' );
     }
 
     /**
@@ -334,7 +334,7 @@ class Dashboard_Controller extends Base_Rest_Controller {
      * @return bool|WP_Error True if user has permission, WP_Error otherwise.
      */
     public function update_order_status_permissions_check( $request ) {
-        return current_user_can( 'manage_woocommerce' );
+        return current_user_can( 'manage_woocommerce' ) || current_user_can( 'manage_options' );
     }
 
     /**
@@ -345,6 +345,6 @@ class Dashboard_Controller extends Base_Rest_Controller {
      * @return bool|WP_Error True if user has permission, WP_Error otherwise.
      */
     public function get_top_sales_permissions_check( $request ) {
-        return current_user_can( 'manage_woocommerce' );
+        return current_user_can( 'manage_woocommerce' ) || current_user_can( 'manage_options' );
     }
 } 

@@ -775,18 +775,26 @@ class Wpc_Utilities {
 			case ( $product->get_type() == 'variable' || $product->get_type() == 'grouped' )
 			&& $product->is_in_stock() == true :
 				if( $cart_button=='on' || $cart_button =='yes' ) {
-					if ( function_exists('wpcafe_pro') ) {
-						return apply_filters("wpcafe/shortcode/variation", $product, $customize_btn, $widget_id, $customization_icon );
-					} else {
-						$icon_html = self::render_cart_icon( $is_custom_icon, $cart_icon );
-						$price_html = '
-							<div class="wpc-add-to-cart">
-								<a href="'.$product->get_permalink().'" class="wpc-btn">
-									'.$icon_html.'
-								</a>
-							</div>
-						';
-						}
+					// Free's Product_Popup_Service hooks into this filter to
+					// render the Customize button + open the variation popup.
+					// Pro replaces it with its own (richer) version. Either
+					// way, fire the filter unconditionally.
+					$filtered = apply_filters( 'wpcafe/shortcode/variation', $product, $customize_btn, $widget_id, $customization_icon );
+
+					if ( is_string( $filtered ) && '' !== $filtered ) {
+						return $filtered;
+					}
+
+					// No listener returned markup (popup module disabled?).
+					// Fall back to a plain permalink link with the cart icon.
+					$icon_html = self::render_cart_icon( $is_custom_icon, $cart_icon );
+					$price_html = '
+						<div class="wpc-add-to-cart">
+							<a href="' . esc_url( $product->get_permalink() ) . '" class="wpc-btn">
+								' . $icon_html . '
+							</a>
+						</div>
+					';
 				}
 				break;
 
@@ -796,35 +804,30 @@ class Wpc_Utilities {
 
 				$class = !empty($wpc_btn_text) ? 'cart-text-added' : 'cart-text-no-added';
 
-				// Check if product has addons from optiontics
-				$has_addons = false;
-				if ( function_exists('optiontics') && class_exists('\Optiontics\Core\WC\Services\Product_Blocks_Service') ) {
-					$blocks_service = new \Optiontics\Core\WC\Services\Product_Blocks_Service();
-					$blocks_data = $blocks_service->get_product_blocks_data( $product->get_id() );
-					$has_addons = !empty( $blocks_data['blocks'] );
+				// Give add-on integrations (e.g. Optiontics) a chance to
+				// replace the default add-to-cart with their own Customize UI.
+				// Listeners return empty when they do not handle this product.
+				$filtered = apply_filters( 'wpcafe/shortcode/simple', $product, $customize_btn, $widget_id, $customization_icon, $is_custom_icon, $cart_icon );
+				if ( is_string( $filtered ) && '' !== $filtered ) {
+					return $filtered;
 				}
 
-				if ( function_exists('optiontics') && $has_addons && function_exists('wpcafe_pro') ) {
-					return apply_filters("wpcafe/shortcode/simple", $product, $customize_btn, $widget_id , $customization_icon, $is_custom_icon, $cart_icon );
-				}else {
-				
-					$price_html ='<div class="wpc-add-to-cart">
-						<a href="?add-to-cart='.esc_html($product->get_id()).'"
-						data-product_name="'.esc_html($product->get_name()).'"
-						data-product_price="'.esc_html( wc_get_price_to_display( $product ) . get_woocommerce_currency_symbol() ).'"
-						data-product_id="'.esc_html($product->get_id()).'"
-						'.esc_html($html).'
-						rel="nofollow" class="button  add_to_cart_button ajax_add_to_cart '.esc_attr($class).'">
-							<span class="adding"> '.esc_html__('Adding...', 'wp-cafe').'</span>
-							<span class="added"> '.esc_html__('Added', 'wp-cafe').'</span>';
-							if (isset($wpc_btn_text) && $wpc_btn_text  != '') {
-								
-								$price_html .='<span class="add-cart-text"> '.esc_html($wpc_btn_text).' </span>';
-							}
-							$price_html .= self::render_cart_icon( $is_custom_icon, $cart_icon );
-							$price_html .='</a>
-					</div>';
-				}
+				$price_html ='<div class="wpc-add-to-cart">
+					<a href="?add-to-cart='.esc_html($product->get_id()).'"
+					data-product_name="'.esc_html($product->get_name()).'"
+					data-product_price="'.esc_html( wc_get_price_to_display( $product ) . get_woocommerce_currency_symbol() ).'"
+					data-product_id="'.esc_html($product->get_id()).'"
+					'.esc_html($html).'
+					rel="nofollow" class="button  add_to_cart_button ajax_add_to_cart '.esc_attr($class).'">
+						<span class="adding"> '.esc_html__('Adding...', 'wp-cafe').'</span>
+						<span class="added"> '.esc_html__('Added', 'wp-cafe').'</span>';
+						if (isset($wpc_btn_text) && $wpc_btn_text  != '') {
+
+							$price_html .='<span class="add-cart-text"> '.esc_html($wpc_btn_text).' </span>';
+						}
+						$price_html .= self::render_cart_icon( $is_custom_icon, $cart_icon );
+						$price_html .='</a>
+				</div>';
 
 				break;
 

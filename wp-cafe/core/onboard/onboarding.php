@@ -94,9 +94,19 @@ class Onboarding {
             return;
         }
 
-        wpc_update_option( 'onboarding_completed', true );
         wp_safe_redirect( admin_url( 'admin.php?page=wpcafe#/onboard' ) );
-        exit;   
+        exit;
+    }
+
+    /**
+     * Mark onboarding as completed and clear the init flag.
+     *
+     * @return void
+     */
+    public static function complete() {
+        wpc_update_option( 'onboarding_completed', true );
+        wpc_update_option( 'onboarding_init', false );
+        wpc_update_option( 'onboard_setup', true );
     }
 
     /**
@@ -106,9 +116,9 @@ class Onboarding {
      */
     public static function onboarding_init() {
         if ( self::is_onboarding_completed() ) {
-            wpc_get_option( 'onboarding_init', false );
-        }else{
-            wpc_update_option( 'onboarding_init', true ); 
+            wpc_update_option( 'onboarding_init', false );
+        } else {
+            wpc_update_option( 'onboarding_init', true );
         }
     }
 }

@@ -97,6 +97,166 @@ class Reservation_Email_Handler implements Hookable_Service_Contract {
 	}
 
 	/**
+	 * Resolve reservation status from post status (model meta is unreliable).
+	 *
+	 * @param Reservation_Model $reservation
+	 * @return string
+	 */
+	private function get_reservation_status( $reservation ) {
+		$status = get_post_status( $reservation->id );
+		return $status ?: '';
+	}
+
+	/**
+	 * Load the table-layout JSON for a branch.
+	 *
+	 * Reads location-specific term meta first, then falls back to the global
+	 * `visual_table_layout` plugin setting. Result is decoded and cached.
+	 *
+	 * @param int $branch_id Reservation branch term_id.
+	 * @return array
+	 */
+	private function get_table_layout( $branch_id ) {
+		static $cache = [];
+		$key = (int) $branch_id;
+		if ( isset( $cache[ $key ] ) ) {
+			return $cache[ $key ];
+		}
+
+		$layout = '';
+		if ( $branch_id ) {
+			$layout = get_term_meta( $branch_id, 'visual_table_layout', true );
+		}
+		if ( empty( $layout ) ) {
+			$layout = wpc_get_option( 'visual_table_layout', '' );
+		}
+
+		if ( is_string( $layout ) && '' !== $layout ) {
+			$decoded = json_decode( $layout, true );
+			$layout  = is_array( $decoded ) ? $decoded : [];
+		}
+		if ( ! is_array( $layout ) ) {
+			$layout = [];
+		}
+
+		$cache[ $key ] = $layout;
+		return $layout;
+	}
+
+	/**
+	 * Resolve a stored seat ref to its containing table.
+	 *
+	 * @param string $seat_ref e.g. "S5".
+	 * @param int    $branch_id Reservation branch term_id.
+	 * @return array{seat_label:string, table_label:string}|null
+	 */
+	private function resolve_seat_row( $seat_ref, $branch_id ) {
+		$seat_ref = (string) $seat_ref;
+		if ( '' === $seat_ref ) {
+			return null;
+		}
+
+		$layout = $this->get_table_layout( $branch_id );
+		$tables = $layout['tables'] ?? [];
+
+		if ( empty( $tables ) || ! is_array( $tables ) ) {
+			return null;
+		}
+
+		foreach ( $tables as $table ) {
+			$seats = $table['seats'] ?? [];
+			if ( is_array( $seats ) ) {
+				foreach ( $seats as $seat ) {
+					$id = (string) ( $seat['id'] ?? '' );
+					if ( $id === $seat_ref ) {
+						return [
+							'seat_label'  => (string) ( $seat['label'] ?? $seat['name'] ?? $id ),
+							'table_label' => (string) ( $table['name'] ?? $table['label'] ?? $table['id'] ?? '' ),
+						];
+					}
+				}
+			}
+
+			$top_id = (string) ( $table['id'] ?? '' );
+			if ( $top_id === $seat_ref ) {
+				$table_label = (string) ( $table['name'] ?? $table['label'] ?? $top_id );
+				return [
+					'seat_label'  => $table_label,
+					'table_label' => $table_label,
+				];
+			}
+		}
+
+		return null;
+	}
+
+	/**
+	 * Build comma-separated seat label list for the reservation.
+	 *
+	 * @param Reservation_Model $reservation
+	 * @return string
+	 */
+	private function get_seat_names( $reservation ) {
+		$seat_ids = $reservation->seats ?? [];
+		if ( empty( $seat_ids ) || ! is_array( $seat_ids ) ) {
+			return '';
+		}
+
+		$branch_id = (int) ( $reservation->branch_id ?? 0 );
+		$labels    = [];
+
+		foreach ( $seat_ids as $seat_ref ) {
+			$resolved = $this->resolve_seat_row( $seat_ref, $branch_id );
+			$label    = ( $resolved && ! empty( $resolved['seat_label'] ) ) ? $resolved['seat_label'] : (string) $seat_ref;
+			if ( '' !== $label ) {
+				$labels[] = $label;
+			}
+		}
+
+		return implode( ', ', $labels );
+	}
+
+	/**
+	 * Resolve table name. Priority:
+	 *  1. QR-flow `table_name` meta.
+	 *  2. Parent-table label resolved from booked seats.
+	 *  3. Empty.
+	 *
+	 * @param Reservation_Model $reservation
+	 * @return string
+	 */
+	private function get_table_name( $reservation ) {
+		$table_name = $reservation->table_name ?? '';
+		if ( '' !== $table_name ) {
+			return $table_name;
+		}
+
+		$seat_ids = $reservation->seats ?? [];
+		if ( empty( $seat_ids ) || ! is_array( $seat_ids ) ) {
+			return '';
+		}
+
+		$branch_id    = (int) ( $reservation->branch_id ?? 0 );
+		$table_labels = [];
+		$seen         = [];
+
+		foreach ( $seat_ids as $seat_ref ) {
+			$resolved = $this->resolve_seat_row( $seat_ref, $branch_id );
+			if ( ! $resolved || empty( $resolved['table_label'] ) ) {
+				continue;
+			}
+			$label = $resolved['table_label'];
+			if ( isset( $seen[ $label ] ) ) {
+				continue;
+			}
+			$seen[ $label ]   = true;
+			$table_labels[]   = $label;
+		}
+
+		return implode( ', ', $table_labels );
+	}
+
+	/**
 	 * Send reservation created notification via email automation.
 	 *
 	 * @param Reservation_Model $reservation The reservation model instance.
@@ -132,11 +292,11 @@ class Reservation_Email_Handler implements Hookable_Service_Contract {
 			'reservation_start_time'    => $this->format_reservation_time( $reservation->start_time ?? '' ),
 			'reservation_end_time'      => $this->format_reservation_time( $reservation->end_time ?? '' ),
 			'reservation_total_guests'  => (string) ( $reservation->total_guest ?? '' ),
-			'reservation_table_name'    => $reservation->table_name ?? '',
+			'reservation_table_name'    => $this->get_table_name( $reservation ),
 			'reservation_branch_name'   => $reservation->branch_name ?? '',
 			'reservation_branch_address'=> $branch_address,
 			'reservation_branch_id'     => (string) ( $reservation->branch_id ?? '' ),
-			'reservation_status'        => $reservation->status ?? '',
+			'reservation_status'        => $this->get_reservation_status( $reservation ),
 			'reservation_notes'         => $reservation->notes ?? '',
 			'reservation_booking_amount'=> (string) ( $reservation->booking_amount ?? '' ),
 			'reservation_total_price'   => (string) ( $reservation->total_price ?? '' ),
@@ -144,7 +304,7 @@ class Reservation_Email_Handler implements Hookable_Service_Contract {
 			'reservation_payment_method'=> $reservation->payment_method ?? '',
 			'reservation_food_order'    => $reservation->food_order ?? '',
 			'reservation_invoice'       => $reservation->invoice ?? '',
-			'reservation_seat_names'    => '',
+			'reservation_seat_names'    => $this->get_seat_names( $reservation ),
 		);
 
 		// Add custom field data to notification
@@ -192,11 +352,11 @@ class Reservation_Email_Handler implements Hookable_Service_Contract {
 			'reservation_start_time'    => $this->format_reservation_time( $reservation->start_time ?? '' ),
 			'reservation_end_time'      => $this->format_reservation_time( $reservation->end_time ?? '' ),
 			'reservation_total_guests'  => (string) ( $reservation->total_guest ?? '' ),
-			'reservation_table_name'    => $reservation->table_name ?? '',
+			'reservation_table_name'    => $this->get_table_name( $reservation ),
 			'reservation_branch_name'   => $reservation->branch_name ?? '',
 			'reservation_branch_address'=> $branch_address,
 			'reservation_branch_id'     => (string) ( $reservation->branch_id ?? '' ),
-			'reservation_status'        => $reservation->status ?? '',
+			'reservation_status'        => $this->get_reservation_status( $reservation ),
 			'reservation_notes'         => $reservation->notes ?? '',
 			'reservation_booking_amount'=> (string) ( $reservation->booking_amount ?? '' ),
 			'reservation_total_price'   => (string) ( $reservation->total_price ?? '' ),
@@ -204,7 +364,7 @@ class Reservation_Email_Handler implements Hookable_Service_Contract {
 			'reservation_payment_method'=> $reservation->payment_method ?? '',
 			'reservation_food_order'    => $reservation->food_order ?? '',
 			'reservation_invoice'       => $reservation->invoice ?? '',
-			'reservation_seat_names'    => '',
+			'reservation_seat_names'    => $this->get_seat_names( $reservation ),
 		);
 
 		// Add custom field data to notification
@@ -264,11 +424,11 @@ class Reservation_Email_Handler implements Hookable_Service_Contract {
 			'reservation_start_time'         => $this->format_reservation_time( $reservation->start_time ?? '' ),
 			'reservation_end_time'           => $this->format_reservation_time( $reservation->end_time ?? '' ),
 			'reservation_total_guests'       => (string) ( $reservation->total_guest ?? '' ),
-			'reservation_table_name'         => $reservation->table_name ?? '',
+			'reservation_table_name'         => $this->get_table_name( $reservation ),
 			'reservation_branch_name'        => $reservation->branch_name ?? '',
 			'reservation_branch_address'     => $branch_address,
 			'reservation_branch_id'          => (string) ( $reservation->branch_id ?? '' ),
-			'reservation_status'             => $reservation->status ?? '',
+			'reservation_status'             => $this->get_reservation_status( $reservation ),
 			'reservation_previous_status'    => $old_status,
 			'reservation_notes'              => $reservation->notes ?? '',
 			'reservation_booking_amount'     => (string) ( $reservation->booking_amount ?? '' ),
@@ -277,7 +437,7 @@ class Reservation_Email_Handler implements Hookable_Service_Contract {
 			'reservation_payment_method'     => $reservation->payment_method ?? '',
 			'reservation_food_order'         => $reservation->food_order ?? '',
 			'reservation_invoice'            => $reservation->invoice ?? '',
-			'reservation_seat_names'         => '',
+			'reservation_seat_names'         => $this->get_seat_names( $reservation ),
 		);
 
 		// Add custom field data to notification
@@ -324,11 +484,11 @@ class Reservation_Email_Handler implements Hookable_Service_Contract {
 			'reservation_start_time'         => $this->format_reservation_time( $reservation->start_time ?? '' ),
 			'reservation_end_time'           => $this->format_reservation_time( $reservation->end_time ?? '' ),
 			'reservation_total_guests'       => (string) ( $reservation->total_guest ?? '' ),
-			'reservation_table_name'         => $reservation->table_name ?? '',
+			'reservation_table_name'         => $this->get_table_name( $reservation ),
 			'reservation_branch_name'        => $reservation->branch_name ?? '',
 			'reservation_branch_address'     => $branch_address,
 			'reservation_branch_id'          => (string) ( $reservation->branch_id ?? '' ),
-			'reservation_status'             => $reservation->status ?? '',
+			'reservation_status'             => $this->get_reservation_status( $reservation ),
 			'reservation_notes'              => $reservation->notes ?? '',
 			'reservation_booking_amount'     => (string) ( $reservation->booking_amount ?? '' ),
 			'reservation_total_price'        => (string) ( $reservation->total_price ?? '' ),
@@ -336,7 +496,7 @@ class Reservation_Email_Handler implements Hookable_Service_Contract {
 			'reservation_payment_method'     => $reservation->payment_method ?? '',
 			'reservation_food_order'         => $reservation->food_order ?? '',
 			'reservation_invoice'            => $reservation->invoice ?? '',
-			'reservation_seat_names'         => '',
+			'reservation_seat_names'         => $this->get_seat_names( $reservation ),
 		);
 
 		// Add custom field data to notification

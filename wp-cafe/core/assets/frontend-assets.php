@@ -26,11 +26,27 @@ class Frontend_Assets extends Base_Assets {
      * @return  void
      */
     public function enqueue() {
-        
+
         wp_enqueue_style( 'wpcafe-frontend-style' );
-        wp_enqueue_style( 'wpc-public' ); 
+        wp_enqueue_style( 'wpc-public' );
         wp_enqueue_script( 'wpc-public' );
         wp_enqueue_style( 'wpc-icon' );
+
+        // Force-enqueue WooCommerce's frontend scripts so the food-menu
+        // shortcode + customize popup work on arbitrary pages. WC only
+        // auto-loads these on shop / archive / single-product pages.
+        //   - wc-add-to-cart            : AJAX add-to-cart for simple products
+        //   - wc-cart-fragments         : mini-cart auto-refresh
+        //   - wc-add-to-cart-variation  : variation form (matches selected
+        //                                 attributes to a variation_id; the
+        //                                 popup add-to-cart depends on this)
+        //   - wc-single-product         : tabs / image zoom inside the modal
+        if ( function_exists( 'WC' ) ) {
+            wp_enqueue_script( 'wc-add-to-cart' );
+            wp_enqueue_script( 'wc-cart-fragments' );
+            wp_enqueue_script( 'wc-add-to-cart-variation' );
+            wp_enqueue_script( 'wc-single-product' );
+        }
 
         if(function_exists('is_cart') && is_cart() || function_exists('is_checkout') && is_checkout()) {
              wp_enqueue_script( 'wpc-flatpicker' );
@@ -104,6 +120,11 @@ class Frontend_Assets extends Base_Assets {
                 'deps'      => ['wp-i18n', 'wp-data','wp-api-fetch'],
                 'in_footer' => true,
             ],
+            'wpcafe-restaurant-management-scripts' => [
+                'src'       => wpcafe()->assets_url . '/build/js/restaurant-management.js',
+                'deps'      => ['wp-i18n', 'wp-element', 'wp-api-fetch'],
+                'in_footer' => true,
+            ],
             'wpc-flatpicker'     => [
                 'src'       => wpcafe()->assets_url . '/js/flatpickr.min.js',
                 'deps'      => ['jquery'],
@@ -143,6 +164,9 @@ class Frontend_Assets extends Base_Assets {
         $styles = [
             'wpcafe-frontend-style'    => [
                 'src' => wpcafe()->assets_url . '/build/css/frontend.css',
+            ],
+            'wpcafe-restaurant-management-style' => [
+                'src' => wpcafe()->assets_url . '/build/css/restaurant-management.css',
             ],
             'flatpicker'    => [
                 'src' => wpcafe()->assets_url . '/css/flatpickr.min.css',
