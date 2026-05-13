@@ -125,6 +125,17 @@ class Wpc_Location_Menu extends Widget_Base
             ]
         );
         $this->add_control(
+            'show_item_label',
+            [
+                'label' => esc_html__('Show Product Labels', 'wp-cafe'),
+                'type' => \Elementor\Controls_Manager::SWITCHER,
+                'label_on' => esc_html__('Show', 'wp-cafe'),
+                'label_off' => esc_html__('Hide', 'wp-cafe'),
+                'return_value' => 'yes',
+                'default' => 'no',
+            ]
+        );
+        $this->add_control(
             'wpc_show_desc',
             [
                 'label' => esc_html__('Show Description', 'wp-cafe'),
@@ -191,6 +202,18 @@ class Wpc_Location_Menu extends Widget_Base
                     'min'   => esc_html__( 'Min Price (For Variation)', 'wp-cafe' ),
                     'max'   => esc_html__( 'Max Price (For Variation)', 'wp-cafe' ),
                 ],
+            ]
+        );
+
+        $this->add_control(
+            'show_pagination',
+            [
+                'label' => esc_html__('Show Pagination', 'wp-cafe'),
+                'type' => \Elementor\Controls_Manager::SWITCHER,
+                'label_on' => esc_html__('Show', 'wp-cafe'),
+                'label_off' => esc_html__('Hide', 'wp-cafe'),
+                'return_value' => 'yes',
+                'default' => 'yes',
             ]
         );
 
@@ -751,6 +774,7 @@ class Wpc_Location_Menu extends Widget_Base
         $wpc_menu_order      	= $settings["wpc_menu_order"];
 
         $show_item_status      	= $settings["show_item_status"];
+        $show_item_label        = isset( $settings["show_item_label"] ) ? $settings["show_item_label"] : 'no';
         $show_thumbnail      	= $settings["show_thumbnail"];
         $wpc_cart_button        = $settings["wpc_cart_button_show"];
         $wpc_price_show      	= $settings["wpc_price_show"];
@@ -758,6 +782,7 @@ class Wpc_Location_Menu extends Widget_Base
         $wpc_desc_limit      	= $settings["wpc_desc_limit"];
         $wpc_show_desc      	= $settings["wpc_show_desc"];
         $wpc_delivery_time_show = $settings["wpc_delivery_time_show"];
+        $show_pagination        = isset($settings["show_pagination"]) ? $settings["show_pagination"] : 'yes';
 
         $location_alignment		= $settings['location_alignment'];
 
@@ -780,20 +805,32 @@ class Wpc_Location_Menu extends Widget_Base
             'wpc_desc_limit'        => $wpc_desc_limit,
             'wpc_delivery_time_show'=> $wpc_delivery_time_show,
             'show_item_status'      => $show_item_status,
+            'show_item_label'       => $show_item_label,
             'wpc_menu_order'        => $wpc_menu_order,
             'unique_id'             => $unique_id,
-            'location_alignment'   => $location_alignment
+            'location_alignment'    => $location_alignment,
+            'show_pagination'       => $show_pagination,
         ];
+        $current_page = 1;
+
         $food_list_args = array(
             'post_type'     => 'product',
             'no_of_product' => $wpc_menu_count,
             'wpc_cat'       => $wpc_menu_cat,
             'order'         => $wpc_menu_order,
+            'page'          => $current_page,
         );
+
+        $selected_location = function_exists( 'wpc_selected_location_id' ) ? wpc_selected_location_id() : null;
+        if ( ! empty( $selected_location ) ) {
+            $food_list_args['wpc_location'] = $selected_location;
+        }
 
         $unique_id = md5(md5(microtime()));
 
-        $products = Wpc_Utilities::product_query( $food_list_args );
+        $page_result = Wpc_Utilities::product_query_with_pagination( $food_list_args );
+        $products    = $page_result['products'];
+        $total_pages = $page_result['total_pages'];
         ?>
         <div class="food_location_wrapper main_wrapper_<?php echo esc_html($unique_id)?>" data-id="<?php echo esc_attr($unique_id);?>" >
 

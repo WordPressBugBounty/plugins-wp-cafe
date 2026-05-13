@@ -84,16 +84,22 @@ class Reservation_Email_Handler implements Hookable_Service_Contract {
 			return 0;
 		}
 
-		// Get time components from start_time timestamp using wp_date
-		$hour = (int) wp_date( 'H', $start_time_int );
-		$minute = (int) wp_date( 'i', $start_time_int );
-		$second = (int) wp_date( 's', $start_time_int );
+		// start_time is stored as wall-clock-time-interpreted-as-UTC by the
+		// reservation controller (WordPress forces date_default_timezone_set('UTC')),
+		// so gmdate() recovers the original H:i:s the user entered.
+		$start_time_pre_format = gmdate( 'H:i:s', $start_time_int );
 
-		// Combine date with time
-		$datetime_string = $date . ' ' . sprintf( '%02d:%02d:%02d', $hour, $minute, $second );
-		$timestamp = strtotime( $datetime_string );
+		$datetime = \DateTimeImmutable::createFromFormat(
+			'Y-m-d H:i:s',
+			$date . ' ' . $start_time_pre_format,
+			wp_timezone()
+		);
 
-		return ( false === $timestamp ) ? 0 : $timestamp;
+		if ( false === $datetime ) {
+			return 0;
+		}
+
+		return $datetime->getTimestamp();
 	}
 
 	/**

@@ -17,6 +17,7 @@ class Template_Functions {
 			$class              = $args['class'] ?? '';
 			$col                = $args['col'] ?? '';
 			$show_item_status   = $args['show_item_status'] ?? '';
+			$show_item_label    = $args['show_item_label'] ?? 'no';
 			$wpc_price_show     = $args['wpc_price_show'] ?? '';
 			$wpc_show_vendor    = $args['wpc_show_vendor'] ?? '';
 			$wpc_show_desc      = $args['wpc_show_desc'] ?? '';
@@ -47,6 +48,7 @@ class Template_Functions {
 									<div class="wpc-menu-tag-wrap">
 											<?php
 											$show_item_status == 'yes' ? Wpc_Utilities::wpc_tag( $product->get_id() , $product->is_in_stock() ) : "";
+											if ( $show_item_label === 'yes' ) { Wpc_Utilities::wpc_product_labels( $product->get_id() ); }
 											if ($product->get_price_suffix() != '') { ?>
 													<ul class="wpc-menu-tag">
 															<li>
@@ -148,6 +150,7 @@ class Template_Functions {
 			$permalink          = $args['permalink'] ?? '';
 			$class              = $args['class'] ?? '';
 			$show_item_status   = $args['show_item_status'] ?? '';
+			$show_item_label    = $args['show_item_label'] ?? 'no';
 			$wpc_price_show     = $args['wpc_price_show'] ?? '';
 			$wpc_show_vendor    = $args['wpc_show_vendor'] ?? '';
 			$wpc_show_desc      = $args['wpc_show_desc'] ?? '';
@@ -167,6 +170,7 @@ class Template_Functions {
 											<div class="wpc-menu-tag-wrap">
 											<?php
 											$show_item_status == 'yes' ? Wpc_Utilities::wpc_tag( $product->get_id() , $product->is_in_stock() ) : "";
+											if ( $show_item_label === 'yes' ) { Wpc_Utilities::wpc_product_labels( $product->get_id() ); }
 											$price = Wpc_Utilities::menu_price_by_tax( $product );
 											?>
 													<?php
@@ -285,6 +289,7 @@ class Template_Functions {
 			$permalink          = $args['permalink'] ?? '';
 			$class              = $args['class'] ?? '';
 			$show_item_status   = $args['show_item_status'] ?? '';
+			$show_item_label    = $args['show_item_label'] ?? 'no';
 			$wpc_price_show     = $args['wpc_price_show'] ?? '';
 			$wpc_show_vendor    = $args['wpc_show_vendor'] ?? '';
 			$wpc_show_desc      = $args['wpc_show_desc'] ?? '';
@@ -304,6 +309,7 @@ class Template_Functions {
 											<!-- display tag -->
 											<?php
 											$show_item_status == 'yes' ? Wpc_Utilities::wpc_tag( $product->get_id() , $product->is_in_stock() ) : "";
+											if ( $show_item_label === 'yes' ) { Wpc_Utilities::wpc_product_labels( $product->get_id() ); }
 											$price = Wpc_Utilities::menu_price_by_tax( $product );
 											?>
 											<?php
@@ -474,29 +480,120 @@ class Template_Functions {
 			$show_thumbnail   = $args['show_thumbnail']   ?? 'yes';
 			$title_link_show  = $args['title_link_show']  ?? 'yes';
 			$show_item_status = $args['show_item_status'] ?? 'yes';
+			$show_item_label  = $args['show_item_label']  ?? 'no';
 			$wpc_desc_limit   = $args['wpc_desc_limit']   ?? 15;
 			$wpc_show_vendor  = $args['wpc_show_vendor']  ?? 'no';
 			$wpc_menu_col     = $args['wpc_menu_col']     ?? 6;
+			$current_page     = isset( $args['current_page'] ) ? max( 1, (int) $args['current_page'] ) : 1;
+			$total_pages      = isset( $args['total_pages'] ) ? (int) $args['total_pages'] : 0;
+			$show_pagination  = isset( $args['show_pagination'] ) ? $args['show_pagination'] : 'yes';
+			$product_data     = isset( $args['product_data'] ) && is_array( $args['product_data'] ) ? $args['product_data'] : array();
 			?>
 			<div class='wpc-tab <?php echo esc_attr($active_class); ?>' data-id='tab_<?php echo intval($content_key); ?>' data-cat_id='<?php echo  esc_attr($cat_id);?>'>
 					<div class="tab_template_<?php echo esc_attr( $cat_id.'_'.$unique_id );?>"></div>
 					<div class="template_data_<?php echo esc_attr( $cat_id.'_'.$unique_id );?>">
-							<?php
-							$is_pro_active = function_exists('wpcafe_pro') || defined('WPCAFE_PRO_FILE');
-							$style_path = wpcafe()->plugin_directory . "/widgets/wpc-food-menu-tab/style/{$style}.php";
+							<div class="wpc-paginated-products"
+								data-shortcode="food_menu_tab"
+								data-cat_id="<?php echo esc_attr( $cat_id ); ?>"
+								data-current="<?php echo esc_attr( $current_page ); ?>"
+								data-product_data="<?php echo esc_attr( wp_json_encode( $product_data ) ); ?>">
+								<div class="wpc-paginated-products-body">
+									<?php
+									$is_pro_active = function_exists('wpcafe_pro') || defined('WPCAFE_PRO_FILE');
+									$style_path = wpcafe()->plugin_directory . "/widgets/wpc-food-menu-tab/style/{$style}.php";
 
-							if ( !file_exists( $style_path ) && $is_pro_active && function_exists('wpcafe_pro') ) {
-								$pro_style_path = wpcafe_pro()->plugin_directory . "/widgets/food-menu-tab/style/{$style}.php";
-								if ( file_exists( $pro_style_path ) ) {
-									$style_path = $pro_style_path;
+									if ( !file_exists( $style_path ) && $is_pro_active && function_exists('wpcafe_pro') ) {
+										$pro_style_path = wpcafe_pro()->plugin_directory . "/widgets/food-menu-tab/style/{$style}.php";
+										if ( file_exists( $pro_style_path ) ) {
+											$style_path = $pro_style_path;
+										}
+									}
+
+							ob_start();
+									include $style_path;
+							$style_markup = ob_get_clean();
+
+							echo wp_kses( $style_markup, Wpc_Utilities::wpc_kses_allowed_tags() );
+									?>
+								</div>
+								<?php
+								if ( 'yes' === $show_pagination ) {
+									echo \WpCafe\Utils\Wpc_Utilities::render_menu_pagination( $current_page, $total_pages ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 								}
-							}
-
-							include $style_path;
-							?>
+								?>
+							</div>
 					</div>
 			</div><!-- Tab pane 1 end -->
 			<?php
+	}
+
+	/**
+	 * Inject product label markup into legacy pro tab styles that render only tag terms.
+	 *
+	 * @param array $args Injection arguments.
+	 *
+	 * @return string
+	 */
+	private static function maybe_inject_tab_product_labels( $args ) {
+			$style_markup    = $args['style_markup'] ?? '';
+			$style_path      = $args['style_path'] ?? '';
+			$products        = $args['products'] ?? [];
+			$show_item_label = $args['show_item_label'] ?? 'no';
+
+			if ( 'yes' !== $show_item_label || empty( $style_markup ) || empty( $products ) || ! is_array( $products ) ) {
+					return $style_markup;
+			}
+
+			if ( ! self::is_pro_food_menu_tab_style( $style_path ) ) {
+					return $style_markup;
+			}
+
+			$label_markup_by_product = [];
+			foreach ( $products as $product ) {
+					if ( ! is_object( $product ) || ! method_exists( $product, 'get_id' ) ) {
+							$label_markup_by_product[] = '';
+							continue;
+					}
+
+					ob_start();
+					Wpc_Utilities::wpc_product_labels( $product->get_id() );
+					$label_markup_by_product[] = ob_get_clean();
+			}
+
+			if ( ! array_filter( $label_markup_by_product ) ) {
+					return $style_markup;
+			}
+
+			$index = 0;
+			$updated_markup = preg_replace_callback(
+					'/(<div[^>]*class=(["\'])[^"\']*\bwpc-menu-tag-wrap\b[^"\']*\2[^>]*>)/i',
+					function ( $matches ) use ( &$index, $label_markup_by_product ) {
+							$label_markup = $label_markup_by_product[ $index ] ?? '';
+							$index++;
+
+							return $matches[1] . $label_markup;
+					},
+					$style_markup
+			);
+
+			return is_string( $updated_markup ) ? $updated_markup : $style_markup;
+	}
+
+	/**
+	 * Check whether a resolved style path points to a pro food-menu-tab style.
+	 *
+	 * @param string $style_path Style file path.
+	 *
+	 * @return bool
+	 */
+	private static function is_pro_food_menu_tab_style( $style_path ) {
+			if ( empty( $style_path ) || ! function_exists( 'wpcafe_pro' ) ) {
+					return false;
+			}
+
+			$pro_style_base = trailingslashit( wpcafe_pro()->plugin_directory ) . 'widgets/food-menu-tab/style/';
+
+			return 0 === strpos( wp_normalize_path( $style_path ), wp_normalize_path( $pro_style_base ) );
 	}
 
 	public static function modal_markup( $wpc_locations, $store_id = null ){

@@ -20,6 +20,7 @@ class Location_Selector implements Hookable_Service_Contract {
         add_action( 'woocommerce_review_order_before_order_total', [ $this, 'display_checkout_location_selector' ] );
 
         add_action('wp_footer', [ $this, 'add_location_modal_html' ] );
+        add_action('wp_footer', [ $this, 'add_floating_widget_html' ], 11 );
 
         add_action( 'wp_ajax_save_location', [ $this, 'save_location' ] );
         add_action( 'wp_ajax_nopriv_save_location', [ $this, 'save_location' ] );
@@ -42,36 +43,74 @@ class Location_Selector implements Hookable_Service_Contract {
      *
      * @return  void
      */
-    public function add_location_modal_html() { 
-        $location_display = wpc_get_option('display_location_selector', 'dont_show');
-        $location_selector_pages = wpc_get_option('location_selector_pages', []);
-        
-        // Don't show if disabled
-        if ( $location_display == 'dont_show') {
+    public function add_location_modal_html() {
+        if ( ! $this->should_render_on_current_page() ) {
             return;
         }
- 
-        // If "specific_pages" is selected, check if current page is in the list
-        if ( $location_display == 'specific_pages' ) {
-            // Only check pages if specific_pages mode is selected
-            if ( ! empty( $location_selector_pages ) && is_array( $location_selector_pages ) ) {
-                if ( ! $this->is_current_page_in_selected_pages( $location_selector_pages ) ) {
-                    return;
-                }
-            } else {
-                // If specific_pages is selected but no pages are chosen, don't show
-                return;
-            }
-        }
-        
-        // For "all_pages" mode, show on all pages including home page
 
-        $locations         = Location_Model::all();
+        $locations            = Location_Model::all();
         $selected_location_id = wpc_selected_location_id();
+        $selected_location    = $selected_location_id ? Location_Model::find( $selected_location_id ) : null;
+        $primary_color        = wpc_get_option('primary_color') ?: '#c82333';
+
         wp_enqueue_style( 'wpc-location-selector' );
         wp_enqueue_script( 'wpc-location-selector' );
 
-        require_once wpcafe()->template_directory . '/location/location-selector-popup.php';
+        require wpcafe()->template_directory . '/location/location-selector-popup.php';
+    }
+
+    /**
+     * Render floating location widget when enabled.
+     *
+     * Honors the same page rules as the auto-open modal so the widget
+     * never appears on pages where the location selector itself is hidden.
+     *
+     * @return void
+     */
+    public function add_floating_widget_html() {
+        if ( ! wpc_get_option('enable_floating_location_widget') ) {
+            return;
+        }
+
+        if ( ! function_exists('wpc_is_module_enable') || ! wpc_is_module_enable('location') ) {
+            return;
+        }
+
+        if ( ! $this->should_render_on_current_page() ) {
+            return;
+        }
+
+        $selected_location_id = wpc_selected_location_id();
+        $selected_location    = $selected_location_id ? Location_Model::find( $selected_location_id ) : null;
+        $primary_color        = wpc_get_option('primary_color') ?: '#c82333';
+
+        wp_enqueue_style( 'wpc-location-selector' );
+        wp_enqueue_script( 'wpc-location-selector' );
+
+        require wpcafe()->template_directory . '/location/location-floating-widget.php';
+    }
+
+    /**
+     * Whether the location selector (modal + widget) is allowed on the current page.
+     *
+     * @return bool
+     */
+    private function should_render_on_current_page() {
+        $location_display        = wpc_get_option('display_location_selector', 'dont_show');
+        $location_selector_pages = wpc_get_option('location_selector_pages', []);
+
+        if ( $location_display === 'dont_show' ) {
+            return false;
+        }
+
+        if ( $location_display === 'specific_pages' ) {
+            if ( empty( $location_selector_pages ) || ! is_array( $location_selector_pages ) ) {
+                return false;
+            }
+            return $this->is_current_page_in_selected_pages( $location_selector_pages );
+        }
+
+        return true;
     }
 
     /**

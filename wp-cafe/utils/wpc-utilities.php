@@ -125,6 +125,8 @@ class Wpc_Utilities {
 			],
 			'li'                            => [
 				'class' => [],
+				'style' => [],
+				'data-product_id' => [],
 			],
 			'ol'                            => [
 				'class' => [],
@@ -305,6 +307,8 @@ class Wpc_Utilities {
 			],
 			'li'                            => [
 				'class' => [],
+				'style' => [],
+				'data-product_id' => [],
 			],
 			'ol'                            => [
 				'class' => [],
@@ -608,10 +612,42 @@ class Wpc_Utilities {
 	}
 
 	/**
+	 * Render product label badges for a product.
+	 *
+	 * Thin wrapper over the global wpc_product_labels() helper so that
+	 * templates calling other Wpc_Utilities methods stay stylistically
+	 * consistent.
+	 */
+	public static function wpc_product_labels( $product_id ) {
+		if ( function_exists( 'wpc_product_labels' ) ) {
+			wpc_product_labels( $product_id );
+		}
+	}
+
+	/**
 	 * Product query
 	 * @param array $args = [ $post_type, $no_of_product, $wpc_cat, $order, $page, $total_count, $search_value, $taxonomy ]
 	 */
 	public static function product_query( $params ){
+		$result = self::run_product_query( $params );
+		return $result['products'];
+	}
+
+	/**
+	 * Product query with pagination metadata.
+	 *
+	 * @param array $params Same params as product_query plus a forced 'page'.
+	 * @return array { products: WC_Product[], total_pages: int, current_page: int }
+	 */
+	public static function product_query_with_pagination( $params ) {
+		$params['paginate'] = true;
+		if ( empty( $params['page'] ) ) {
+			$params['page'] = 1;
+		}
+		return self::run_product_query( $params );
+	}
+
+	private static function run_product_query( $params ){
 		$defaults = array(
 			'post_type'     => 'product',
 			'no_of_product' => 10,
@@ -621,7 +657,8 @@ class Wpc_Utilities {
 			'total_count'   => false,
 			'search_value'  => false,
 			'taxonomy'      => 'product_cat',
-			'wpc_location'  => null
+			'wpc_location'  => null,
+			'paginate'      => false,
 		);
 
 		$parsed = wp_parse_args( $params, $defaults );
@@ -701,11 +738,94 @@ class Wpc_Utilities {
 
 		$args['post_type']     = $args['post_type'] ?? 'product';
 		$args['fields']        = 'ids';
-		$args['no_found_rows'] = true;
+		$args['no_found_rows'] = empty( $parsed['paginate'] );
 
-		$ids = ( new \WP_Query( $args ) )->posts;
+		$query    = new \WP_Query( $args );
+		$ids      = $query->posts;
+		$products = $ids ? array_filter( array_map( 'wc_get_product', $ids ) ) : [];
 
-		return $ids ? array_filter( array_map( 'wc_get_product', $ids ) ) : [];
+		return [
+			'products'     => $products,
+			'total_pages'  => ! empty( $parsed['paginate'] ) ? (int) $query->max_num_pages : 0,
+			'current_page' => ! empty( $parsed['paginate'] ) ? max( 1, (int) ( $parsed['page'] ?? 1 ) ) : 0,
+		];
+	}
+
+	/**
+	 * Render numbered pagination nav for menu shortcodes/widgets.
+	 *
+	 * Pagination clicks are handled client-side via wpc-public.js — anchors
+	 * carry data-page; outer nav carries data-current/data-total so JS can
+	 * prevent invalid jumps.
+	 */
+	public static function render_menu_pagination( $current_page, $total_pages ) {
+		$current_page = max( 1, (int) $current_page );
+		$total_pages  = (int) $total_pages;
+
+		if ( $total_pages <= 1 ) {
+			return '';
+		}
+
+		$prev  = max( 1, $current_page - 1 );
+		$next  = min( $total_pages, $current_page + 1 );
+		$items = self::build_pagination_items( $current_page, $total_pages );
+
+		ob_start();
+		?>
+		<nav class="wpc-pagination" data-current="<?php echo esc_attr( $current_page ); ?>" data-total="<?php echo esc_attr( $total_pages ); ?>">
+			<ul class="wpc-pagination-list">
+				<li class="wpc-pagination-item wpc-pagination-prev<?php echo $current_page === 1 ? ' is-disabled' : ''; ?>">
+					<a href="#" data-page="<?php echo esc_attr( $prev ); ?>" aria-label="<?php esc_attr_e( 'Previous page', 'wp-cafe' ); ?>"><?php echo esc_html__( 'Prev', 'wp-cafe' ); ?></a>
+				</li>
+				<?php foreach ( $items as $item ) : ?>
+					<?php if ( '...' === $item ) : ?>
+						<li class="wpc-pagination-item wpc-pagination-ellipsis is-disabled" aria-hidden="true">
+							<span>&hellip;</span>
+						</li>
+					<?php else : ?>
+						<li class="wpc-pagination-item<?php echo $item === $current_page ? ' is-current' : ''; ?>">
+							<a href="#" data-page="<?php echo esc_attr( $item ); ?>"><?php echo esc_html( $item ); ?></a>
+						</li>
+					<?php endif; ?>
+				<?php endforeach; ?>
+				<li class="wpc-pagination-item wpc-pagination-next<?php echo $current_page === $total_pages ? ' is-disabled' : ''; ?>">
+					<a href="#" data-page="<?php echo esc_attr( $next ); ?>" aria-label="<?php esc_attr_e( 'Next page', 'wp-cafe' ); ?>"><?php echo esc_html__( 'Next', 'wp-cafe' ); ?></a>
+				</li>
+			</ul>
+		</nav>
+		<?php
+		return ob_get_clean();
+	}
+
+	/**
+	 * Build a compact pagination sequence with ellipses.
+	 *
+	 * Always anchors first two and last two pages, plus current ±1, and
+	 * fills gaps with the literal token '...'. Up to 7 entries are shown
+	 * so width stays bounded for large page counts.
+	 */
+	private static function build_pagination_items( $current_page, $total_pages ) {
+		if ( $total_pages <= 7 ) {
+			return range( 1, $total_pages );
+		}
+
+		$anchors = [ 1, 2, $current_page - 1, $current_page, $current_page + 1, $total_pages - 1, $total_pages ];
+		$anchors = array_values( array_unique( array_filter( $anchors, function ( $p ) use ( $total_pages ) {
+			return $p >= 1 && $p <= $total_pages;
+		} ) ) );
+		sort( $anchors );
+
+		$items = [];
+		$prev  = 0;
+		foreach ( $anchors as $p ) {
+			if ( $prev && $p - $prev > 1 ) {
+				$items[] = '...';
+			}
+			$items[] = $p;
+			$prev    = $p;
+		}
+
+		return $items;
 	}
 
 	/**
@@ -968,13 +1088,15 @@ class Wpc_Utilities {
                 'location_alignment'   => 'center'
             ], $atts ));
         
-		$food_location  = Wpc_Utilities::get_location_data ( esc_html__("Select food location", "wp-cafe") , esc_html__("No location is set", "wp-cafe"),"id" );
+		$food_location          = Wpc_Utilities::get_location_data ( esc_html__("Select food location", "wp-cafe") , esc_html__("No location is set", "wp-cafe"),"id" );
+		$selected_location_id   = function_exists( 'wpc_selected_location_id' ) ? wpc_selected_location_id() : null;
+		$selected_location_key  = $selected_location_id ? (string) $selected_location_id : '';
 		?>
 		<!-- select location -->
 		<form class="location_menu">
 			<select id="filter_location" name="filter_location" class="filter-location <?php echo esc_attr($location_alignment); ?>">
 				<?php foreach ( $food_location as $key => $value ) { ?>
-					<option value="<?php echo esc_attr($key); ?>"><?php echo esc_html( $value ) ?></option>
+					<option value="<?php echo esc_attr($key); ?>" <?php selected( (string) $key, $selected_location_key ); ?>><?php echo esc_html( $value ) ?></option>
 				<?php } ?>
 			</select>
 		</form>

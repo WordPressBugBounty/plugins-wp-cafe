@@ -15,6 +15,8 @@ use WpCafe\Feedback\Feedback_Service_Provider;
 use WpCafe\FoodOrder\Food_Order_Service_Provider;
 use WpCafe\Location\Location_Service_Provider;
 use WpCafe\Products\Products_Service_Provider;
+use WpCafe\Products\Labels\Product_Label_Service_Provider;
+use WpCafe\Products\Nutrition\Nutrition_Service_Provider;
 use WpCafe\Settings\Settings_Service_Provider;
 use WpCafe\Onboard\Onboard_Service_Provider;
 use WpCafe\Reservation\Reservation_Service_Provider;
@@ -55,6 +57,8 @@ class Global_Service_Provider implements Provider_Contract {
         'food-order'    => Food_Order_Service_Provider::class,
         'location'      => Location_Service_Provider::class,
         'products'      => Products_Service_Provider::class,
+        'product-labels' => Product_Label_Service_Provider::class,
+        'product-nutrition' => Nutrition_Service_Provider::class,
         'dashboard'     => Dashboard_Service_Provider::class,
         'payments'      => Payment_Service_Provider::class,
         'integrations'  => Integration_Service_Provider::class,

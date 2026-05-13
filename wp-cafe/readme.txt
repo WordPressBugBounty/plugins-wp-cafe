@@ -3,7 +3,7 @@ Contributors: arraytics, ehsanriyadh
 Tags: restaurant, reservation, food menu, food delivery, booking, table reservation, WooCommerce, food pickup, takeout, online reservations, restaurant management system, online food ordering
 Requires at least: 6.2
 Tested up to: 6.9
-Stable tag: 3.0.10
+Stable tag: 3.0.11
 Requires PHP: 7.4
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
@@ -415,6 +415,25 @@ Please report security bugs found in the source code of the WPCafe plugin throug
 Note: WooCommerce is required for online food ordering functionality. It is free and will be prompted during setup if not already installed.
 
 == Changelog ==
+
+= 3.0.11 ( May 13, 2026 ) =
+New: Food label – Product labels feature for displaying customizable badges on menu items
+New: Food nutrition – Nutritional and allergen info cards with detailed ingredient breakdown
+New: Frontend – Floating location widget with revamped location selector
+New: Shortcode – Pagination support for food menu shortcodes with per-page configuration
+New: Elementor – Support for pro shortcodes inside Elementor widgets
+New: Minicart – Tax settings with option to include tax in minicart total
+New: Reservation – Customizable thank you page message
+New: Checkout – ASAP option settings for pickup and delivery
+Fix: Email – Reminder email date and time mismatch resolved
+Fix: Reservation – Shortcode not rendering inside the editor fixed
+Fix: Reservation – Date range input validation in admin filter
+Fix: Reservation – Form style and attribute rendering issues
+Fix: Elementor – Pagination controller not working for Elementor widgets
+Fix: Elementor – Food location filtering widget behavior inside shortcode
+Fix: Theme – Ocean theme font-size compatibility conflict resolved
+Tweak: Performance – reduced admin page script size for faster loading.
+Tweak: Admin – Sidebar menu items rearranged for better usability
 
 = 3.0.10 ( May 05, 2026 ) =
 New: Restaurant Management – Frontend dashboard panel with orders, reservations, profile management, role-based access control, and authentication flow (login/logout)

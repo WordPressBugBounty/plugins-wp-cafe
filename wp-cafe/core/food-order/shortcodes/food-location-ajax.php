@@ -31,7 +31,7 @@ class Food_Location_Ajax {
     public function food_location_ajax() {
         global $woocommerce;
 
-        if ( ! wp_verify_nonce( sanitize_text_field( wp_unslash( $_REQUEST['_wpc_nonce'] ?? '' ) ), 'filter_food_location_nonce' ) ) {
+        if ( ! check_ajax_referer( 'filter_food_location_nonce', '_wpc_nonce', false ) ) {
             wp_send_json_error(
                 [
                     'message' => esc_html__( 'Nonce verification failed!', 'wp-cafe' ),
@@ -39,10 +39,9 @@ class Food_Location_Ajax {
             );
         }
 
-        $post_arr = filter_input_array( INPUT_POST, FILTER_SANITIZE_SPECIAL_CHARS );
-        $location = $post_arr['location'];
-
+        $location    = isset( $_POST['location'] ) ? sanitize_text_field( wp_unslash( $_POST['location'] ) ) : '';
         $location_id = absint( $location );
+
         if ( $location_id ) {
             Session::set( 'selected_location', $location_id );
             setcookie( 'wpc_selected_location', (string) $location_id, time() + ( 30 * DAY_IN_SECONDS ), COOKIEPATH ?: '/', COOKIE_DOMAIN, is_ssl(), false );
@@ -53,21 +52,28 @@ class Food_Location_Ajax {
             unset( $_COOKIE['wpc_selected_location'] );
         }
 
-        if ( isset( $post_arr['product_data'] ) ) {
-            $product_data           = $post_arr['product_data'];
-            $show_thumbnail         = $product_data['show_thumbnail'];
-            $show_item_status       = $product_data['show_item_status'];
-            $wpc_cart_button        = $product_data['wpc_cart_button'];
-            $wpc_price_show         = $product_data['wpc_price_show'];
-            $wpc_show_desc          = $product_data['wpc_show_desc'];
-            $wpc_delivery_time_show = $product_data['wpc_delivery_time_show'];
-            $wpc_desc_limit         = $product_data['wpc_desc_limit'];
-            $unique_id              = $product_data['unique_id'];
-            $allowed_cols           = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12'];
-            $menu_col               = isset($product_data['wpc_menu_col']) && in_array($product_data['wpc_menu_col'], $allowed_cols, true) ? $product_data['wpc_menu_col'] : '3';
-            $col                    = 'wpc-col-md-' . $menu_col;
-            $title_link_show        = $product_data['title_link_show'];
-            $get_location           = $location === '' ? [] : [ $location ];
+        $has_product_data = isset( $_POST['product_data'] ) && is_array( $_POST['product_data'] );
+
+        if ( $has_product_data ) {
+            $raw_product_data = wp_unslash( $_POST['product_data'] ); // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- sanitized per-field below.
+
+            $show_thumbnail         = wpc_sanitize_yes_no( $raw_product_data['show_thumbnail'] ?? '', 'yes' );
+            $show_item_status       = wpc_sanitize_yes_no( $raw_product_data['show_item_status'] ?? '', 'yes' );
+            $show_item_label        = $product_data['show_item_label'] ?? 'no';
+            $wpc_cart_button        = wpc_sanitize_yes_no( $raw_product_data['wpc_cart_button'] ?? '', 'yes' );
+            $wpc_price_show         = wpc_sanitize_yes_no( $raw_product_data['wpc_price_show'] ?? '', 'yes' );
+            $wpc_show_desc          = wpc_sanitize_yes_no( $raw_product_data['wpc_show_desc'] ?? '', 'yes' );
+            $wpc_delivery_time_show = wpc_sanitize_yes_no( $raw_product_data['wpc_delivery_time_show'] ?? '', 'no' );
+            $title_link_show        = wpc_sanitize_yes_no( $raw_product_data['title_link_show'] ?? '', 'yes' );
+            $wpc_desc_limit         = isset( $raw_product_data['wpc_desc_limit'] ) ? absint( $raw_product_data['wpc_desc_limit'] ) : 15;
+            $unique_id              = isset( $raw_product_data['unique_id'] ) ? sanitize_text_field( $raw_product_data['unique_id'] ) : '';
+
+            $allowed_cols = [ '1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12' ];
+            $raw_menu_col = isset( $raw_product_data['wpc_menu_col'] ) ? sanitize_text_field( $raw_product_data['wpc_menu_col'] ) : '3';
+            $menu_col     = in_array( $raw_menu_col, $allowed_cols, true ) ? $raw_menu_col : '3';
+            $col          = 'wpc-col-md-' . $menu_col;
+
+            $get_location = $location_id ? [ $location_id ] : [];
 
             $args = [
                 'order'    => 'DESC',
@@ -95,7 +101,8 @@ class Food_Location_Ajax {
         }
 
         // Clear cart data.
-        if ( ! empty( $post_arr['clear_cart'] ) && 1 === (int) $post_arr['clear_cart'] ) {
+        $clear_cart = isset( $_POST['clear_cart'] ) ? absint( $_POST['clear_cart'] ) : 0;
+        if ( 1 === $clear_cart ) {
             $woocommerce->cart->empty_cart();
             WC()->session->set( 'cart', [] );
         }
@@ -103,7 +110,7 @@ class Food_Location_Ajax {
         // Check cart data.
         $cart_empty = ( WC()->cart->cart_contents_count === 0 ) ? 1 : 0;
 
-        if ( isset( $post_arr['product_data'] ) ) {
+        if ( $has_product_data ) {
             wp_send_json(
                 [
                     'html'       => $html,

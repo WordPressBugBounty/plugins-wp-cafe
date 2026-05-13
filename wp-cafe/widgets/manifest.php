@@ -26,7 +26,7 @@ Class Manifest implements Switchable_Service_Contract {
             'Wpc_Menus_List',
             'Wpc_Food_Menu_Tab',
             'Wpc_Resevation_Form',
-            'Wpc_Food_Locaion',
+            'Wpc_Food_Location',
             'Wpc_Location_Menu',
             'Wpc_Food_Location_Filter'
         ];

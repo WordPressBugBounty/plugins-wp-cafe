@@ -352,7 +352,6 @@ class Reservation_Controller extends Base_Rest_Controller {
         $search   = ! empty( $request['search'] ) ? sanitize_text_field( $request['search'] ) : '';
         $status   = ! empty( $request['status'] ) ? sanitize_text_field( $request['status'] ) : 'any';
 
-
         $filter = [];
 
         if ( isset( $request['status'] ) ) {
@@ -367,8 +366,21 @@ class Reservation_Controller extends Base_Rest_Controller {
             $filter['food_order'] = sanitize_text_field( $request['food_order'] );
         }
 
-        if ( isset( $request['date_range'] ) ) {
-            $filter['date_range'] = sanitize_text_field( $request['date_range'] );
+        if ( isset( $request['date_range'] ) && is_array( $request['date_range'] ) && count( $request['date_range'] ) === 2 ) {
+            $start_date = sanitize_text_field( $request['date_range'][0] );
+            $end_date = sanitize_text_field( $request['date_range'][1] );
+            
+            if ( ! empty( $start_date ) && ! empty( $end_date ) ) {
+                $filter['date_range'] = [ $start_date, $end_date ];
+            }
+        } elseif ( isset( $request['date_range[0]'] ) && isset( $request['date_range[1]'] ) ) {
+            // Fallback for non-parsed array notation
+            $start_date = sanitize_text_field( $request['date_range[0]'] );
+            $end_date = sanitize_text_field( $request['date_range[1]'] );
+            
+            if ( ! empty( $start_date ) && ! empty( $end_date ) ) {
+                $filter['date_range'] = [ $start_date, $end_date ];
+            }
         }
 
         $args = [

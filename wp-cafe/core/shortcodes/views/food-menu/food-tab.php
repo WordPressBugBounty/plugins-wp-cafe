@@ -17,6 +17,7 @@ $wpc_show_desc  = is_array($settings) && isset($settings['wpc_show_desc']) ? $se
 $wpc_show_vendor  = is_array($settings) && isset($settings['wpc_show_vendor']) ? $settings['wpc_show_vendor'] : 'no';
 $show_thumbnail = is_array($settings) && isset($settings['show_thumbnail']) ? $settings['show_thumbnail'] : 'yes';
 $title_link_show= is_array($settings) && isset($settings['title_link_show']) ? $settings['title_link_show'] : 'yes';
+$show_pagination = is_array($settings) && isset($settings['show_pagination']) ? $settings['show_pagination'] : 'yes';
 $class = ($title_link_show=='yes')? '' : 'wpc-no-link';
 ?>
 <div class="wpc-food-tab-wrapper wpc-nav-shortcode main_wrapper_<?php echo esc_attr($unique_id)?>" data-id="<?php echo esc_attr($unique_id);?>">
@@ -30,11 +31,17 @@ $class = ($title_link_show=='yes')? '' : 'wpc-no-link';
                     $active_class = (($content_key == array_keys($food_menu_tabs)[0]) ? 'tab-active' : ' ');
                     $cat_id = isset($value['post_cats'][0] ) ? intval( $value['post_cats'][0] ) : 0 ;
 
+                    $current_page = 1;
+                    if ( isset( $settings['_page_per_cat'][ $cat_id ] ) ) {
+                        $current_page = max( 1, (int) $settings['_page_per_cat'][ $cat_id ] );
+                    }
+
                     $food_tab_args = array(
                         'post_type'     => 'product',
                         'no_of_product' => $wpc_menu_count,
                         'wpc_cat'       => $value['post_cats'],
                         'order'         => $wpc_menu_order,
+                        'page'          => $current_page,
                     );
 
                     $selected_location = wpc_selected_location_id();
@@ -42,7 +49,26 @@ $class = ($title_link_show=='yes')? '' : 'wpc-no-link';
                         $food_tab_args['wpc_location'] = $selected_location;
                     }
 
-                    $products = Wpc_Utilities::product_query( $food_tab_args );
+                    $page_result = Wpc_Utilities::product_query_with_pagination( $food_tab_args );
+                    $products    = $page_result['products'];
+                    $total_pages = $page_result['total_pages'];
+
+                    $tab_product_data = array(
+                        'style'             => $style,
+                        'no_of_product'     => $wpc_menu_count,
+                        'wpc_menu_order'    => $wpc_menu_order,
+                        'wpc_cart_button'   => $wpc_cart_button,
+                        'wpc_price_show'    => $wpc_price_show,
+                        'wpc_show_desc'     => $wpc_show_desc,
+                        'product_thumbnail' => $show_thumbnail,
+                        'title_link_show'   => $title_link_show,
+                        'show_item_status'  => $show_item_status,
+                        'wpc_desc_limit'    => $wpc_desc_limit,
+                        'wpc_show_vendor'   => $wpc_show_vendor,
+                        'show_pagination'   => $show_pagination,
+                        'cat_id'            => $cat_id,
+                        'post_cats'         => $value['post_cats'],
+                    );
 
                     $menu_tab_args = array(
                         'active_class'      => $active_class,
@@ -57,9 +83,14 @@ $class = ($title_link_show=='yes')? '' : 'wpc-no-link';
                         'show_thumbnail'    => $show_thumbnail,
                         'title_link_show'   => $title_link_show,
                         'show_item_status'  => $show_item_status,
+                        'show_item_label'   => isset( $show_item_label ) ? $show_item_label : 'no',
                         'wpc_desc_limit'    => $wpc_desc_limit,
                         'wpc_show_vendor'   => $wpc_show_vendor,
                         'wpc_menu_col'      => 6, // Default column setting for pro styles
+                        'current_page'      => $current_page,
+                        'total_pages'       => $total_pages,
+                        'show_pagination'   => $show_pagination,
+                        'product_data'      => $tab_product_data,
                     );
                     Template_Functions::render_food_menu_tab_product_block( $menu_tab_args );
                 }

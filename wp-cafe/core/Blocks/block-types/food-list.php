@@ -57,6 +57,10 @@ class FoodList extends AbstractBlock {
 				'type'    => 'string',
 				'default' => 'yes',
 			],
+			'show_item_label'       => [
+				'type'    => 'string',
+				'default' => 'no',
+			],
 			'wpc_price_show'        => [
 				'type'    => 'string',
 				'default' => 'yes',
@@ -89,6 +93,7 @@ class FoodList extends AbstractBlock {
 
 		$style               = $attributes['food_menu_style'] ?? 'style-1';
 		$show_item_status    = $attributes['show_item_status'] ?? 'yes';
+		$show_item_label     = $attributes['show_item_label'] ?? 'no';
 		$show_thumbnail      = $attributes['show_thumbnail'] ?? 'yes';
 		$title_link_show     = $attributes['title_link_show'] ?? 'yes';
 		$wpc_cart_button     = $attributes['wpc_cart_button_show'] ?? 'yes';

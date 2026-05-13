@@ -23,13 +23,15 @@ class Shortcode_Manager implements Hookable_Service_Contract {
      * @return  void
      */
     public function register() {
-        new Food_Location_Ajax();
-
         // Composer's classmap autoloader is built at install time and won't
         // know about files added afterwards until `composer dump-autoload`
-        // is run. Require directly so the popup service works on a fresh
+        // is run. Require directly so newly added services work on a fresh
         // checkout without that build step.
+        require_once __DIR__ . '/food-menu-ajax.php';
         require_once __DIR__ . '/product-popup-service.php';
+
+        new Food_Location_Ajax();
+        new Food_Menu_Ajax();
         ( new Product_Popup_Service() )->register();
 
         $shortcodes = apply_filters( 'wpcafe_food_order_shortcodes', $this->shortcodes );

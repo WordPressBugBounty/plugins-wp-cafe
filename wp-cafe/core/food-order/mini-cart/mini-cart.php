@@ -105,27 +105,57 @@ class Mini_Cart {
 
         WC()->cart->calculate_totals();
 
-        // Extract item price for subtotal calculation.
-        $cart_item    = $cart->cart_contents[ $cart_item_key ];
-        $item_price   = isset( $cart_item['line_total'] ) ? $cart_item['line_total'] / $cart_item['quantity'] : 0;
-        $new_subtotal = ( $qty * $item_price );
+        // Pull the just-recalculated cart item.
+        $cart_item = $cart->cart_contents[ $cart_item_key ];
+        $_product  = isset( $cart_item['data'] ) ? $cart_item['data'] : null;
 
-        // Get the cart total using get_total( 'edit' ) to ensure recalculation
-        $cart_total = WC()->cart->get_total( 'edit' );
-        if ( ! $cart_total || $cart_total === '' ) {
-            $cart_total = WC()->cart->total;
-        }
+        // Line subtotal HTML respects woocommerce_tax_display_cart (incl/excl).
+        $new_subtotal_html = $_product
+            ? WC()->cart->get_product_subtotal( $_product, $cart_item['quantity'] )
+            : wc_price( 0 );
 
-        $cart_subtotal = WC()->cart->get_subtotal();
+        // Display-aware unit price for the data-item-price attribute used by optimistic JS recalc.
+        $display_unit_price = $_product ? wc_get_price_to_display( $_product ) : 0;
 
         wp_send_json_success( [
-            'message'        => __( 'Cart updated successfully', 'wp-cafe' ),
-            'cart_item_key'  => $cart_item_key,
-            'new_subtotal'   => wc_price( $new_subtotal ),
-            'cart_count'     => WC()->cart->get_cart_contents_count(),
-            'cart_subtotal'  => wc_price( $cart_subtotal ),
-            'cart_total'     => wc_price( $cart_total ),
+            'message'         => __( 'Cart updated successfully', 'wp-cafe' ),
+            'cart_item_key'   => $cart_item_key,
+            'new_subtotal'    => $new_subtotal_html,
+            'item_unit_price' => $display_unit_price,
+            'cart_count'      => WC()->cart->get_cart_contents_count(),
+            'cart_subtotal'   => WC()->cart->get_cart_subtotal(),
+            'cart_total'      => WC()->cart->get_total(),
+            'item_tax_html'   => $this->build_item_tax_html( $cart_item_key ),
         ] );
+    }
+
+    /**
+     * Build the per-item tax line HTML for an AJAX response.
+     *
+     * Returns empty string when the toggle is off, taxes are disabled, the
+     * cart item is gone, or the line tax is zero — JS treats empty as "remove".
+     *
+     * @since 1.0.0
+     * @param  string $cart_item_key Cart item key.
+     * @return string Pre-escaped HTML.
+     */
+    private function build_item_tax_html( string $cart_item_key ): string {
+        if ( ! wc_tax_enabled() || ! wpc_get_option( 'mini_cart_show_per_item_tax', false ) ) {
+            return '';
+        }
+
+        $cart_item = WC()->cart->cart_contents[ $cart_item_key ] ?? null;
+        $line_tax  = $cart_item ? (float) ( $cart_item['line_tax'] ?? 0 ) : 0;
+        if ( $line_tax <= 0 ) {
+            return '';
+        }
+
+        return sprintf(
+            '<small class="wpc-minicart-item-tax" data-cart-item-key="%s">%s %s</small>',
+            esc_attr( $cart_item_key ),
+            esc_html__( 'incl. tax', 'wp-cafe' ),
+            wp_kses_post( wc_price( $line_tax ) )
+        );
     }
 
     /**
@@ -158,9 +188,10 @@ class Mini_Cart {
             WC()->cart->calculate_totals();
 
             wp_send_json_success( [
-                'message'     => __( 'Item removed from cart', 'wp-cafe' ),
-                'cart_count'  => WC()->cart->get_cart_contents_count(),
-                'cart_total'  => wc_price( WC()->cart->total ),
+                'message'       => __( 'Item removed from cart', 'wp-cafe' ),
+                'cart_count'    => WC()->cart->get_cart_contents_count(),
+                'cart_subtotal' => WC()->cart->get_cart_subtotal(),
+                'cart_total'    => WC()->cart->get_total(),
             ] );
         } else {
             wp_send_json_error( [ 'message' => __( 'Failed to remove item', 'wp-cafe' ) ] );

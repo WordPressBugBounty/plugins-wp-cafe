@@ -28,75 +28,82 @@ class Food_Menu_List extends Base_Shortcode {
     public function render($atts = [], $content = null) {
         if (!class_exists('Woocommerce')) { return; }
 
-        $atts    = Wpc_Utilities::replace_qoute( $atts );
-        $atts    = extract(shortcode_atts(
+        $atts = Wpc_Utilities::replace_qoute( $atts );
+        $atts = shortcode_atts(
             [
-                'style'                 => 'style-1',
-                'wpc_food_categories'   => '',
-                'no_of_product'         => 5,
-                'wpc_cart_button'       => 'yes',
-                'product_thumbnail'     => 'yes',
-                'wpc_price_show'        => 'yes',
-                'show_item_status'      => 'yes',
-                'wpc_show_desc'         => 'yes',
-                'title_link_show'       => 'yes',
-                'wpc_desc_limit'        => 20,
-                'wpc_menu_order'        => 'DESC',
-                'wpc_menu_col'          => '4',
-                'wpc_menu_col_tablet'   => '3',
-                'wpc_menu_col_mobile'   => '2',
-                'wpc_show_vendor'       => 'no',
-                'wpc_location'          => ''
+                'style'               => 'style-1',
+                'wpc_food_categories' => '',
+                'no_of_product'       => 5,
+                'wpc_cart_button'     => 'yes',
+                'product_thumbnail'   => 'yes',
+                'wpc_price_show'      => 'yes',
+                'show_item_status'    => 'yes',
+                'show_item_label'       => 'no',
+                'wpc_show_desc'       => 'yes',
+                'title_link_show'     => 'yes',
+                'wpc_desc_limit'      => 20,
+                'wpc_menu_order'      => 'DESC',
+                'wpc_menu_col'        => '4',
+                'wpc_menu_col_tablet' => '3',
+                'wpc_menu_col_mobile' => '2',
+                'wpc_show_vendor'     => 'no',
+                'show_pagination'     => 'yes',
             ],
             $atts
-        ));
+        );
 
-        $allowed_file_names = [
-            'style-1',
-            'style-2',
-            'style-3'
-        ];
-    
-        if( in_array($style, $allowed_file_names)){
-            $template_file = esc_html($style);
-        }else{
-            $template_file = $allowed_file_names[0];
-        }
+        $style               = $atts['style'];
+        $wpc_food_categories = $atts['wpc_food_categories'];
+        $no_of_product       = $atts['no_of_product'];
+        $wpc_cart_button     = $atts['wpc_cart_button'];
+        $product_thumbnail   = $atts['product_thumbnail'];
+        $wpc_price_show      = $atts['wpc_price_show'];
+        $show_item_status    = $atts['show_item_status'];
+        $show_item_label     = $atts['show_item_label'];
+        $wpc_show_desc       = $atts['wpc_show_desc'];
+        $title_link_show     = $atts['title_link_show'];
+        $wpc_desc_limit      = $atts['wpc_desc_limit'];
+        $wpc_menu_order      = $atts['wpc_menu_order'];
+        $wpc_menu_col        = $atts['wpc_menu_col'];
+        $wpc_menu_col_tablet = $atts['wpc_menu_col_tablet'];
+        $wpc_menu_col_mobile = $atts['wpc_menu_col_mobile'];
+        $wpc_show_vendor     = $atts['wpc_show_vendor'];
+        $show_pagination     = $atts['show_pagination'];
+
+        $allowed_file_names = [ 'style-1', 'style-2', 'style-3' ];
+        $template_file = in_array( $style, $allowed_file_names, true ) ? $style : $allowed_file_names[0];
 
         ob_start();
-        // category sorting from backend
-        $wpc_cat_arr      = explode(',', $wpc_food_categories);
 
-        // Show all products if no categories provided, or only specified categories
-        $has_categories = is_array($wpc_cat_arr) && count($wpc_cat_arr) > 0 && !empty($wpc_cat_arr[0]);
+        $wpc_cat_arr    = array_filter( array_map( 'trim', explode( ',', $wpc_food_categories ) ) );
+        $has_categories = ! empty( $wpc_cat_arr );
 
-        if ( $has_categories || empty( $wpc_food_categories ) ) {
-            $unique_id = md5(md5(microtime()));
-            $settings = array();
-            $settings["food_menu_style"]        = $template_file;
-            $settings["show_thumbnail"]         = $product_thumbnail;
-            $settings["wpc_price_show"]         = $wpc_price_show;
-            $settings["wpc_cart_button_show"]   = $wpc_cart_button;
-            $settings["show_item_status"]       = $show_item_status;
-            $settings["title_link_show"]        = $title_link_show;
-            $settings["wpc_show_desc"]          = $wpc_show_desc;
-            $settings["wpc_desc_limit"]         = $wpc_desc_limit;
-            $settings["wpc_menu_cat"]           = $has_categories ? $wpc_cat_arr : [];
-            $settings["wpc_menu_count"]         = $no_of_product;
-            $settings["wpc_menu_order"]         = $wpc_menu_order;
+        $unique_id = md5( md5( microtime() ) );
+        $settings = [
+            'food_menu_style'      => $template_file,
+            'show_thumbnail'       => $product_thumbnail,
+            'wpc_price_show'       => $wpc_price_show,
+            'wpc_cart_button_show' => $wpc_cart_button,
+            'show_item_status'     => $show_item_status,
+            'show_item_label'      => $show_item_label,
+            'title_link_show'      => $title_link_show,
+            'wpc_show_desc'        => $wpc_show_desc,
+            'wpc_desc_limit'       => $wpc_desc_limit,
+            'wpc_menu_cat'         => $has_categories ? $wpc_cat_arr : [],
+            'wpc_menu_count'       => $no_of_product,
+            'wpc_menu_order'       => $wpc_menu_order,
+            'wpc_menu_col'         => $wpc_menu_col,
+            'wpc_menu_col_tablet'  => $wpc_menu_col_tablet,
+            'wpc_menu_col_mobile'  => $wpc_menu_col_mobile,
+            'wpc_show_vendor'      => $wpc_show_vendor,
+            'show_pagination'      => $show_pagination,
+        ];
 
-            $settings['wpc_menu_col']           = $wpc_menu_col;
-            $settings['wpc_menu_col_tablet']    = $wpc_menu_col_tablet;
-            $settings['wpc_menu_col_mobile']    = $wpc_menu_col_mobile;
-            $settings["wpc_show_vendor"]        = $wpc_show_vendor;
-            $settings["wpc_location"]           = !empty($wpc_location) ? intval($wpc_location) : null;
-
-            // render template
-            $template = wpcafe()->template_directory . "/shortcodes/food-list.php";
-            if( file_exists( $template ) ){
-                include $template;
-            }
+        $template = wpcafe()->template_directory . "/shortcodes/food-list.php";
+        if ( file_exists( $template ) ) {
+            include $template;
         }
+
         return ob_get_clean();
     }
 }

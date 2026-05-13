@@ -1,6 +1,6 @@
 <?php
 
-namespace WpCafe\Widgets\Wpc_Food_Menu_Tab;
+namespace WpCafe\Widgets\Wpc_Food_Location;
 
 use Elementor\Controls_Manager;
 use Elementor\Widget_Base;
@@ -145,6 +145,17 @@ class Wpc_Food_Location extends Widget_Base {
                 'default'      => 'yes',
             ]
         );
+        $this->add_control(
+            'show_item_label',
+            [
+                'label'        => esc_html__( 'Show Product Labels', 'wp-cafe' ),
+                'type'         => \Elementor\Controls_Manager::SWITCHER,
+                'label_on'     => esc_html__( 'Show', 'wp-cafe' ),
+                'label_off'    => esc_html__( 'Hide', 'wp-cafe' ),
+                'return_value' => 'yes',
+                'default'      => 'no',
+            ]
+        );
 
         $this->add_control(
             'wpc_show_desc',
@@ -189,7 +200,19 @@ class Wpc_Food_Location extends Widget_Base {
                 'default'      => 'yes',
             ]
         );
-        
+
+        $this->add_control(
+            'show_pagination',
+            [
+                'label'        => esc_html__( 'Show Pagination', 'wp-cafe' ),
+                'type'         => \Elementor\Controls_Manager::SWITCHER,
+                'label_on'     => esc_html__( 'Show', 'wp-cafe' ),
+                'label_off'    => esc_html__( 'Hide', 'wp-cafe' ),
+                'return_value' => 'yes',
+                'default'      => 'yes',
+            ]
+        );
+
         if( is_array( $get_data ) && count( $get_data )>0 && isset( $get_data['search_control'] ) ){
             $this->add_control( $get_data['search_control']['name'], $get_data['search_control']['parameter']);
         }
@@ -668,6 +691,7 @@ class Wpc_Food_Location extends Widget_Base {
 
         $food_menu_tabs       = $settings["food_menu_tabs"];
         $show_item_status     = $settings["show_item_status"];
+        $show_item_label      = isset( $settings["show_item_label"] ) ? $settings["show_item_label"] : 'no';
         $wpc_cart_button      = $settings["wpc_cart_button_show"];
         $wpc_desc_limit       = $settings["wpc_desc_limit"];
         $wpc_menu_order       = $settings["wpc_menu_order"];

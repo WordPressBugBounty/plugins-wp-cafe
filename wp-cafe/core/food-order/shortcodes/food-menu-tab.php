@@ -33,19 +33,38 @@ class Food_Menu_Tab extends Base_Shortcode {
         $settings = array();
         $atts     = Wpc_Utilities::replace_qoute( $atts );
 
-        $atts = extract(shortcode_atts([
-            'style'                 => 'style-1',
-            'wpc_food_categories'   => '',
-            'no_of_product'         => 5,
-            'wpc_desc_limit'        => 20,
-            'wpc_menu_order'        => 'DESC',
-            'wpc_show_desc'         => 'yes',
-            'title_link_show'       => 'yes',
-            'show_item_status'      => 'yes',
-            'product_thumbnail'     => 'yes',
-            'wpc_cart_button'       => 'yes',
-            'wpc_price_show'        => 'yes',
-        ], $atts));
+        $atts = shortcode_atts(
+            [
+                'style'               => 'style-1',
+                'wpc_food_categories' => '',
+                'no_of_product'       => 5,
+                'wpc_desc_limit'      => 20,
+                'wpc_menu_order'      => 'DESC',
+                'wpc_show_desc'       => 'yes',
+                'title_link_show'     => 'yes',
+                'show_item_status'    => 'yes',
+            'show_item_label'       => 'no',
+                'product_thumbnail'   => 'yes',
+                'wpc_cart_button'     => 'yes',
+                'wpc_price_show'      => 'yes',
+                'show_pagination'     => 'yes',
+            ],
+            $atts
+        );
+
+        $style               = $atts['style'];
+        $wpc_food_categories = $atts['wpc_food_categories'];
+        $no_of_product       = $atts['no_of_product'];
+        $wpc_desc_limit      = $atts['wpc_desc_limit'];
+        $wpc_menu_order      = $atts['wpc_menu_order'];
+        $wpc_show_desc       = $atts['wpc_show_desc'];
+        $title_link_show     = $atts['title_link_show'];
+        $show_item_status    = $atts['show_item_status'];
+        $show_item_label     = $atts['show_item_label'];
+        $product_thumbnail   = $atts['product_thumbnail'];
+        $wpc_cart_button     = $atts['wpc_cart_button'];
+        $wpc_price_show      = $atts['wpc_price_show'];
+        $show_pagination     = $atts['show_pagination'];
 
         ob_start();
         $wpc_cat_arr  = explode(',', $wpc_food_categories);
@@ -82,12 +101,14 @@ class Food_Menu_Tab extends Base_Shortcode {
             $settings["show_thumbnail"]         = $product_thumbnail;
             $settings["wpc_menu_order"]         = $wpc_menu_order;
             $settings["show_item_status"]       = $show_item_status;
+            $settings["show_item_label"]        = $show_item_label;
             $settings["wpc_menu_count"]         = $no_of_product;
             $settings["wpc_show_desc"]          = $wpc_show_desc;
             $settings["wpc_desc_limit"]         = $wpc_desc_limit;
             $settings["title_link_show"]        = $title_link_show;
             $settings["wpc_cart_button"]        = $wpc_cart_button;
             $settings["wpc_price_show"]        = $wpc_price_show;
+            $settings["show_pagination"]        = $show_pagination;
             // render template
             $template = wpcafe()->template_directory . "/shortcodes/food-tab.php";
 

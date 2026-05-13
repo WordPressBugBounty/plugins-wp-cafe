@@ -78,8 +78,8 @@ $cart_link        = wpc_get_option('mini_cart_empty_button_link', get_permalink(
 
                         <div class="mini-cart-quantity-wrapper">
                             <?php
-                            // Get the product price from the cart item (which includes variations)
-                            $item_price = isset( $cart_item['line_total'] ) ? $cart_item['line_total'] / $cart_item['quantity'] : $_product->get_price();
+                            // Display-aware unit price (respects woocommerce_tax_display_cart and wc_prices_include_tax).
+                            $item_price = $_product ? wc_get_price_to_display( $_product ) : 0;
                             ?>
                             <?php
                             // Quantity input and price using WooCommerce filter.
@@ -99,13 +99,22 @@ $cart_link        = wpc_get_option('mini_cart_empty_button_link', get_permalink(
                                 $cart_item_key
                             );
                             ?>
-                            <strong class="single-subtotal-item">   
-                                <?php  $line_total = isset( $cart_item['line_total'] ) ? floatval( $cart_item['line_total'] ) : ( $item_price * $cart_item['quantity'] ); ?>
+                            <strong class="single-subtotal-item">
                                 <span class="wpc-minicart-subtotal" data-item-price="<?php echo esc_attr( $item_price ); ?>">
-                                    <?php echo wp_kses_post( wc_price( $line_total ) ); ?>
+                                    <?php echo wp_kses_post( WC()->cart->get_product_subtotal( $_product, $cart_item['quantity'] ) ); ?>
                                 </span>
                             </strong>
-                            
+
+                            <?php if ( function_exists( 'wc_tax_enabled' ) && wc_tax_enabled() && wpc_get_option( 'mini_cart_show_per_item_tax', false ) ) :
+                                $line_tax = isset( $cart_item['line_tax'] ) ? (float) $cart_item['line_tax'] : 0;
+                                if ( $line_tax > 0 ) : ?>
+                                    <small class="wpc-minicart-item-tax" data-cart-item-key="<?php echo esc_attr( $cart_item_key ); ?>">
+                                        <?php echo esc_html__( 'incl. tax', 'wp-cafe' ); ?>
+                                        <?php echo wp_kses_post( wc_price( $line_tax ) ); ?>
+                                    </small>
+                                <?php endif;
+                            endif; ?>
+
                         </div>
                     </li>
                     <?php

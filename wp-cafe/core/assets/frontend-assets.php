@@ -18,6 +18,31 @@ class Frontend_Assets extends Base_Assets {
     public function register() {
         add_action( 'wp_enqueue_scripts',  [$this, 'register_styles_scripts'] );
         add_action( 'wp_enqueue_scripts',  [$this, 'enqueue'] );
+        add_action( 'elementor/preview/enqueue_scripts', [ $this, 'enqueue_for_elementor_preview' ] );
+    }
+
+    /**
+     * Enqueue shortcode assets inside the Elementor editor preview iframe.
+     *
+     * @return void
+     */
+    public function enqueue_for_elementor_preview() {
+        if ( ! class_exists( '\\Elementor\\Plugin' ) ) {
+            return;
+        }
+
+        $preview = \Elementor\Plugin::$instance->preview ?? null;
+        $post_id = $preview && method_exists( $preview, 'get_post_id' )
+            ? (int) $preview->get_post_id()
+            : (int) get_the_ID();
+
+        if ( ! function_exists( 'wpc_post_uses_shortcode' )
+            || ! wpc_post_uses_shortcode( $post_id, 'wpc_reservation_form' ) ) {
+            return;
+        }
+
+        wp_enqueue_style( 'wpcafe-frontend-style' );
+        wp_enqueue_script( 'wpcafe-frontend-scripts' );
     }
 
     /**
@@ -31,6 +56,8 @@ class Frontend_Assets extends Base_Assets {
         wp_enqueue_style( 'wpc-public' );
         wp_enqueue_script( 'wpc-public' );
         wp_enqueue_style( 'wpc-icon' );
+        wp_enqueue_style( 'dashicons' );
+        wp_enqueue_style( 'wpc-product-labels' );
 
         // Force-enqueue WooCommerce's frontend scripts so the food-menu
         // shortcode + customize popup work on arbitrary pages. WC only
@@ -78,7 +105,8 @@ class Frontend_Assets extends Base_Assets {
         $form_data['_nonces'] = [
             'wpc_check_for_submission_nonce'    => wp_create_nonce('wpc_check_for_submission_nonce'),
             'filter_food_location_nonce'        => wp_create_nonce('filter_food_location_nonce'),
-            'wpc_seat_capacity_nonce'           => wp_create_nonce('wpc_seat_capacity_nonce')
+            'wpc_seat_capacity_nonce'           => wp_create_nonce('wpc_seat_capacity_nonce'),
+            'wpc_food_menu_paginate_nonce'      => wp_create_nonce('wpc_food_menu_paginate_nonce'),
         ];
         wp_localize_script( 'wpc-public', 'wpc_form_client_data', $form_data );
         wp_localize_script( 'wpc-public', 'wpCafe',  Localize::get_frontend() );
@@ -182,6 +210,9 @@ class Frontend_Assets extends Base_Assets {
             ],
             'wpc-tip'    => [
                 'src' => wpcafe()->assets_url . '/css/tip.css',
+            ],
+            'wpc-product-labels' => [
+                'src' => wpcafe()->assets_url . '/build/css/product-labels.css',
             ],
         ];
 

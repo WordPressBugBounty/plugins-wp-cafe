@@ -139,6 +139,17 @@ class Wpc_Menus_List extends Widget_Base {
             ]
         );
         $this->add_control(
+            'show_item_label',
+            [
+                'label'        => esc_html__( 'Show Product Labels', 'wp-cafe' ),
+                'type'         => \Elementor\Controls_Manager::SWITCHER,
+                'label_on'     => esc_html__( 'Show', 'wp-cafe' ),
+                'label_off'    => esc_html__( 'Hide', 'wp-cafe' ),
+                'return_value' => 'yes',
+                'default'      => 'no',
+            ]
+        );
+        $this->add_control(
             'wpc_show_desc',
             [
                 'label'        => esc_html__( 'Show Description', 'wp-cafe' ),
@@ -195,7 +206,7 @@ class Wpc_Menus_List extends Widget_Base {
                 ],
             ]
         );
-        if(class_exists('Wpcafe_Multivendor')) { 
+        if(class_exists('Wpcafe_Multivendor')) {
             $this->add_control(
                 'wpc_show_vendor',
                 [
@@ -208,6 +219,18 @@ class Wpc_Menus_List extends Widget_Base {
                 ]
             );
         }
+
+        $this->add_control(
+            'show_pagination',
+            [
+                'label'        => esc_html__( 'Show Pagination', 'wp-cafe' ),
+                'type'         => \Elementor\Controls_Manager::SWITCHER,
+                'label_on'     => esc_html__( 'Show', 'wp-cafe' ),
+                'label_off'    => esc_html__( 'Hide', 'wp-cafe' ),
+                'return_value' => 'yes',
+                'default'      => 'yes',
+            ]
+        );
 
         if( is_array( $get_data ) &&  count( $get_data )>0 && isset( $get_data['search_control'] ) ){
             $this->add_control( $get_data['search_control']['name'], $get_data['search_control']['parameter']);

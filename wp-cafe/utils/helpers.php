@@ -162,6 +162,49 @@ if ( ! function_exists( 'wpc_update_option' ) ) {
     }
 }
 
+if ( ! function_exists( 'wpc_post_uses_shortcode' ) ) {
+    /**
+     * Detect whether a post contains a given shortcode, including inside
+     * Elementor's `_elementor_data` layout tree (text editor / shortcode
+     * widget content). Used to conditionally enqueue assets in contexts where
+     * the shortcode's own render-time enqueue cannot reach (e.g. Elementor
+     * editor preview iframe).
+     */
+    function wpc_post_uses_shortcode( $post_id, $shortcode_tag ) {
+        $post_id = (int) $post_id;
+        if ( $post_id <= 0 || ! $shortcode_tag ) {
+            return false;
+        }
+
+        $post = get_post( $post_id );
+        if ( $post && has_shortcode( (string) $post->post_content, $shortcode_tag ) ) {
+            return true;
+        }
+
+        $elementor_data = get_post_meta( $post_id, '_elementor_data', true );
+        if ( is_string( $elementor_data ) && '' !== $elementor_data ) {
+            return false !== strpos( $elementor_data, '[' . $shortcode_tag );
+        }
+
+        return false;
+    }
+}
+
+if ( ! function_exists( 'wpc_sanitize_yes_no' ) ) {
+    /**
+     * Sanitize a yes/no toggle value.
+     *
+     * @param  mixed  $value   Raw value from request/setting.
+     * @param  string $default Fallback when value is missing or invalid. Must be 'yes' or 'no'.
+     * @return string          Either 'yes' or 'no'.
+     */
+    function wpc_sanitize_yes_no( $value, $default = 'no' ) {
+        $value   = sanitize_text_field( (string) $value );
+        $default = in_array( $default, [ 'yes', 'no' ], true ) ? $default : 'no';
+        return in_array( $value, [ 'yes', 'no' ], true ) ? $value : $default;
+    }
+}
+
 if ( ! function_exists( 'wpc_selected_location_id' ) ) {
     /**
      * Get selected location ID from session
@@ -711,5 +754,198 @@ if ( ! function_exists( 'wpcafe_our_plugins_list' ) ) {
 ',
             ]
         ];
+    }
+}
+/**
+ * Product Label helpers — frontend rendering for the wpcafe_product_label taxonomy.
+ *
+ * @package WpCafe/Products/Labels
+ */
+
+if ( ! function_exists( 'wpc_product_label_defaults' ) ) {
+    function wpc_product_label_defaults() {
+        return [
+            'display'    => 'name',
+            'bg'         => '#1F2937',
+            'fg'         => '#FFFFFF',
+            'icon_type'  => 'dashicons',
+            'icon_value' => '',
+        ];
+    }
+}
+
+if ( ! function_exists( 'wpc_product_label_meta' ) ) {
+    /**
+     * Read all meta keys for a label term with sane defaults.
+     *
+     * @param int $term_id
+     * @return array
+     */
+    function wpc_product_label_meta( $term_id ) {
+        $defaults = wpc_product_label_defaults();
+        $allowed_display = [ 'name', 'icon', 'icon_name', 'name_icon' ];
+        $allowed_icon_types = [ 'dashicons', 'svg' ];
+
+        $display = get_term_meta( $term_id, '_wpcafe_label_display', true );
+        if ( ! in_array( $display, $allowed_display, true ) ) {
+            $display = $defaults['display'];
+        }
+
+        $background = get_term_meta( $term_id, '_wpcafe_label_bg', true );
+        $background = $background ? sanitize_hex_color( $background ) : '';
+        if ( ! $background ) $background = $defaults['bg'];
+
+        $foreground = get_term_meta( $term_id, '_wpcafe_label_fg', true );
+        $foreground = $foreground ? sanitize_hex_color( $foreground ) : '';
+        if ( ! $foreground ) $foreground = $defaults['fg'];
+
+        $icon_type = get_term_meta( $term_id, '_wpcafe_label_icon_type', true );
+        if ( ! in_array( $icon_type, $allowed_icon_types, true ) ) {
+            $icon_type = $defaults['icon_type'];
+        }
+
+        $icon_value = get_term_meta( $term_id, '_wpcafe_label_icon_value', true );
+
+        return [
+            'display'    => $display,
+            'bg'         => $background,
+            'fg'         => $foreground,
+            'icon_type'  => $icon_type,
+            'icon_value' => $icon_value,
+        ];
+    }
+}
+
+if ( ! function_exists( 'wpc_sanitize_hex_color_value' ) ) {
+    /**
+     * Validate a 3- or 6-char hex color string. Returns the sanitized value
+     * (with leading #) on success, or the supplied fallback on failure.
+     *
+     * @param string $color
+     * @param string $fallback
+     * @return string
+     */
+    function wpc_sanitize_hex_color_value( $color, $fallback = '' ) {
+        $color = is_string( $color ) ? trim( $color ) : '';
+        if ( '' === $color ) return $fallback;
+        if ( preg_match( '/^#(?:[A-Fa-f0-9]{3}){1,2}$/', $color ) ) {
+            return $color;
+        }
+        return $fallback;
+    }
+}
+
+if ( ! function_exists( 'wpc_product_label_icon_url' ) ) {
+    /**
+     * Resolve attachment ID to URL for SVG icon type.
+     *
+     * @param string $icon_type
+     * @param mixed  $icon_value
+     * @return string
+     */
+    function wpc_product_label_icon_url( $icon_type, $icon_value ) {
+        if ( 'svg' !== $icon_type ) return '';
+        $attachment_id = absint( $icon_value );
+        if ( ! $attachment_id ) return '';
+        $url = wp_get_attachment_url( $attachment_id );
+        return $url ? $url : '';
+    }
+}
+
+if ( ! function_exists( 'wpc_product_label_icon_html' ) ) {
+    /**
+     * Build the icon HTML fragment for a label, escaped.
+     *
+     * @param array $meta
+     * @return string
+     */
+    function wpc_product_label_icon_html( $meta ) {
+        if ( 'svg' === $meta['icon_type'] ) {
+            $url = wpc_product_label_icon_url( 'svg', $meta['icon_value'] );
+            if ( ! $url ) return '';
+            return '<img class="wpc-product-label__icon wpc-product-label__icon--svg" src="' . esc_url( $url ) . '" alt="" />';
+        }
+        // dashicons
+        if ( empty( $meta['icon_value'] ) ) return '';
+        $class = sanitize_html_class( $meta['icon_value'] );
+        if ( ! $class ) return '';
+        return '<span class="wpc-product-label__icon dashicons ' . esc_attr( $class ) . '" aria-hidden="true"></span>';
+    }
+}
+
+if ( ! function_exists( 'wpc_product_labels' ) ) {
+    /**
+     * Render the product label badge list for a product.
+     * Echoes nothing when no labels are assigned or WooCommerce is not active.
+     *
+     * @param int $product_id
+     * @return void
+     */
+    function wpc_product_labels( $product_id ) {
+        if ( ! class_exists( 'WooCommerce' ) ) return;
+
+        $product_id = absint( $product_id );
+        if ( ! $product_id ) return;
+
+        $terms = get_the_terms( $product_id, 'wpcafe_product_label' );
+        if ( empty( $terms ) || is_wp_error( $terms ) ) return;
+
+        $allowed_displays = [ 'name', 'icon', 'icon_name', 'name_icon' ];
+
+        ob_start();
+        echo '<ul class="wpc-product-labels">';
+        foreach ( $terms as $term ) {
+            $meta      = wpc_product_label_meta( $term->term_id );
+            $name      = $term->name;
+            $icon_html = wpc_product_label_icon_html( $meta );
+
+            // Validate display against allowlist; fall back to name when icon mode lacks icon.
+            $display = in_array( $meta['display'], $allowed_displays, true ) ? $meta['display'] : 'name';
+            if ( in_array( $display, [ 'icon', 'icon_name', 'name_icon' ], true ) && '' === $icon_html ) {
+                $display = 'name';
+            }
+
+            // Validate hex colors; fall back to defaults when malformed.
+            $bg = wpc_sanitize_hex_color_value( $meta['bg'] ?? '', '#1F2937' );
+            $fg = wpc_sanitize_hex_color_value( $meta['fg'] ?? '', '#FFFFFF' );
+
+            $style         = sprintf( 'background-color:%s;color:%s;', $bg, $fg );
+            $display_class = sanitize_html_class( $display );
+
+            printf(
+                '<li class="wpc-product-label wpc-product-label--%1$s" style="%2$s">',
+                esc_attr( $display_class ),
+                esc_attr( $style )
+            );
+
+            switch ( $display ) {
+                case 'icon':
+                    echo wp_kses_post( $icon_html );
+                    echo '<span class="screen-reader-text">' . esc_html( $name ) . '</span>';
+                    break;
+                case 'icon_name':
+                    echo wp_kses_post( $icon_html );
+                    echo '<span class="wpc-product-label__name">' . esc_html( $name ) . '</span>';
+                    break;
+                case 'name_icon':
+                    echo '<span class="wpc-product-label__name">' . esc_html( $name ) . '</span>';
+                    echo wp_kses_post( $icon_html );
+                    break;
+                case 'name':
+                default:
+                    echo '<span class="wpc-product-label__name">' . esc_html( $name ) . '</span>';
+                    break;
+            }
+
+            echo '</li>';
+        }
+        echo '</ul>';
+        $output = ob_get_clean();
+
+        if ( class_exists( '\\WpCafe\\Utils\\Wpc_Utilities' ) ) {
+            echo wp_kses( $output, \WpCafe\Utils\Wpc_Utilities::wpc_kses_allowed_tags() );
+        } else {
+            echo wp_kses_post( $output );
+        }
     }
 }

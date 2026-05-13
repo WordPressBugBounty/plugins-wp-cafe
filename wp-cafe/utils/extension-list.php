@@ -166,7 +166,7 @@ return [
 </svg>
 ',
     ],
-    /* Hidden for this release
+    
     'receipt-layout' => [
         'name' => 'receipt-layout',
         'slug' => 'receipt-layout',
@@ -189,7 +189,7 @@ return [
 </svg>
 ',
     ],
-    */
+    
     'mini_cart' => [
         'name' => 'mini_cart',
         'slug' => 'mini_cart',

@@ -29,6 +29,7 @@ if ( is_array( $products ) && count( $products ) > 0 ) {
                 'product'            => $product,
                 'class'              => $class,
                 'show_item_status'   => $show_item_status,
+                'show_item_label'    => isset( $show_item_label ) ? $show_item_label : 'no',
                 'wpc_show_desc'      => $wpc_show_desc,
                 'wpc_desc_limit'     => $wpc_desc_limit,
                 'cart_icon'          => $cart_icon,
