@@ -1,9 +1,9 @@
 <?php return array(
     'root' => array(
         'name' => 'themewinter/wp-cafe',
-        'pretty_version' => 'dev-develop',
-        'version' => 'dev-develop',
-        'reference' => '370323e7f9be6408f824845ffeda273795627be8',
+        'pretty_version' => 'dev-latest',
+        'version' => 'dev-latest',
+        'reference' => '4ea77c4d991d227a66f2ce48f078ab1ee828475e',
         'type' => 'project',
         'install_path' => __DIR__ . '/../../',
         'aliases' => array(),
@@ -35,7 +35,7 @@
         'themewinter/email-notification-sdk' => array(
             'pretty_version' => 'dev-main',
             'version' => 'dev-main',
-            'reference' => '8c5d46a27b8fbf95ad659f5c2f0cb723db792be4',
+            'reference' => '51d7a40f381bc2d49083cd16f1a7bce730d3549f',
             'type' => 'library',
             'install_path' => __DIR__ . '/../themewinter/email-notification-sdk',
             'aliases' => array(
@@ -55,9 +55,9 @@
             'dev_requirement' => false,
         ),
         'themewinter/wp-cafe' => array(
-            'pretty_version' => 'dev-develop',
-            'version' => 'dev-develop',
-            'reference' => '370323e7f9be6408f824845ffeda273795627be8',
+            'pretty_version' => 'dev-latest',
+            'version' => 'dev-latest',
+            'reference' => '4ea77c4d991d227a66f2ce48f078ab1ee828475e',
             'type' => 'project',
             'install_path' => __DIR__ . '/../../',
             'aliases' => array(),

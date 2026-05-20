@@ -70,19 +70,71 @@ class Store_Api_Extension {
             [
                 'namespace' => self::NAMESPACE_KEY,
                 'callback'  => function ( $data ) {
-                    $location_id = isset( $data['location_id'] ) ? intval( $data['location_id'] ) : 0;
-
-                    if ( $location_id <= 0 ) {
-                        return;
-                    }
-
-                    $location = Location_Model::find( $location_id );
-                    if ( ! $location ) {
-                        return;
-                    }
-
-                    Session::set( 'selected_location', $location_id );
+                    $this->handle_location_update( $data );
+                    $this->handle_tip_update( $data );
                 },
+            ]
+        );
+    }
+
+    /**
+     * Persist a location selection pushed by the block-checkout UI.
+     *
+     * @param array $data
+     * @return void
+     */
+    private function handle_location_update( $data ) {
+        if ( ! array_key_exists( 'location_id', (array) $data ) ) {
+            return;
+        }
+
+        $location_id = isset( $data['location_id'] ) ? intval( $data['location_id'] ) : 0;
+        if ( $location_id <= 0 ) {
+            return;
+        }
+
+        $location = Location_Model::find( $location_id );
+        if ( ! $location ) {
+            return;
+        }
+
+        Session::set( 'selected_location', $location_id );
+    }
+
+    /**
+     * Persist a tip selection pushed by the block-checkout UI.
+     *
+     * @param array $data
+     * @return void
+     */
+    private function handle_tip_update( $data ) {
+        $has_type   = array_key_exists( 'tip_type', (array) $data );
+        $has_amount = array_key_exists( 'tip_amount', (array) $data );
+        if ( ! $has_type && ! $has_amount ) {
+            return;
+        }
+
+        if ( ! function_exists( 'WC' ) || ! WC()->session ) {
+            return;
+        }
+
+        $type   = isset( $data['tip_type'] ) ? sanitize_text_field( wp_unslash( (string) $data['tip_type'] ) ) : '';
+        $amount = isset( $data['tip_amount'] ) ? floatval( $data['tip_amount'] ) : 0;
+
+        $allowed_types = [ 'fixed_amount', 'percentage_amount', 'custom' ];
+        $is_valid_type = in_array( $type, $allowed_types, true );
+
+        if ( ! $is_valid_type || $amount <= 0 ) {
+            WC()->session->__unset( 'wpc_pro_tip' );
+            return;
+        }
+
+        WC()->session->set(
+            'wpc_pro_tip',
+            [
+                'tip_added'         => 1,
+                'tip_selected_type' => $type,
+                'tip_amount'        => $amount,
             ]
         );
     }
@@ -100,6 +152,18 @@ class Store_Api_Extension {
                 'context'     => [ 'view', 'edit' ],
                 'readonly'    => false,
             ],
+            'tip_type'    => [
+                'description' => __( 'Selected tip type (fixed_amount, percentage_amount, or custom).', 'wp-cafe' ),
+                'type'        => [ 'string', 'null' ],
+                'context'     => [ 'view', 'edit' ],
+                'readonly'    => false,
+            ],
+            'tip_amount'  => [
+                'description' => __( 'Selected tip amount (currency value for fixed/custom, percent for percentage).', 'wp-cafe' ),
+                'type'        => [ 'number', 'null' ],
+                'context'     => [ 'view', 'edit' ],
+                'readonly'    => false,
+            ],
         ];
     }
 
@@ -109,8 +173,14 @@ class Store_Api_Extension {
      * @return array
      */
     public function data_callback() {
+        $tip = ( function_exists( 'WC' ) && WC()->session ) ? WC()->session->get( 'wpc_pro_tip' ) : null;
+        $tip_type   = ( is_array( $tip ) && ! empty( $tip['tip_added'] ) ) ? (string) ( $tip['tip_selected_type'] ?? '' ) : '';
+        $tip_amount = ( is_array( $tip ) && ! empty( $tip['tip_added'] ) ) ? floatval( $tip['tip_amount'] ?? 0 ) : 0;
+
         return [
             'location_id' => function_exists( 'wpc_selected_location_id' ) ? wpc_selected_location_id() : null,
+            'tip_type'    => $tip_type,
+            'tip_amount'  => $tip_amount,
         ];
     }
 

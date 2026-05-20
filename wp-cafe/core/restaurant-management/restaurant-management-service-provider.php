@@ -35,6 +35,7 @@ class Restaurant_Management_Service_Provider extends Base_Service_Provider {
      */
     public function boot() {
         add_action( 'init', [ Roles::class, 'register' ], 19 );
+        add_filter( 'woocommerce_prevent_admin_access', [ Roles::class, 'filter_wc_prevent_admin_access' ] );
         parent::boot();
     }
 }

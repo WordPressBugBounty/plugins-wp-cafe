@@ -115,6 +115,19 @@ class Block_Service implements Hookable_Service_Contract {
                 ]
             );
         }
+
+        $tipping_path = $base . '/tipping';
+        if ( file_exists( $tipping_path . '/block.json' ) ) {
+            register_block_type(
+                $tipping_path,
+                [
+                    'editor_script_handles' => [ $handle ],
+                    'render_callback'       => function ( $attributes, $content, $block ) {
+                        return '<div data-block-name="' . esc_attr( $block->name ) . '"></div>';
+                    },
+                ]
+            );
+        }
     }
 
     /**

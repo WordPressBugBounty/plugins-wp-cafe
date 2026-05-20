@@ -3,7 +3,7 @@ namespace WpCafe\Wc;
 
 defined( 'ABSPATH' ) || exit;
 
-use WpCafe\Providers\Base_Service_Provider;
+use WpCafe\Contracts\Bootable_Provider_Contract;
 use WpCafe\Wc\Blocks\Block_Service;
 
 /**
@@ -14,15 +14,24 @@ use WpCafe\Wc\Blocks\Block_Service;
  *
  * @package WpCafe/Wc
  */
-class Wc_Integration_Service_Provider extends Base_Service_Provider {
+class Wc_Integration_Service_Provider implements Bootable_Provider_Contract {
     /**
-     * Get services
+     * Services to bootstrap.
      *
-     * @return array
+     * @var array
      */
-    public function get_services() {
-        return [
-            Block_Service::class,
-        ];
+    protected $services = [
+        Block_Service::class,
+    ];
+
+    /**
+     * Boot services.
+     *
+     * @return void
+     */
+    public function boot() {
+        foreach ( $this->services as $service ) {
+            ( new $service() )->register();
+        }
     }
 }

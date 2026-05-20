@@ -10,6 +10,22 @@ use WP_Role;
  */
 class Roles {
     /**
+     * Primitive capability that opens the WPCafe admin menu and bypasses the
+     * WooCommerce `/my-account/` admin redirect. Grant via any role editor to
+     * elevate a user without changing their role.
+     */
+    public const ADMIN_ACCESS_CAP = 'wpcafe_access_admin_menu';
+
+    /**
+     * Roles that receive the admin-access capability automatically.
+     *
+     * @return string[]
+     */
+    private static function get_admin_access_roles(): array {
+        return [ 'administrator', 'shop_manager' ];
+    }
+
+    /**
      * Register restaurant roles and synchronize their managed capabilities.
      *
      * @return void
@@ -30,6 +46,41 @@ class Roles {
         }
 
         self::grant_baseline_view_caps();
+        self::grant_admin_access_cap();
+    }
+
+    /**
+     * Grant the admin-access cap to roles that should land in wp-admin and see
+     * the WPCafe menu by default.
+     *
+     * @return void
+     */
+    private static function grant_admin_access_cap(): void {
+        foreach ( self::get_admin_access_roles() as $role_slug ) {
+            $role = get_role( $role_slug );
+            if ( ! $role instanceof WP_Role ) {
+                continue;
+            }
+
+            if ( ! $role->has_cap( self::ADMIN_ACCESS_CAP ) ) {
+                $role->add_cap( self::ADMIN_ACCESS_CAP, true );
+            }
+        }
+    }
+
+    /**
+     * Relax the WooCommerce admin-access redirect for users holding the WPCafe
+     * admin cap. Only ever returns `false` to relax — never tightens.
+     *
+     * @param  bool $prevent Current prevent flag from WooCommerce.
+     * @return bool
+     */
+    public static function filter_wc_prevent_admin_access( $prevent ): bool {
+        if ( current_user_can( self::ADMIN_ACCESS_CAP ) ) {
+            return false;
+        }
+
+        return (bool) $prevent;
     }
 
     /**
@@ -76,6 +127,16 @@ class Roles {
                 if ( $role->has_cap( $cap ) ) {
                     $role->remove_cap( $cap );
                 }
+            }
+        }
+
+        foreach ( self::get_admin_access_roles() as $role_slug ) {
+            $role = get_role( $role_slug );
+            if ( ! $role instanceof WP_Role ) {
+                continue;
+            }
+            if ( $role->has_cap( self::ADMIN_ACCESS_CAP ) ) {
+                $role->remove_cap( self::ADMIN_ACCESS_CAP );
             }
         }
     }

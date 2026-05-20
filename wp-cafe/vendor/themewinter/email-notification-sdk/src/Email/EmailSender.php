@@ -1,6 +1,8 @@
 <?php
 namespace Ens\Email;
 
+use Ens\Utils\Helpers;
+
 /**
  * Class EmailSender
  *
@@ -15,18 +17,20 @@ class EmailSender {
     protected $message;
     protected $action_data;
     protected $from;
+    protected $identifier;
 
     /**
      * EmailSender constructor.
      *
      * @since 1.0.0
      */
-    public function __construct( $action_name, $receiverType, $to,$from, $subject, $message, $action_data, $count) {
+    public function __construct( $identifier, $action_name, $receiverType, $to, $from, $subject, $message, $action_data, $count ) {
+        $this->identifier  = $identifier;
         $this->to          = $to;
         $this->from        = $from;
         $this->subject     = $this->replace_placeholders( $subject, $action_data );
         $message_content   = $this->replace_placeholders( $message, $action_data );
-        $this->message     = apply_filters( 'notification_sdk_email_message', $message_content, $receiverType, $action_name, $action_data, $count );
+        $this->message     = apply_filters( Helpers::get_hook_name( $this->identifier, 'notification_sdk_email_message' ), $message_content, $receiverType, $action_name, $action_data, $count );
         $this->action_data = $action_data;
     }
 
@@ -48,9 +52,9 @@ class EmailSender {
 
         $headers = $this->get_headers();
 
-        $this->message = apply_filters( 'notification_sdk_email_header', $this->message );
-        $this->message = apply_filters( 'notification_sdk_email_body', $this->message );
-        $this->message = apply_filters( 'notification_sdk_email_footer', $this->message );
+        $this->message = apply_filters( Helpers::get_hook_name( $this->identifier, 'notification_sdk_email_header' ), $this->message );
+        $this->message = apply_filters( Helpers::get_hook_name( $this->identifier, 'notification_sdk_email_body' ), $this->message );
+        $this->message = apply_filters( Helpers::get_hook_name( $this->identifier, 'notification_sdk_email_footer' ), $this->message );
         
         wp_mail( $this->to, $this->subject, $this->message, $headers );
 
@@ -79,7 +83,7 @@ class EmailSender {
             $headers[] = "From: {$from}";
         }
 
-        return apply_filters( 'eventin_email_headers', $headers );
+        return apply_filters( Helpers::get_hook_name( $this->identifier, 'eventin_email_headers' ), $headers );
     }
 
     /**

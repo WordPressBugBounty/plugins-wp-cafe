@@ -183,10 +183,38 @@ $cart_link        = wpc_get_option('mini_cart_empty_button_link', get_permalink(
             do_action( 'woocommerce_widget_shopping_cart_before_buttons' );
 
             if ( floatval( WC()->cart->subtotal ) > $min_order_amount || 0 === $min_order_amount ) :
-                ?>
-                <p class="wpc-woocommerce-mini-cart__buttons buttons">
-                    <?php do_action( 'woocommerce_widget_shopping_cart_buttons' ); ?>
-                </p>
+                $wpc_minicart_ordering_disabled = (bool) apply_filters( 'wpcafe_minicart_ordering_disabled', false );
+
+                if ( $wpc_minicart_ordering_disabled ) :
+                    $wpc_minicart_disabled_notice = (string) apply_filters(
+                        'wpcafe_minicart_ordering_disabled_notice',
+                        esc_html__( 'Ordering is currently unavailable for this location.', 'wp-cafe' )
+                    );
+
+                    if ( $wpc_minicart_disabled_notice !== '' ) :
+                        ?>
+                        <p class="wpc-minicart-ordering-disabled-notice woocommerce-info" role="status">
+                            <?php echo wp_kses_post( $wpc_minicart_disabled_notice ); ?>
+                        </p>
+                        <?php
+                    endif;
+                    ?>
+                    <p class="wpc-woocommerce-mini-cart__buttons buttons">
+                        <?php woocommerce_widget_shopping_cart_button_view_cart(); ?>
+                        <a href="#"
+                           class="button checkout wc-forward wpc-minicart-checkout-disabled disabled"
+                           aria-disabled="true"
+                           tabindex="-1"
+                           data-wpcafe-pro-pause="all"
+                           onclick="return false;">
+                            <?php esc_html_e( 'Checkout', 'wp-cafe' ); ?>
+                        </a>
+                    </p>
+                <?php else : ?>
+                    <p class="wpc-woocommerce-mini-cart__buttons buttons">
+                        <?php do_action( 'woocommerce_widget_shopping_cart_buttons' ); ?>
+                    </p>
+                <?php endif; ?>
             <?php else : ?>
                 <?php
                 $message = sprintf(

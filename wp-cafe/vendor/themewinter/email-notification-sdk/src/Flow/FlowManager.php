@@ -4,6 +4,7 @@ namespace Ens\Flow;
 use DateTime;
 use Ens\Config;
 use Ens\Email\EmailSender;
+use Ens\Utils\Helpers;
 
 /**
  * Class FlowManager
@@ -298,7 +299,7 @@ class FlowManager {
                 $receiverType = $node['data']['receiverType'] ?? null;
                 if ( $receiverType && isset( $hook_data[$receiverType] ) ) {
                     $user_email = $hook_data[$receiverType];
-                    $user_email = apply_filters( 'notification_sdk_to_emails', $hook_data[$receiverType], $hook_data, $action );
+                    $user_email = apply_filters( Helpers::get_hook_name( $this->identifier, 'notification_sdk_to_emails' ), $hook_data[$receiverType], $hook_data, $action );
 
                     if(is_array( $user_email )) {
                         foreach ( $user_email as $key=>$email ) {
@@ -495,7 +496,7 @@ class FlowManager {
             return;
         }
 
-        $email_sender = new EmailSender( $action_name, $receiverType, $email, $from, $subject, $body, $action_data, $count );
+        $email_sender = new EmailSender( $this->identifier, $action_name, $receiverType, $email, $from, $subject, $body, $action_data, $count );
         $email_sender->send();
     }
 }

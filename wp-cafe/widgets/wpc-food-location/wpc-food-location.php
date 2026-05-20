@@ -269,6 +269,122 @@ class Wpc_Food_Location extends Widget_Base {
 
         $this->end_controls_section();
 
+        // item label style section
+        $this->start_controls_section(
+            'item_label_style',
+            [
+                'label'     => esc_html__( 'Item Label Style', 'wp-cafe' ),
+                'tab'       => \Elementor\Controls_Manager::TAB_STYLE,
+                'condition' => [ 'show_item_label' => 'yes' ],
+            ]
+        );
+
+        $this->add_control(
+            'wpc_label_override_colors',
+            [
+                'label'        => esc_html__( 'Override default colors', 'wp-cafe' ),
+                'type'         => Controls_Manager::SWITCHER,
+                'label_on'     => esc_html__( 'Yes', 'wp-cafe' ),
+                'label_off'    => esc_html__( 'No', 'wp-cafe' ),
+                'return_value' => 'yes',
+                'default'      => 'no',
+                'description'  => esc_html__( 'When enabled, these colors override the per-label colors set in the WP Cafe → Product Labels taxonomy.', 'wp-cafe' ),
+            ]
+        );
+
+        $this->start_controls_tabs(
+            'item_label_style_tabs',
+            [
+                'condition' => [ 'wpc_label_override_colors' => 'yes' ],
+            ]
+        );
+
+        $this->start_controls_tab( 'item_label_style_normal', [ 'label' => esc_html__( 'Normal', 'wp-cafe' ) ] );
+
+        $this->add_control(
+            'wpc_menu_item_label_color',
+            [
+                'label'     => esc_html__( 'Item Label Color', 'wp-cafe' ),
+                'type'      => Controls_Manager::COLOR,
+                'selectors' => [
+                    '{{WRAPPER}} .wpc-product-labels .wpc-product-label' => 'color: {{VALUE}} !important;',
+                ],
+            ]
+        );
+
+        $this->add_control(
+            'wpc_menu_item_label_bg_color',
+            [
+                'label'     => esc_html__( 'Item Label BG Color', 'wp-cafe' ),
+                'type'      => Controls_Manager::COLOR,
+                'selectors' => [
+                    '{{WRAPPER}} .wpc-product-labels .wpc-product-label' => 'background-color: {{VALUE}} !important;',
+                ],
+            ]
+        );
+
+        $this->end_controls_tab();
+
+        $this->start_controls_tab( 'item_label_style_hover', [ 'label' => esc_html__( 'Hover', 'wp-cafe' ) ] );
+
+        $this->add_control(
+            'wpc_menu_item_label_hover_color',
+            [
+                'label'     => esc_html__( 'Item Label Color', 'wp-cafe' ),
+                'type'      => Controls_Manager::COLOR,
+                'selectors' => [
+                    '{{WRAPPER}} .wpc-product-labels .wpc-product-label:hover' => 'color: {{VALUE}} !important;',
+                ],
+            ]
+        );
+
+        $this->add_control(
+            'wpc_menu_item_label_hover_bg_color',
+            [
+                'label'     => esc_html__( 'Item Label BG Color', 'wp-cafe' ),
+                'type'      => Controls_Manager::COLOR,
+                'selectors' => [
+                    '{{WRAPPER}} .wpc-product-labels .wpc-product-label:hover' => 'background-color: {{VALUE}} !important;',
+                ],
+            ]
+        );
+
+        $this->end_controls_tab();
+        $this->end_controls_tabs();
+
+        $this->add_control(
+            'wpc_menu_item_label_separator',
+            [
+                'type'      => Controls_Manager::DIVIDER,
+                'condition' => [ 'wpc_label_override_colors' => 'yes' ],
+            ]
+        );
+
+        $this->add_group_control(
+            \Elementor\Group_Control_Typography::get_type(),
+            [
+                'name'      => 'wpc_menu_label_typo',
+                'label'     => esc_html__( 'Typography', 'wp-cafe' ),
+                'selector'  => '{{WRAPPER}} .wpc-product-labels .wpc-product-label',
+                'condition' => [ 'wpc_label_override_colors' => 'yes' ],
+            ]
+        );
+
+        $this->add_responsive_control(
+            'wpc_menu_item_label_padding',
+            [
+                'label'      => esc_html__( 'Padding', 'wp-cafe' ),
+                'type'       => Controls_Manager::DIMENSIONS,
+                'size_units' => [ 'px', '%', 'em' ],
+                'selectors'  => [
+                    '{{WRAPPER}} .wpc-product-labels .wpc-product-label' => 'padding: {{TOP}}{{UNIT}} {{RIGHT}}{{UNIT}} {{BOTTOM}}{{UNIT}} {{LEFT}}{{UNIT}};',
+                ],
+                'condition'  => [ 'wpc_label_override_colors' => 'yes' ],
+            ]
+        );
+
+        $this->end_controls_section();
+
         // item cart button style section
         $this->start_controls_section(
             'item_cart_button_style',

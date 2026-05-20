@@ -263,50 +263,56 @@ class Mini_Cart {
      * @return void
      */
     public function handle_mini_cart_buttons_before() {
+        if ( class_exists( 'Wpcafe_Multivendor' ) ) {
+            return;
+        }
+
+        $show_delivery = (bool) apply_filters( 'wpcafe_minicart_show_delivery', wpc_is_module_enable( 'delivery' ) );
+        $show_pickup   = (bool) apply_filters( 'wpcafe_minicart_show_pickup', wpc_is_module_enable( 'pickup' ) );
+
+        if ( ! $show_delivery && ! $show_pickup ) {
+            return;
+        }
         ?>
-        <?php if ( ! class_exists( 'Wpcafe_Multivendor' ) ) {
-            ?>
             <div class="wpc_pro_order_time">
                 <div class="minicart-condition-parent">
-
-                    <?php if ( wpc_is_module_enable( 'delivery' ) ): ?>
+                    <?php if ( $show_delivery ): ?>
                     <div class="wpc-field-wrap">
                         <label for="wpc_pro_order_time_delivary">
-                            <input 
-                                type="radio" 
-                                name="wpc_pro_order_time" 
-                                class="wpc-minicart-condition-input" id="wpc_pro_order_time_delivary" 
+                            <input
+                                type="radio"
+                                name="wpc_pro_order_time"
+                                class="wpc-minicart-condition-input" id="wpc_pro_order_time_delivary"
                                 value="Delivery"
-                            > 
+                            >
                             <?php echo esc_html__( 'Delivery', 'wp-cafe' ); ?>
                             <span class="dot-shadow"></span>
                         </label>
                     </div>
                     <?php endif; ?>
 
-                    <?php if ( wpc_is_module_enable( 'pickup' ) ): ?>
+                    <?php if ( $show_pickup ): ?>
                     <div class="wpc-field-wrap">
                         <label for="wpc_pro_order_time_pickup">
-                            <input 
-                                type="radio" 
-                                name="wpc_pro_order_time" 
-                                class="wpc-minicart-condition-input" id="wpc_pro_order_time_pickup" 
+                            <input
+                                type="radio"
+                                name="wpc_pro_order_time"
+                                class="wpc-minicart-condition-input" id="wpc_pro_order_time_pickup"
                                 value="Pickup"
-                            > 
+                            >
                             <?php echo esc_html__( 'Pickup', 'wp-cafe' ); ?>
                             <span class="dot-shadow"></span>
                         </label>
                     </div>
                     <?php endif; ?>
 
-                    <?php if ( wpc_is_module_enable( 'delivery' ) && wpc_is_module_enable( 'pickup' ) ): ?>
+                    <?php if ( $show_delivery && $show_pickup ): ?>
                     <input type="hidden" name="is_order_time_selected" id="wpc-minicart-condition-value-holder" value=""/>
-                    <input type="hidden" name="order_type" class="order_type" value="<?php echo esc_attr( wpc_is_module_enable( 'delivery' ) ? 'Delivery' : 'Pickup' ); ?>"/>
+                    <input type="hidden" name="order_type" class="order_type" value="<?php echo esc_attr( $show_delivery ? 'Delivery' : 'Pickup' ); ?>"/>
                     <?php endif; ?>
                 </div>
             </div>
             <?php
-        }
     }
 
     /**

@@ -9,9 +9,9 @@ use Automattic\WooCommerce\Blocks\Integrations\IntegrationInterface;
  * Block Integration
  *
  * Hooks the WPCafe checkout-block JS bundle into WooCommerce's Blocks
- * IntegrationRegistry. Exposes runtime data to the bundle through the
- * `wp-cafe-checkout-blocks` settings key (read in JS via
- * `getSetting( 'wp-cafe-checkout-blocks' )`).
+ * IntegrationRegistry. Exposes runtime data through the
+ * `wpc-checkout-blocks_data` settings key (read in JS via
+ * `getSetting( 'wpc-checkout-blocks_data' )`).
  */
 class Block_Integration implements IntegrationInterface {
 
@@ -23,7 +23,7 @@ class Block_Integration implements IntegrationInterface {
      * @return string
      */
     public function get_name() {
-        return 'wp-cafe-checkout-blocks';
+        return 'wpc-checkout-blocks';
     }
 
     /**
@@ -86,13 +86,70 @@ class Block_Integration implements IntegrationInterface {
             'ajax_url'                  => esc_url_raw( admin_url( 'admin-ajax.php' ) ),
             'selected_location_id'      => function_exists( 'wpc_selected_location_id' ) ? wpc_selected_location_id() : null,
             'location_module'           => function_exists( 'wpc_is_module_enable' ) ? (bool) wpc_is_module_enable( 'location' ) : false,
+            'tipping_module'            => function_exists( 'wpc_is_module_enable' ) ? (bool) wpc_is_module_enable( 'tipping' ) : false,
+            'tipping_settings'          => $this->get_tipping_settings(),
+            'tipping_current'           => $this->get_tipping_current_from_session(),
+            'currency_symbol'           => function_exists( 'get_woocommerce_currency_symbol' ) ? html_entity_decode( get_woocommerce_currency_symbol() ) : '',
         ];
     }
 
     /**
-     * Pull the reservation payload out of the WC session. Mirrors
-     * Reservation_Hooks::wpc_display_reservation_info_on_checkout (classic
-     * checkout reads the same key).
+     * Read tipping settings via the shared wpc_get_option helper.
+     *
+     * @return array
+     */
+    private function get_tipping_settings() {
+        if ( ! function_exists( 'wpc_get_option' ) ) {
+            return [
+                'calculation_method'    => '',
+                'tip_options'           => [],
+                'enable_custom_tipping' => false,
+                'custom_tipping_label'  => __( 'Custom Tip', 'wp-cafe' ),
+            ];
+        }
+
+        $raw_options = wpc_get_option( 'tip_options', [] );
+        $tip_options = [];
+        if ( is_array( $raw_options ) ) {
+            foreach ( $raw_options as $value ) {
+                if ( is_numeric( $value ) ) {
+                    $tip_options[] = floatval( $value );
+                }
+            }
+        }
+
+        return [
+            'calculation_method'    => (string) wpc_get_option( 'tipping_calculation_method', '' ),
+            'tip_options'           => $tip_options,
+            'enable_custom_tipping' => (bool) wpc_get_option( 'enable_custom_tipping', false ),
+            'custom_tipping_label'  => (string) wpc_get_option( 'custom_tipping_label', __( 'Custom Tip', 'wp-cafe' ) ),
+        ];
+    }
+
+    /**
+     * Snapshot the WC session tip so the block can re-hydrate the active
+     * button on reload.
+     *
+     * @return array|null
+     */
+    private function get_tipping_current_from_session() {
+        if ( ! function_exists( 'WC' ) || ! WC()->session ) {
+            return null;
+        }
+
+        $tip = WC()->session->get( 'wpc_pro_tip' );
+        if ( empty( $tip ) || ! is_array( $tip ) || empty( $tip['tip_added'] ) ) {
+            return null;
+        }
+
+        return [
+            'tip_selected_type' => isset( $tip['tip_selected_type'] ) ? (string) $tip['tip_selected_type'] : '',
+            'tip_amount'        => isset( $tip['tip_amount'] ) ? floatval( $tip['tip_amount'] ) : 0,
+        ];
+    }
+
+    /**
+     * Pull the reservation payload out of the WC session.
      *
      * @return array|null
      */

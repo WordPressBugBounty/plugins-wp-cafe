@@ -97,4 +97,26 @@ class Helpers {
 
         return null;
     }
+
+    /**
+     * Build a plugin-scoped hook name.
+     *
+     * Prepends the consumer plugin's hook_prefix (or general_prefix as
+     * fallback) to the given suffix so hooks fired from the SDK do not
+     * collide when the package is bundled in multiple plugins.
+     *
+     * @param string $identifier The consumer plugin identifier (general_prefix).
+     * @param string $hook_suffix The unscoped hook name (e.g. 'email_body').
+     *
+     * @return string
+     */
+    public static function get_hook_name( $identifier, $hook_suffix ) {
+        $prefix = self::get_config_data( $identifier, 'hook_prefix' );
+
+        if ( empty( $prefix ) ) {
+            $prefix = $identifier;
+        }
+
+        return $prefix . '_' . $hook_suffix;
+    }
 }

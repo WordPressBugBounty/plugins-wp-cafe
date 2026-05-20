@@ -485,6 +485,6 @@ class FlowAPI extends WP_REST_Controller {
             'status'      => $flow->get_status(),
         ];
 
-        return apply_filters( 'ens_flow_prepare_item', $data, $flow_id );
+        return apply_filters( Helpers::get_hook_name( $this->identifier, 'ens_flow_prepare_item' ), $data, $flow_id );
     }
 }

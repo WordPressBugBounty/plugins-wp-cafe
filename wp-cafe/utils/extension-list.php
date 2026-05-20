@@ -76,7 +76,7 @@ return [
         'notice' => '',
         'demo_link' => '',
         'settings_link' => 'admin.php?page=wpcafe#/settings?tab=delivery',
-        'doc_link' => 'https://support.themewinter.com/docs/plugins/plugin-docs/wpcafe-version-3/restaurant-delivery-setup-in-wpcafe/',
+        'doc_link' => 'https://support.themewinter.com/docs/plugins/plugin-docs/food-ordering/delivery/',
         'icon' => '<svg width="26" height="26" viewBox="0 0 26 26" fill="none" xmlns="http://www.w3.org/2000/svg">
 <path d="M2.16406 14.547V8.66602H23.8307V14.547C23.8307 18.9243 23.8307 21.113 22.4206 22.4728C21.0103 23.8327 18.7406 23.8327 14.2011 23.8327H11.7937C7.25424 23.8327 4.98452 23.8327 3.57429 22.4728C2.16406 21.113 2.16406 18.9243 2.16406 14.547Z" stroke="#525266" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
 <path d="M2.16406 8.66602L3.20573 6.16602C4.01359 4.22713 4.41754 3.25769 5.23629 2.71185C6.05504 2.16602 7.10528 2.16602 9.20573 2.16602H16.7891C18.8895 2.16602 19.9397 2.16602 20.7585 2.71185C21.5773 3.25769 21.9812 4.22713 22.7891 6.16602L23.8307 8.66602" stroke="#525266" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
@@ -97,7 +97,7 @@ return [
         'notice' => '',
         'demo_link' => '',
         'settings_link' => 'admin.php?page=wpcafe#/settings?tab=pickup',
-        'doc_link' => 'https://support.themewinter.com/docs/plugins/plugin-docs/wpcafe-version-3/restaurant-pickup-setup-in-wpcafe/',
+        'doc_link' => 'https://support.themewinter.com/docs/plugins/plugin-docs/food-ordering/pickup/',
         'icon' => '<svg width="26" height="26" viewBox="0 0 26 26" fill="none" xmlns="http://www.w3.org/2000/svg">
 <path d="M21.1276 18.9583C21.1276 20.4541 19.915 21.6667 18.4193 21.6667C16.9235 21.6667 15.7109 20.4541 15.7109 18.9583C15.7109 17.4626 16.9235 16.25 18.4193 16.25C19.915 16.25 21.1276 17.4626 21.1276 18.9583Z" stroke="#525266" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
 <path d="M10.2917 18.9583C10.2917 20.4541 9.0791 21.6667 7.58333 21.6667C6.08756 21.6667 4.875 20.4541 4.875 18.9583C4.875 17.4626 6.08756 16.25 7.58333 16.25C9.0791 16.25 10.2917 17.4626 10.2917 18.9583Z" stroke="#525266" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
@@ -118,7 +118,7 @@ return [
         'notice' => '',
         'demo_link' => '',
         'settings_link' => 'admin.php?page=wpcafe#/settings?tab=tipping',
-        'doc_link' => 'https://support.themewinter.com/docs/plugins/plugin-docs/wpcafe-version-3/how-to-set-up-tipping-using-wpcafe/',
+        'doc_link' => 'https://support.themewinter.com/docs/plugins/plugin-docs/food-ordering/tipping/',
         'icon' => '<svg width="26" height="26" viewBox="0 0 26 26" fill="none" xmlns="http://www.w3.org/2000/svg">
 <path d="M21.6693 8.66667C21.6693 10.7607 19.9717 12.4583 17.8776 12.4583C15.7835 12.4583 14.0859 10.7607 14.0859 8.66667C14.0859 6.57258 15.7835 4.875 17.8776 4.875C19.9717 4.875 21.6693 6.57258 21.6693 8.66667Z" stroke="#525266" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
 <path d="M16.0644 5.33364C15.5723 3.81057 14.1426 2.70898 12.4557 2.70898C10.3616 2.70898 8.66406 4.40657 8.66406 6.50065C8.66406 8.59466 10.3616 10.2923 12.4557 10.2923C13.1104 10.2923 13.7263 10.1264 14.2637 9.83432" stroke="#525266" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
@@ -138,7 +138,7 @@ return [
         'notice' => '',
         'demo_link' => '',
         'settings_link' => 'admin.php?page=wpcafe#/discount',
-        'doc_link' => 'https://support.themewinter.com/docs/plugins/plugin-docs/wpcafe-version-3/how-to-add-discounts-using-wpcafe/',
+        'doc_link' => 'https://support.themewinter.com/docs/plugins/plugin-docs/food-ordering/discount-2/',
         'icon' => '<svg width="26" height="26" viewBox="0 0 26 26" fill="none" xmlns="http://www.w3.org/2000/svg">
 <path d="M11.7773 23.3043L9.5778 21.9988C9.01957 21.6675 8.74045 21.5018 8.43068 21.4922C8.09593 21.4818 7.81187 21.6408 7.20866 21.9988C6.53308 22.3999 5.18974 23.5044 4.32079 22.9777C3.78906 22.6553 3.78906 21.8365 3.78906 20.1989V8.66602C3.78906 5.60188 3.78906 4.06982 4.74097 3.11792C5.69287 2.16602 7.22493 2.16602 10.2891 2.16602H15.7057C18.7698 2.16602 20.3019 2.16602 21.2538 3.11792C22.2057 4.06982 22.2057 5.60188 22.2057 8.66602V20.1989C22.2057 21.8365 22.2057 22.6553 21.674 22.9777C20.8051 23.5044 19.4618 22.3999 18.7861 21.9988C18.2279 21.6675 17.9488 21.5018 17.639 21.4922C17.3043 21.4818 17.0202 21.6408 16.417 21.9988L14.2174 23.3043C13.6242 23.6565 13.3275 23.8326 12.9974 23.8326C12.6673 23.8326 12.3706 23.6565 11.7773 23.3043Z" stroke="#525266" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
 <path d="M16.25 8.66602L9.75 15.166" stroke="#525266" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
@@ -158,7 +158,7 @@ return [
         'notice' => '',
         'demo_link' => '',
         'settings_link' => 'admin.php?page=wpcafe#/timed-product',
-        'doc_link' => 'https://support.themewinter.com/docs/plugins/plugin-docs/wpcafe-version-3/how-to-use-time-based-products-in-wpcafe/',
+        'doc_link' => 'https://support.themewinter.com/docs/plugins/plugin-docs/food-ordering/how-to-use-time-based-products-in-wpcafe/',
         'icon' => '<svg width="26" height="26" viewBox="0 0 26 26" fill="none" xmlns="http://www.w3.org/2000/svg">
 <path d="M9.0749 3.25C8.84317 3.33659 8.61526 3.43105 8.39151 3.53303M22.4454 17.6595C22.5561 17.4199 22.6581 17.1754 22.7512 16.9265M20.0415 20.9784C20.2276 20.8048 20.4074 20.6246 20.5805 20.4382M16.5425 23.1533C16.7528 23.074 16.9598 22.9883 17.1635 22.8964M13.1702 23.8267C12.92 23.8354 12.6682 23.8354 12.4179 23.8267M8.43744 22.9021C8.6333 22.9902 8.83233 23.0726 9.03429 23.149M5.06311 20.4975C5.21119 20.6545 5.364 20.8069 5.52131 20.9547M2.85327 16.9699C2.93439 17.184 3.02224 17.395 3.11655 17.6023M2.17323 13.5474C2.1662 13.322 2.16622 13.0951 2.17323 12.8693M2.84542 9.46523C2.92511 9.25345 3.01138 9.04489 3.10396 8.83978M5.0452 5.93583C5.20192 5.7689 5.36395 5.60704 5.53106 5.45051" stroke="#525266" stroke-width="1.625" stroke-linecap="round" stroke-linejoin="round"/>
 <path d="M14.625 13C14.625 13.8974 13.8974 14.625 13 14.625C12.1026 14.625 11.375 13.8974 11.375 13C11.375 12.1026 12.1026 11.375 13 11.375M14.625 13C14.625 12.1026 13.8974 11.375 13 11.375M14.625 13H17.3333M13 11.375V6.5" stroke="#525266" stroke-width="1.625" stroke-linecap="round"/>
@@ -202,7 +202,7 @@ return [
         'notice' => '',
         'demo_link' => '',
         'settings_link' => 'admin.php?page=wpcafe#/settings?tab=mini-cart',
-        'doc_link' => 'https://support.themewinter.com/docs/plugins/plugin-docs/wpcafe-version-3/mini-cart-settings/',
+        'doc_link' => 'https://support.themewinter.com/docs/plugins/plugin-docs/food-ordering/minicart-2/',
         'icon' => '<svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
 <path d="M6.66797 13.3333L13.9347 12.7277C16.2085 12.5383 16.7189 12.0417 16.9709 9.77408L17.5013 5" stroke="#141B34" stroke-width="1.25" stroke-linecap="round"/>
 <path d="M5 5H18.3333" stroke="#141B34" stroke-width="1.25" stroke-linecap="round"/>
@@ -244,7 +244,7 @@ return [
         'notice' => '',
         'demo_link' => '',
         'settings_link' => '',
-        'doc_link' => 'https://support.themewinter.com/docs/plugins/plugin-docs/getting-started/wp-cafe-multivendor-restaurant-addon/',
+        'doc_link' => 'https://support.themewinter.com/docs/plugins/plugin-docs/integrations/wp-cafe-multivendor-restaurant-addon/',
         'icon' => '<svg width="22" height="26" viewBox="0 0 22 26" fill="none" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
 <rect width="21.3228" height="26" fill="url(#pattern0_196_2098)"/>
 <defs>
@@ -267,7 +267,7 @@ return [
         'notice' => '',
         'demo_link' => '',
         'settings_link' => '',
-        'doc_link' => 'https://support.themewinter.com/docs/plugins/plugin-docs/getting-started/wpcafe-oxygen-builder-elements/',
+        'doc_link' => 'https://support.themewinter.com/docs/plugins/plugin-docs/integrations/wpcafe-oxygen-builder-elements/',
         'icon' => '<svg width="50" height="50" viewBox="0 0 50 50" fill="none" xmlns="http://www.w3.org/2000/svg">
 <circle opacity="0.1" cx="25" cy="25" r="25" fill="#5D5DFF"/>
 <circle opacity="0.1" cx="25" cy="25" r="25" fill="#5D5DFF"/>

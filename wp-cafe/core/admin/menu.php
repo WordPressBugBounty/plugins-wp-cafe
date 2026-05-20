@@ -27,7 +27,7 @@ class Menu implements Hookable_Service_Contract {
      */
     public function register_admin_menu() {
         global $submenu;
-        $capability = 'manage_options';
+        $capability = apply_filters( 'wpcafe_admin_menu_capability', 'wpcafe_access_admin_menu' );
         $slug       = 'wpcafe';
         $url        = 'admin.php?page=' . $slug . '#';  
         add_menu_page(

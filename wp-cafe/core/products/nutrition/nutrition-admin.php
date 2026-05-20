@@ -44,11 +44,13 @@ class Nutrition_Admin implements Hookable_Service_Contract {
         $allergens = wpc_product_allergens( $post->ID );
         $presets   = wpc_allergen_presets();
 
-        $enabled       = ! empty( $nutrition['enabled'] );
-        $format        = in_array( ( $nutrition['format'] ?? 'fda' ), wpc_nutrition_formats(), true ) ? $nutrition['format'] : 'fda';
-        $serving_label = $nutrition['serving_label'] ?? '';
-        $serving_size  = $nutrition['serving_size'] ?? '';
-        $serving_unit  = in_array( ( $nutrition['serving_unit'] ?? 'g' ), wpc_nutrition_serving_units(), true ) ? $nutrition['serving_unit'] : 'g';
+        $enabled            = ! empty( $nutrition['enabled'] );
+        $format_candidate   = $nutrition['format'] ?? 'fda';
+        $format             = in_array( $format_candidate, wpc_nutrition_formats(), true ) ? $format_candidate : 'fda';
+        $serving_label      = $nutrition['serving_label'] ?? '';
+        $serving_size       = $nutrition['serving_size'] ?? '';
+        $serving_unit_value = $nutrition['serving_unit'] ?? 'g';
+        $serving_unit       = in_array( $serving_unit_value, wpc_nutrition_serving_units(), true ) ? $serving_unit_value : 'g';
 
         $val = function ( $key ) use ( $nutrition ) {
             return isset( $nutrition[ $key ] ) ? $nutrition[ $key ] : '';
@@ -287,12 +289,15 @@ class Nutrition_Admin implements Hookable_Service_Contract {
             ? wp_unslash( $_POST['wpcafe_nutrition'] )
             : [];
 
+        $raw_format       = $raw_nutrition['format'] ?? 'fda';
+        $raw_serving_unit = $raw_nutrition['serving_unit'] ?? 'g';
+
         $sanitized = [
             'enabled'       => ! empty( $raw_nutrition['enabled'] ),
-            'format'        => in_array( ( $raw_nutrition['format'] ?? 'fda' ), wpc_nutrition_formats(), true ) ? $raw_nutrition['format'] : 'fda',
+            'format'        => in_array( $raw_format, wpc_nutrition_formats(), true ) ? $raw_format : 'fda',
             'serving_label' => isset( $raw_nutrition['serving_label'] ) ? sanitize_text_field( $raw_nutrition['serving_label'] ) : '',
             'serving_size'  => isset( $raw_nutrition['serving_size'] ) && '' !== $raw_nutrition['serving_size'] ? $this->sanitize_decimal( $raw_nutrition['serving_size'] ) : '',
-            'serving_unit'  => in_array( ( $raw_nutrition['serving_unit'] ?? 'g' ), wpc_nutrition_serving_units(), true ) ? $raw_nutrition['serving_unit'] : 'g',
+            'serving_unit'  => in_array( $raw_serving_unit, wpc_nutrition_serving_units(), true ) ? $raw_serving_unit : 'g',
             'ingredients'   => $this->sanitize_ingredients( $raw_nutrition['ingredients'] ?? [] ),
         ];
 
