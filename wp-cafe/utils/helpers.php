@@ -120,13 +120,44 @@ if ( ! function_exists( 'wpc_get_pickup_delivery_properties' ) ) {
         $pickup_properties = [
             'wpc_location_name'     => __( 'Food Order Location', 'wp-cafe' ),
             'wpc_pro_order_time'    => __( 'Delivery Type', 'wp-cafe' ),
+            'wpc_pro_order_mode'    => __( 'Order Mode', 'wp-cafe' ),
             'wpc_pro_delivery_date' => __( 'Delivery Date', 'wp-cafe' ),
             'wpc_pro_delivery_time' => __( 'Delivery Time', 'wp-cafe' ),
             'wpc_pro_pickup_date'   => __( 'Pickup Date', 'wp-cafe' ),
             'wpc_pro_pickup_time'   => __( 'Pickup Time', 'wp-cafe' ),
+            'wpc_pro_table_id'      => __( 'Table', 'wp-cafe' ),
+            'wpc_pro_table_label'   => __( 'Table Label', 'wp-cafe' ),
+            'wpc_pro_party_size'    => __( 'Party Size', 'wp-cafe' ),
+            'wpc_pro_created_by'    => __( 'Created By', 'wp-cafe' ),
         ];
 
         return $pickup_properties;
+    }
+}
+
+if ( ! function_exists( 'wpc_get_order_mode' ) ) {
+    /**
+     * Resolve a WC order's fulfillment mode.
+     *
+     * Prefers the new `wpc_pro_order_mode` meta (`Pickup` | `Delivery` | `DineIn`),
+     * falling back to the legacy `wpc_pro_order_time` (`Pickup` | `Delivery`) for
+     * orders created before the dine-in change shipped. Returns an empty string
+     * when neither meta key is set (e.g. non-WPCafe orders).
+     *
+     * @param  \WC_Order $order WC Order object.
+     * @return string
+     */
+    function wpc_get_order_mode( $order ) {
+        if ( ! $order || ! method_exists( $order, 'get_meta' ) ) {
+            return '';
+        }
+
+        $mode = (string) $order->get_meta( 'wpc_pro_order_mode' );
+        if ( $mode !== '' ) {
+            return $mode;
+        }
+
+        return (string) $order->get_meta( 'wpc_pro_order_time' );
     }
 }
 

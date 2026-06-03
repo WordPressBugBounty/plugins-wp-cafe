@@ -109,6 +109,7 @@ class Settings {
             'whatsapp_token'                          => 'string',
             'whatsapp_from_number_id'                 => 'string',
             'whatsapp_business_account_id'            => 'string',
+            'whatsapp_admin_number'                   => 'string',
 
             // Email
             'restaurant_email'                        => 'email',

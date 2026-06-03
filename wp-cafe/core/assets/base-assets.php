@@ -254,12 +254,47 @@ abstract class Base_Assets implements Hookable_Service_Contract {
                 $basename = basename( $file );
 
                 if ( preg_match( $filename_regex, $basename, $matches ) ) {
-                    $map[ $matches[1] ] = trailingslashit( $directory['url'] ) . $basename;
+                    $url = trailingslashit( $directory['url'] ) . $basename;
+                    $map[ $matches[1] ] = $url;
+
+                    // Also map a stable hash (strip webpack content hash from source path)
+                    // so translations survive rebuilds without regenerating JSON files.
+                    $stable_hash = $this->get_stable_hash( $file );
+                    if ( $stable_hash && $stable_hash !== $matches[1] ) {
+                        $map[ $stable_hash ] = $url;
+                    }
                 }
             }
         }
 
         return $map;
+    }
+
+    /**
+     * Compute a stable md5 hash from a JSON translation file's source path
+     * by stripping the webpack content hash (e.g. ".5583e660") from the chunk filename.
+     *
+     * @param string $file Full path to the JSON translation file.
+     * @return string|null Stable md5 hash, or null on failure.
+     */
+    private function get_stable_hash( $file ) {
+        $raw = file_get_contents( $file, false, null, 0, 512 );
+        if ( ! $raw ) {
+            return null;
+        }
+
+        if ( ! preg_match( '/"source"\s*:\s*"([^"]+)"/', $raw, $m ) ) {
+            return null;
+        }
+
+        $source = stripslashes( $m[1] );
+        $stable = preg_replace( '/\.[a-f0-9]{8}\.js$/', '.js', $source );
+
+        if ( $stable === $source ) {
+            return null;
+        }
+
+        return md5( $stable );
     }
 
     /**

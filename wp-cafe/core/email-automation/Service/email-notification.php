@@ -39,6 +39,10 @@ class Email_Notification implements Hookable_Service_Contract {
 	public function register() {
 		if ( class_exists( SDK::class ) ) {
 			add_filter( 'notification_sdk_email_body', [ $this, 'wrap_email_body' ], 10, 2 );
+			add_filter( 'wpcafe_ens_whatsapp_credentials', [ $this, 'map_whatsapp_credentials' ] );
+			add_action( 'wpcafe_ens_whatsapp_send_error', [ $this, 'log_whatsapp_error' ], 10, 4 );
+			add_action( 'wpcafe_ens_whatsapp_request',    [ $this, 'log_whatsapp_request' ], 10, 4 );
+			add_action( 'wpcafe_ens_whatsapp_send_success', [ $this, 'log_whatsapp_success' ], 10, 4 );
 
 			SDK::get_instance()
                 ->setup(
@@ -75,6 +79,109 @@ class Email_Notification implements Hookable_Service_Contract {
 	 */
 	public function get_available_actions() {
 		return $this->trigger_registry->get_all_configurations();
+	}
+
+	/**
+	 * Map wp-cafe's WhatsApp options into the SDK credentials shape.
+	 *
+	 * Iterates each `whatsapp_*` option via `wpc_get_option()` and maps it to
+	 * the credential key the SDK's MetaCloudProvider expects.
+	 *
+	 * @param array $creds Default credentials from SDK option store.
+	 * @return array
+	 */
+	public function map_whatsapp_credentials( $creds ) {
+		if ( ! is_array( $creds ) ) {
+			$creds = [];
+		}
+
+		$option_map = [
+			'whatsapp_token'              => 'access_token',
+			'whatsapp_from_number_id'     => 'phone_number_id',
+			'whatsapp_business_account_id' => 'business_id',
+		];
+
+		$mapped = [];
+		foreach ( $option_map as $option_key => $cred_key ) {
+			$value = wpc_get_option( $option_key, '' );
+			if ( ! empty( $value ) ) {
+				$mapped[ $cred_key ] = $value;
+			}
+		}
+
+		return array_merge( $creds, $mapped );
+	}
+
+	/**
+	 * Log WhatsApp transport errors so admins can diagnose Meta-side failures.
+	 *
+	 * @param mixed  $error_body Raw response body or error message.
+	 * @param string $to         Normalized recipient.
+	 * @param array  $payload    Request payload sent to Meta.
+	 * @param int    $http_code  HTTP status (0 for transport/setup errors).
+	 */
+	public function log_whatsapp_error( $error_body, $to, $payload, $http_code ) {
+		$error_string = is_string( $error_body ) ? $error_body : wp_json_encode( $error_body );
+
+		error_log( sprintf(
+			'[wpcafe whatsapp] send failed (http=%d, to=%s): %s',
+			(int) $http_code,
+			$to,
+			$error_string
+		) );
+
+		$recent = get_transient( 'wpcafe_whatsapp_recent_errors' );
+		if ( ! is_array( $recent ) ) {
+			$recent = [];
+		}
+		array_unshift( $recent, [
+			'time'  => time(),
+			'to'    => $to,
+			'code'  => (int) $http_code,
+			'error' => $error_string,
+		] );
+		$recent = array_slice( $recent, 0, 20 );
+		set_transient( 'wpcafe_whatsapp_recent_errors', $recent, DAY_IN_SECONDS );
+	}
+
+	/**
+	 * Debug-only log of the outbound Meta request so the payload can be
+	 *
+	 * @param string $endpoint     Full Graph API URL.
+	 * @param array  $payload      Payload that will be sent (already filtered).
+	 * @param string $message_type `text` or `template`.
+	 * @param string $to           Normalized recipient.
+	 */
+	public function log_whatsapp_request( $endpoint, $payload, $message_type, $to ) {
+		if ( ! ( defined( 'WP_DEBUG' ) && WP_DEBUG ) ) {
+			return;
+		}
+		error_log( sprintf(
+			'[wpcafe whatsapp] request type=%s to=%s payload=%s',
+			$message_type,
+			$to,
+			wp_json_encode( $payload )
+		) );
+	}
+
+	/**
+	 * Debug-only log of a successful Meta response so the message id
+	 *
+	 * @param string $response_body Meta API response body.
+	 * @param string $to            Normalized recipient.
+	 * @param array  $payload       Request payload sent to Meta.
+	 * @param int    $http_code     HTTP status.
+	 */
+	public function log_whatsapp_success( $response_body, $to, $payload, $http_code ) {
+		if ( ! ( defined( 'WP_DEBUG' ) && WP_DEBUG ) ) {
+			return;
+		}
+		error_log( sprintf(
+			'[wpcafe whatsapp] sent ok (http=%d, to=%s) response=%s',
+			(int) $http_code,
+			$to,
+			is_string( $response_body ) ? $response_body : wp_json_encode( $response_body )
+		) );
 	}
 
 	/**

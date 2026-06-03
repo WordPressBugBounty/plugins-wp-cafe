@@ -48,6 +48,24 @@ abstract class Abstract_Trigger {
 	abstract public function get_email_receivers();
 
 	/**
+	 * Get WhatsApp receiver options.
+	 *
+	 * @return array
+	 */
+	public function get_whatsapp_receivers() {
+		return array(
+			array(
+				'label' => __( 'Customer Number', 'wp-cafe' ),
+				'value' => 'customer_number',
+			),
+			array(
+				'label' => __( 'Admin Number', 'wp-cafe' ),
+				'value' => 'admin_number',
+			),
+		);
+	}
+
+	/**
 	 * Build complete trigger configuration
 	 *
 	 * Combines all trigger components into the final configuration array
@@ -57,16 +75,17 @@ abstract class Abstract_Trigger {
 	 */
 	public function build_configuration() {
 		$trigger_data = $this->get_trigger_data();
-		
+
 		// Allow custom fields to be added to trigger data for SDK UI
 		$trigger_data = apply_filters( 'wpc_trigger_custom_fields', $trigger_data, $this->get_trigger_value() );
-		
+
 		return array(
 			'trigger_label'      => $this->get_trigger_label(),
 			'trigger_value'      => $this->get_trigger_value(),
 			'trigger_data'       => $trigger_data,
 			'delay_dependencies' => $this->get_delay_dependencies(),
 			'email_receivers'    => $this->get_email_receivers(),
+			'whatsapp_receivers' => $this->get_whatsapp_receivers(),
 		);
 	}
 }

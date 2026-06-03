@@ -10,6 +10,10 @@ class Session {
      * Start session if not already started
      */
     public static function start() {
+        // Skip in CLI (WP-CLI, PHPUnit) — sessions need an HTTP request to set cookies.
+        if ( PHP_SAPI === 'cli' ) {
+            return;
+        }
         if ( session_status() === PHP_SESSION_NONE ) {
             session_start();
         }

@@ -743,12 +743,19 @@ class Reservation_Controller extends Base_Rest_Controller {
 
         $custom_fields = [];
 
-        foreach ( $data as $key => $value ) {
-            if ( $this->is_custom_field( $key, $fillable_keys, array_keys( $custom_field_types ) ) ) {
-                $field_type = $custom_field_types[ $key ] ?? 'text';
-                $custom_fields[ $key ] = $this->sanitize_custom_field_value( $value, $field_type );
-                unset( $data[ $key ] );
+        foreach ( array_keys( $data ) as $original_key ) {
+            $key = (string) $original_key;
+
+            if ( in_array( $key, $fillable_keys, true ) ) {
+                continue;
             }
+
+            if ( isset( $custom_field_types[ $key ] ) ) {
+                $field_type = $custom_field_types[ $key ];
+                $custom_fields[ $key ] = $this->sanitize_custom_field_value( $data[ $original_key ], $field_type );
+            }
+
+            unset( $data[ $original_key ] );
         }
 
         if ( ! empty( $custom_fields ) ) {

@@ -126,10 +126,23 @@ if ( ! empty($form_customization) && is_array($form_customization) ) {
     <?php endif; ?>
 
     <?php if ( ! empty( $reservation_data['custom_fields'] ) && is_array( $reservation_data['custom_fields'] ) ) : ?>
+        <?php
+        $custom_field_labels = [];
+        $customization_settings = wpc_get_option( 'reservation_form_customization', [] );
+        if ( is_array( $customization_settings ) ) {
+            foreach ( $customization_settings as $step ) {
+                foreach ( $step['fields'] ?? [] as $field ) {
+                    if ( ! empty( $field['id'] ) && ! empty( $field['label'] ) ) {
+                        $custom_field_labels[ $field['id'] ] = $field['label'];
+                    }
+                }
+            }
+        }
+        ?>
         <?php foreach ( $reservation_data['custom_fields'] as $field_id => $field_value ) : ?>
             <?php if ( ! empty( $field_value ) ) : ?>
                 <p class="wpc-reservation-field wpc-reservation-custom-field">
-                    <strong class="wpc-reservation-label"><?php echo esc_html( $field_id ); ?> : </strong>
+                    <strong class="wpc-reservation-label"><?php echo esc_html( $custom_field_labels[ $field_id ] ?? $field_id ); ?> : </strong>
                     <span class="wpc-reservation-value"><?php echo esc_html( is_array( $field_value ) ? implode( ', ', $field_value ) : $field_value ); ?></span>
                 </p>
             <?php endif; ?>

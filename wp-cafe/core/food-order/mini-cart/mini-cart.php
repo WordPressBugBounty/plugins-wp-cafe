@@ -269,10 +269,18 @@ class Mini_Cart {
 
         $show_delivery = (bool) apply_filters( 'wpcafe_minicart_show_delivery', wpc_is_module_enable( 'delivery' ) );
         $show_pickup   = (bool) apply_filters( 'wpcafe_minicart_show_pickup', wpc_is_module_enable( 'pickup' ) );
+        // Dine-in visibility is gated on both the dine-in module AND the
+        // customer-checkout toggle — operators can run dine-in staff-only.
+        $show_dine_in = false;
+        if ( function_exists( 'wpc_is_dine_in_customer_checkout_enabled' ) ) {
+            $show_dine_in = (bool) apply_filters( 'wpcafe_minicart_show_dine_in', wpc_is_dine_in_customer_checkout_enabled() );
+        }
 
-        if ( ! $show_delivery && ! $show_pickup ) {
+        if ( ! $show_delivery && ! $show_pickup && ! $show_dine_in ) {
             return;
         }
+        $default_mode = $show_delivery ? 'Delivery' : ( $show_pickup ? 'Pickup' : 'DineIn' );
+        $option_count = (int) $show_delivery + (int) $show_pickup + (int) $show_dine_in;
         ?>
             <div class="wpc_pro_order_time">
                 <div class="minicart-condition-parent">
@@ -306,9 +314,24 @@ class Mini_Cart {
                     </div>
                     <?php endif; ?>
 
-                    <?php if ( $show_delivery && $show_pickup ): ?>
+                    <?php if ( $show_dine_in ): ?>
+                    <div class="wpc-field-wrap">
+                        <label for="wpc_pro_order_time_dine_in">
+                            <input
+                                type="radio"
+                                name="wpc_pro_order_time"
+                                class="wpc-minicart-condition-input" id="wpc_pro_order_time_dine_in"
+                                value="DineIn"
+                            >
+                            <?php echo esc_html__( 'Dine in', 'wp-cafe' ); ?>
+                            <span class="dot-shadow"></span>
+                        </label>
+                    </div>
+                    <?php endif; ?>
+
+                    <?php if ( $option_count > 1 ): ?>
                     <input type="hidden" name="is_order_time_selected" id="wpc-minicart-condition-value-holder" value=""/>
-                    <input type="hidden" name="order_type" class="order_type" value="<?php echo esc_attr( $show_delivery ? 'Delivery' : 'Pickup' ); ?>"/>
+                    <input type="hidden" name="order_type" class="order_type" value="<?php echo esc_attr( $default_mode ); ?>"/>
                     <?php endif; ?>
                 </div>
             </div>

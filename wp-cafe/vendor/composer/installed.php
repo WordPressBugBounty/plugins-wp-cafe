@@ -1,9 +1,9 @@
 <?php return array(
     'root' => array(
         'name' => 'themewinter/wp-cafe',
-        'pretty_version' => 'dev-latest',
-        'version' => 'dev-latest',
-        'reference' => '4ea77c4d991d227a66f2ce48f078ab1ee828475e',
+        'pretty_version' => 'dev-develop',
+        'version' => 'dev-develop',
+        'reference' => '83dbc5e2da1ef3e64a4c0ed83a33262f612c0414',
         'type' => 'project',
         'install_path' => __DIR__ . '/../../',
         'aliases' => array(),
@@ -55,9 +55,9 @@
             'dev_requirement' => false,
         ),
         'themewinter/wp-cafe' => array(
-            'pretty_version' => 'dev-latest',
-            'version' => 'dev-latest',
-            'reference' => '4ea77c4d991d227a66f2ce48f078ab1ee828475e',
+            'pretty_version' => 'dev-develop',
+            'version' => 'dev-develop',
+            'reference' => '83dbc5e2da1ef3e64a4c0ed83a33262f612c0414',
             'type' => 'project',
             'install_path' => __DIR__ . '/../../',
             'aliases' => array(),

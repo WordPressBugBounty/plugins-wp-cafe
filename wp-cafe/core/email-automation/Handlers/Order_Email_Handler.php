@@ -125,6 +125,8 @@ class Order_Email_Handler implements Hookable_Service_Contract {
 		$notification_data = array(
 			'admin_email' => get_option( 'admin_email' ),
 			'customer_email' => $customer_email,
+			'customer_number' => $order->get_billing_phone() ?? '',
+			'admin_number' => wpc_get_option( 'whatsapp_admin_number', '' ),
 			'order_id' => (string) $order->get_id(),
 			'order_number' => (string) $order->get_order_number(),
 			'order_total' => (string) $order->get_total(),

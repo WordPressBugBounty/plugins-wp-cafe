@@ -289,6 +289,8 @@ class Reservation_Email_Handler implements Hookable_Service_Contract {
 		$notification_data = array(
 			'admin_email'				=> get_option( 'admin_email' ),
 			'customer_email'			=> $reservation->email ?? '',
+			'customer_number'			=> $reservation->phone ?? '',
+			'admin_number'				=> wpc_get_option( 'whatsapp_admin_number', '' ),
 			'reservation_id'            => $reservation->id ?? '',
 			'reservation_name'          => $reservation->name ?? '',
 			'reservation_email'         => $reservation->email ?? '',
@@ -349,6 +351,8 @@ class Reservation_Email_Handler implements Hookable_Service_Contract {
 		$notification_data = array(
 			'admin_email'				=> get_option( 'admin_email' ),
 			'customer_email'			=> $reservation->email ?? '',
+			'customer_number'			=> $reservation->phone ?? '',
+			'admin_number'				=> wpc_get_option( 'whatsapp_admin_number', '' ),
 			'reservation_id'            => $reservation->id ?? '',
 			'reservation_name'          => $reservation->name ?? '',
 			'reservation_email'         => $reservation->email ?? '',
@@ -421,6 +425,8 @@ class Reservation_Email_Handler implements Hookable_Service_Contract {
 		$notification_data = array(
 			'admin_email'                    => get_option( 'admin_email' ),
 			'customer_email'                 => $reservation->email ?? '',
+			'customer_number'                => $reservation->phone ?? '',
+			'admin_number'                   => wpc_get_option( 'whatsapp_admin_number', '' ),
 			'reservation_id'                 => $reservation->id ?? '',
 			'reservation_name'               => $reservation->name ?? '',
 			'reservation_email'              => $reservation->email ?? '',
@@ -481,6 +487,8 @@ class Reservation_Email_Handler implements Hookable_Service_Contract {
 		$notification_data = array(
 			'admin_email'                    => get_option( 'admin_email' ),
 			'customer_email'                 => $reservation->email ?? '',
+			'customer_number'                => $reservation->phone ?? '',
+			'admin_number'                   => wpc_get_option( 'whatsapp_admin_number', '' ),
 			'reservation_id'                 => $reservation->id ?? '',
 			'reservation_name'               => $reservation->name ?? '',
 			'reservation_email'              => $reservation->email ?? '',

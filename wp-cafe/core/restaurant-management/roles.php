@@ -160,6 +160,8 @@ class Roles {
                 'caps'  => [
                     'wpcafe_view_all_orders',
                     'wpcafe_view_all_reservations',
+                    'wpcafe_create_dine_in_order',
+                    'wpcafe_edit_own_open_orders',
                 ],
             ],
             'wpcafe_manager' => [
@@ -169,6 +171,9 @@ class Roles {
                     'wpcafe_view_all_reservations',
                     'wpcafe_manage_orders',
                     'wpcafe_manage_reservations',
+                    'wpcafe_create_dine_in_order',
+                    'wpcafe_edit_own_open_orders',
+                    'wpcafe_edit_any_open_order',
                 ],
             ],
         ];
@@ -187,6 +192,9 @@ class Roles {
             'wpcafe_view_all_reservations',
             'wpcafe_manage_orders',
             'wpcafe_manage_reservations',
+            'wpcafe_create_dine_in_order',
+            'wpcafe_edit_own_open_orders',
+            'wpcafe_edit_any_open_order',
         ];
     }
 
