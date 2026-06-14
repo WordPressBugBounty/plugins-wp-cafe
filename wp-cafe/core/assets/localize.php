@@ -30,6 +30,7 @@ class Localize {
             'pages'               => wpc_get_pages(),
             'table_layout'        => wpc_is_module_enable('table_layout'),
             'has_woo_products'    => (wp_count_posts( 'product' )->publish ?? 0) > 0,
+            'deposet'             => wpc_is_deposet_active(),
         ];
 
         return apply_filters( 'wpcafe_admin_localize', $data );
@@ -54,6 +55,7 @@ class Localize {
             'table_layout'        => wpc_is_module_enable('table_layout'),
             'wpcafePro'           => function_exists('wpcafe_pro'),
             'wpcafeMultivendor'   => class_exists('\Wpcafe_Multivendor'),
+            'deposet'             => wpc_is_deposet_active(),
         ];
 
         return apply_filters( 'wpcafe_frontend_localize', $data );

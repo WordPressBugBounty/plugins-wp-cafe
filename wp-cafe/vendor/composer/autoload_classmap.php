@@ -113,6 +113,7 @@ return array(
     'WpCafe\\FoodOrder\\LiveOrder\\Notifier' => $baseDir . '/core/food-order/liver-order/notifier.php',
     'WpCafe\\FoodOrder\\Mini_Cart\\Mini_Cart' => $baseDir . '/core/food-order/mini-cart/mini-cart.php',
     'WpCafe\\FoodOrder\\Mini_Cart\\Mini_Cart_Service' => $baseDir . '/core/food-order/mini-cart/mini-cart-service.php',
+    'WpCafe\\FoodOrder\\Qrcode\\Qr_Fulfillment_Gate' => $baseDir . '/core/food-order/qrcode/qr-fulfillment-gate.php',
     'WpCafe\\FoodOrder\\Qrcode\\Qrcode_Service' => $baseDir . '/core/food-order/qrcode/qrcode-service.php',
     'WpCafe\\FoodOrder\\Qrcode\\Table_Session_Handler' => $baseDir . '/core/food-order/qrcode/table-session-handler.php',
     'WpCafe\\FoodOrder\\Shortcodes\\Food_Location_Ajax' => $baseDir . '/core/food-order/shortcodes/food-location-ajax.php',

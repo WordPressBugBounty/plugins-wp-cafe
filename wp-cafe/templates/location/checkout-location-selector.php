@@ -27,10 +27,10 @@ $primary_color = wpc_get_option('primary_color') ?: '#c82333';
                 <div class="wpc-location__address ">
                     <?php if ( $location ) : ?>
                         <p class="wpc-location__address-postcode"><?php echo esc_html( $location->restaurant_name ); ?></p>
-                        <a class="wpc-location__address-button" wpc-store-popup-open="1" href=""><?php esc_html_e( 'Edit Location', 'wp-cafe' ); ?></a>
+                        <button type="button" class="wpc-location__address-button" style="color: <?php echo esc_attr( $primary_color ); ?>;" wpc-store-popup-open="1"><?php esc_html_e( 'Edit Location', 'wp-cafe' ); ?></button>
                     <?php wp_nonce_field( 'wpc_selected_location', 'wpc_selected_location' ) ?>
                     <?php else : ?>
-                        <a class="wpc-location__address-button" style=" color: <?php echo esc_attr( $primary_color ); ?>;"wpc-store-popup-open="1" href=""><?php esc_html_e( 'Find Location', 'wp-cafe' ); ?></a>
+                        <button type="button" class="wpc-location__address-button" style="color: <?php echo esc_attr( $primary_color ); ?>;" wpc-store-popup-open="1"><?php esc_html_e( 'Find Location', 'wp-cafe' ); ?></button>
                     <?php wp_nonce_field( 'wpc_selected_location', 'wpc_selected_location' ) ?>
                     <?php endif; ?>
 

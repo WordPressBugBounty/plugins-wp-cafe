@@ -166,7 +166,45 @@ return [
 </svg>
 ',
     ],
-    
+    'pause_orders' => [
+        'name' => 'pause_orders',
+        'slug' => 'pause_orders',
+        'type' => 'module',
+        'parent' => 'food_ordering',
+        'status' => 'on',
+        'is_pro' => true,
+        'title' => __('Pause Order', 'wp-cafe'),
+        'description' => __('Temporarily stop accepting orders, pickup, or delivery for any location with one click. Auto-resumes on the next operating day.', 'wp-cafe'),
+        'notice' => '',
+        'demo_link' => '',
+        'settings_link' => '',
+        'doc_link' => '#',
+        'icon' => '<svg width="26" height="26" viewBox="0 0 26 26" fill="none" xmlns="http://www.w3.org/2000/svg">
+<path d="M13 23.8327C18.9831 23.8327 23.8333 18.9824 23.8333 12.9993C23.8333 7.01626 18.9831 2.16602 13 2.16602C7.01692 2.16602 2.16667 7.01626 2.16667 12.9993C2.16667 18.9824 7.01692 23.8327 13 23.8327Z" stroke="#525266" stroke-width="1.625"/>
+<path d="M10.2917 9.75V16.25M15.7083 9.75V16.25" stroke="#525266" stroke-width="1.625" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>
+',
+    ],
+    'dine_in' => [
+        'name' => 'dine_in',
+        'slug' => 'dine_in',
+        'type' => 'module',
+        'parent' => 'food_ordering',
+        'status' => 'on',
+        'is_pro' => true,
+        'title' => __('Dine-in', 'wp-cafe'),
+        'description' => __('Third order mode for on-premises customers. Adds a Dine-in option to classic + WC Blocks checkout with an optional table reference and party size.', 'wp-cafe'),
+        'notice' => '',
+        'demo_link' => '',
+        'settings_link' => '',
+        'doc_link' => '#',
+        'icon' => '<svg width="26" height="26" viewBox="0 0 26 26" fill="none" xmlns="http://www.w3.org/2000/svg">
+<path d="M5.95833 2.16602V10.291M9.20833 2.16602V10.291M5.41667 10.291H9.75C9.75 12.0859 8.29508 13.541 6.5 13.541H8.66667M7.58333 13.541V23.8327" stroke="#525266" stroke-width="1.625" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M18.4167 14.625V23.8333M18.4167 14.625C16.6218 14.625 15.1667 13.1699 15.1667 11.375L16.25 5.95833C16.4097 4.79085 17.2382 2.16667 18.4167 2.16667C19.5951 2.16667 20.4236 4.79085 20.5833 5.95833L21.6667 11.375C21.6667 13.1699 20.2116 14.625 18.4167 14.625Z" stroke="#525266" stroke-width="1.625" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>
+',
+    ],
+
     'receipt-layout' => [
         'name' => 'receipt-layout',
         'slug' => 'receipt-layout',

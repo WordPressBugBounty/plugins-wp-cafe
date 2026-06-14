@@ -218,6 +218,8 @@ class Reservation_Controller extends Base_Rest_Controller {
             $data['status'] = wpc_get_option( 'reservation_status', 'pending' );
         }
 
+        $this->apply_partial_payment( $data );
+
         $reservation = Reservation_Model::create( $data );
 
         if ( is_wp_error( $reservation ) ) {
@@ -242,6 +244,54 @@ class Reservation_Controller extends Base_Rest_Controller {
         $payload = array_merge( $response->to_array(), [ 'payment_token' => $payment_token ] );
 
         return $this->response( $payload, __( 'Reservation created successfully.', 'wp-cafe' ) );
+    }
+
+    /**
+     * Work out the deposit split here on the server and save it on the reservation.
+     *
+     * The form sends deposit numbers too, but we ignore them and recalculate using
+     * the Deposet plugin's own settings, so the stored figures can always be
+     * trusted. A deposit is only taken for WooCommerce online payments (paying at
+     * the venue is always the full amount), and only when both the WP Cafe toggle
+     * and the Deposet plugin are switched on.
+     *
+     * total_price keeps the full amount. deposit_value and remaining_amount hold
+     * the split, and is_partial_payment ('yes'/'no') tells the checkout whether to
+     * charge only the deposit.
+     *
+     * @param array $data Reservation data, changed in place.
+     * @return void
+     */
+    private function apply_partial_payment( array &$data ): void {
+        $is_wc        = ( $data['payment_method'] ?? '' ) === 'wc';
+        $toggle_on    = ! empty( wpc_get_option( 'reservation_partial_payment' ) );
+
+        if ( $is_wc && $toggle_on && wpc_is_deposet_active() ) {
+            $total = (float) ( $data['total_price'] ?? 0 );
+            $calc  = \Deposet\Helpers\Utilities::calculate_checkout_deposit(
+                $total,
+                get_option( 'deposet_type', 'percentage' ),
+                (float) get_option( 'deposet_amount', '50' )
+            );
+
+            /*
+             * Only treat it as a deposit when there is a real part-payment to take:
+             * the deposit is above zero and smaller than the full amount. A deposit
+             * equal to the total is just a full payment, so let it fall through.
+             */
+            if ( is_array( $calc ) && (float) $calc['deposit_value'] > 0 && (float) $calc['deposit_value'] < $total ) {
+                $data['is_partial_payment'] = 'yes';
+                $data['deposit_value']      = (float) $calc['deposit_value'];
+                $data['remaining_amount']   = (float) $calc['remaining'];
+                return;
+            }
+        }
+
+        // Not a deposit booking — save it as a normal full payment and clear any
+        // deposit values the form may have sent.
+        $data['is_partial_payment'] = 'no';
+        $data['deposit_value']      = 0;
+        $data['remaining_amount']   = 0;
     }
 
     /**
@@ -696,6 +746,20 @@ class Reservation_Controller extends Base_Rest_Controller {
         }
         if ( isset( $data['total_price'] ) ) {
             $data['total_price'] = floatval( $data['total_price'] );
+        }
+        /*
+         * Clean up the deposit fields the form sends. We do not rely on these
+         * values — apply_partial_payment() works them out again — but we still
+         * sanitize them so anything stored is a clean number or yes/no.
+         */
+        if ( isset( $data['deposit_value'] ) ) {
+            $data['deposit_value'] = floatval( $data['deposit_value'] );
+        }
+        if ( isset( $data['remaining_amount'] ) ) {
+            $data['remaining_amount'] = floatval( $data['remaining_amount'] );
+        }
+        if ( isset( $data['is_partial_payment'] ) ) {
+            $data['is_partial_payment'] = $data['is_partial_payment'] ? 'yes' : 'no';
         }
         if ( isset( $data['seats'] ) && is_array( $data['seats'] ) ) {
             $data['seats'] = array_values( array_filter( array_map(

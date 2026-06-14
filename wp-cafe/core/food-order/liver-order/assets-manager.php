@@ -30,6 +30,10 @@ class Assets_Manager {
      * @return void
      */
     public function enqueue_assets( $hook ) {
+        if ( ! Notifier::is_legacy_enabled() ) {
+            return;
+        }
+
         wp_enqueue_script( 'wpc-live-order-notify', wpcafe()->assets_url . '/build/js/live-order-notify.js', ['jquery'], '1.0', true );
 
         wp_enqueue_style( 'wpc-live-order-notify', wpcafe()->assets_url . '/build/css/live-order.css', [], '1.0', 'all' );
@@ -57,7 +61,9 @@ class Assets_Manager {
      * @return void
      */
     public function inject_popup_markup() {
-        $screen = get_current_screen();
+        if ( ! Notifier::is_legacy_enabled() ) {
+            return;
+        }
         ?>
         <div class="wpc-live-notice-list"></div>
         <?php

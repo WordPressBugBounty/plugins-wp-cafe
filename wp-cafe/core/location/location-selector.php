@@ -13,6 +13,13 @@ use WpCafe\Session;
  */
 class Location_Selector implements Hookable_Service_Contract {
 
+    /*
+     * True once the inline checkout selector row renders (canonical checkout
+     * page or any shortcode that re-fires the WC review-order hook). Gates the
+     * footer modal + script so the Edit Location button works wherever it shows.
+     */
+    private $checkout_selector_rendered = false;
+
     /**
      * Initialize the class by hooking into WordPress woocommerce_review_order_before_shipping action.
      */
@@ -35,6 +42,7 @@ class Location_Selector implements Hookable_Service_Contract {
      * @return void
      */
     public function display_checkout_location_selector() {
+        $this->checkout_selector_rendered = true;
         require_once wpcafe()->template_directory . '/location/checkout-location-selector.php';
     }
 
@@ -44,7 +52,12 @@ class Location_Selector implements Hookable_Service_Contract {
      * @return  void
      */
     public function add_location_modal_html() {
-        if ( ! $this->should_render_on_current_page() ) {
+        /*
+         * Load modal + script wherever the checkout row rendered (incl. one-page
+         * shortcodes), not only on pages enabled for the auto-open / floating
+         * widget — otherwise the Edit Location button has no JS and reloads.
+         */
+        if ( ! $this->checkout_selector_rendered && ! $this->should_render_on_current_page() ) {
             return;
         }
 

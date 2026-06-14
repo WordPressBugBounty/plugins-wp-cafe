@@ -25,6 +25,9 @@ class Reservation_Model extends Post_Model {
         'invoice'       => '',
         'booking_amount' => '',
         'total_price'   => '',
+        'deposit_value'    => '',
+        'remaining_amount' => '',
+        'is_partial_payment' => '',
         'currency'      => '',
         'payment_method'=> '',
         'payment_intent'=> '',
@@ -61,6 +64,32 @@ class Reservation_Model extends Post_Model {
         }
 
         return $total_price;
+    }
+
+    /**
+     * The amount to collect from the customer right now.
+     *
+     * This is the full reservation total, except when partial payment is on: then
+     * we only take the deposit for the booking. Any food ordered is always paid in
+     * full — the deposit applies to the booking fee only. Whatever booking amount
+     * is left over is collected later and is saved on the order for reference.
+     *
+     * @return float Deposit plus food when partial, otherwise the full total.
+     */
+    public function get_chargeable_amount(): float {
+        $booking = ( $this->is_partial_payment === 'yes' && (float) $this->deposit_value > 0 )
+            ? (float) $this->deposit_value
+            : (float) $this->total_price;
+
+        $items = $this->get_items();
+
+        if ( ! empty( $items ) ) {
+            foreach ( $items as $item ) {
+                $booking += (float) $item->price * (int) $item->quantity;
+            }
+        }
+
+        return $booking;
     }
 
     /**

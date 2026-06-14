@@ -85,7 +85,13 @@ class Plugin_Controller extends Base_Rest_Controller {
         
         $our_plugins  = function_exists( 'wpcafe_our_plugins_list' ) ? wpcafe_our_plugins_list() : [];
         $slug         = isset( $our_plugins[ $name ]['slug'] ) ? $our_plugins[ $name ]['slug'] : $name;
-        $download_url = ! empty( $plugin['download_url'] ) ? $plugin['download_url'] : null;
+
+        // About Us "Our Plugins" carry their own download_url and win over the
+        // extension-list entry, so a non-wporg URL there isn't shadowed by a
+        // same-named module entry. Falls back to extension-list, then wporg slug.
+        $download_url = ! empty( $our_plugins[ $name ]['download_url'] )
+            ? $our_plugins[ $name ]['download_url']
+            : ( ! empty( $plugin['download_url'] ) ? $plugin['download_url'] : null );
 
         $update = false;
 

@@ -232,7 +232,12 @@ class Product_Popup_Service implements Hookable_Service_Contract {
 		<div class="wpc-product-popup-content" id="popup_wrapper">
 			<div class="wpc-popup-wrap" id="product_popup">
 				<div class="wpc-popup-wrap-inner">
-					<button class="wpc-close wpc-btn" type="button"><i>x</i></button>
+					<button class="wpc-close wpc-btn" type="button" aria-label="<?php esc_attr_e( 'Close', 'wp-cafe' ); ?>">
+					<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">
+						<line x1="18" y1="6" x2="6" y2="18"></line>
+						<line x1="6" y1="6" x2="18" y2="18"></line>
+					</svg>
+				</button>
 					<div class="wpc_variation_popup_content"></div>
 				</div>
 			</div>

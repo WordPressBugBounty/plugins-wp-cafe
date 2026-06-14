@@ -137,11 +137,13 @@ class Settings {
             'require_location'                         => 'bool',
             'enable_floating_location_widget'          => 'bool',
             'multiply_booking_amount_with_guests'      => 'bool',
+            'reservation_partial_payment'              => 'bool',
             'enable_local_payment'                     => 'bool',
             'enable_woocommerce_payments'              => 'bool',
             'enable_order_notification'                => 'bool',
             'enable_order_tip'                         => 'bool',
             'mini_cart_show_per_item_tax'              => 'bool',
+            'qr_show_pickup_delivery'                  => 'bool',
 
             // Colors
             'primary_color'                            => 'color',

@@ -3,7 +3,7 @@
  * Plugin Name:        WPCafe - Restaurant Menu, Online Food Ordering & Table Booking System
  * Plugin URI:         https://product.themewinter.com/wpcafe
  * Description:        WordPress Restaurant solution plugin to launch Restaurant Websites.
- * Version:            3.0.13
+ * Version:            3.0.14
  * Author:             Themewinter
  * Author URI:         http://themewinter.com/
  * License:            GPL-2.0+
@@ -28,7 +28,7 @@ require_once __DIR__ . '/vendor/autoload.php';
 define( 'WPCAFE_PLUGIN_NAME', 'WPCafe' );
 defined( 'WPCAFE_FILE' ) || define( 'WPCAFE_FILE', __FILE__ );
 defined( 'WPCAFE_DIR' ) || define( 'WPCAFE_DIR', __DIR__ );
-defined( 'WPCAFE_VERSION' ) || define( 'WPCAFE_VERSION', '3.0.13' );
+defined( 'WPCAFE_VERSION' ) || define( 'WPCAFE_VERSION', '3.0.14' );
 
 add_action( 'init', [ Compatibility_Handler::class, 'init' ] );
 add_action( 'init', [ Compatibility_Handler::class, 'register_hooks' ] );

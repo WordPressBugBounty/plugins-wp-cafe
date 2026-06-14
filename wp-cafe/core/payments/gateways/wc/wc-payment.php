@@ -1,8 +1,9 @@
 <?php
 namespace WpCafe\Payments\Gateways\WC;
 
-use WpCafe\Payments\Abstract_Payment;   
+use WpCafe\Payments\Abstract_Payment;
 use WpCafe\Payments\Payment_Response;
+use WpCafe\Models\Reservation_Model;
 use WC_Product_Simple;
 use WC_Cart;
 
@@ -19,7 +20,7 @@ class WC_Payment extends Abstract_Payment {
      *
      * @param array $data The payment data.
      * @return Payment_Response The payment response.
-     */ 
+     */
     public function initiate_payment( array $data ): Payment_Response {
         // Clear cart
         if ( ! function_exists( 'WC' ) ) {
@@ -32,16 +33,33 @@ class WC_Payment extends Abstract_Payment {
 
         $this->init_woocommerce();
 
-        $cart   = WC()->cart;
+        $cart = WC()->cart;
         $cart->empty_cart();
-        $product_id = $this->generate_generic_product();
 
-        $item_data = [
-            'reservation_id' => $data['reservation_id'],
-        ];
+        $reservation = new Reservation_Model( $data['reservation_id'] );
 
-        // Add reservation product with meta
-        WC()->cart->add_to_cart( $product_id, 1, 0, [], $item_data );
+        if ( 'yes' === $reservation->food_order ) {
+            foreach ( $reservation->get_items() as $item ) {
+                $product_id = (int) $item->product_id;
+                $quantity   = max( 1, (int) $item->quantity );
+
+                if ( $product_id > 0 ) {
+                    $cart->add_to_cart( $product_id, $quantity );
+                }
+            }
+        }
+
+        if ( $cart->is_empty() ) {
+            $product_id = $this->generate_generic_product();
+            $this->disable_deposet_for_product( $product_id );
+
+            $item_data = [
+                'reservation_id' => $data['reservation_id'],
+            ];
+
+            // Add reservation product with meta
+            $cart->add_to_cart( $product_id, 1, 0, [], $item_data );
+        }
 
         // Redirect to checkout
         return new Payment_Response(
@@ -93,11 +111,35 @@ class WC_Payment extends Abstract_Payment {
             $product->set_status( 'publish' );
             $product->set_virtual( true );
             $generic_product_id = $product->save();
-            
+
             wpc_update_option( 'woocommerce_generic_product_id', $generic_product_id);
+
+            // Mark it as no-deposit the moment it is created.
+            $this->disable_deposet_for_product( $generic_product_id );
         }
-        
+
         return $generic_product_id;
+    }
+
+    /**
+     * Mark the reservation product so the Deposet plugin skips it.
+     *
+     * Deposet reads these per-product settings. We set them so the product does
+     * not follow the site-wide deposit rule and has no deposit of its own. Calling
+     * this more than once does no harm, so we also run it on older products that
+     * were created before this opt-out was added.
+     *
+     * @param int|string $product_id Generic reservation product ID.
+     * @return void
+     */
+    private function disable_deposet_for_product( $product_id ) : void {
+        if ( empty( $product_id ) ) {
+            return;
+        }
+
+        update_post_meta( $product_id, '_deposet_inherit', 'no' );
+        update_post_meta( $product_id, '_deposet_enable', 'no' );
+        update_post_meta( $product_id, '_deposet_force', 'no' );
     }
 
     /**
@@ -109,9 +151,9 @@ class WC_Payment extends Abstract_Payment {
         if ( ! WC()->is_rest_api_request() ) {
             return;
         }
-    
+
         WC()->frontend_includes();
-    
+
         if ( null === WC()->cart && function_exists( 'wc_load_cart') ) {
             wc_load_cart();
         }

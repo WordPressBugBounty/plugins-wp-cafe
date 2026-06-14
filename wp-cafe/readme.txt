@@ -3,7 +3,7 @@ Contributors: arraytics, ehsanriyadh
 Tags: restaurant, reservation, food menu, food delivery, booking, table reservation, WooCommerce, food pickup, takeout, online reservations, restaurant management system, online food ordering
 Requires at least: 6.2
 Tested up to: 7.0
-Stable tag: 3.0.13
+Stable tag: 3.0.14
 Requires PHP: 7.4
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
@@ -415,6 +415,14 @@ Please report security bugs found in the source code of the WPCafe plugin throug
 Note: WooCommerce is required for online food ordering functionality. It is free and will be prompted during setup if not already installed.
 
 == Changelog ==
+
+= 3.0.14 ( June 14, 2026 ) =
+New: QR Ordering – Admin toggle to show pickup and delivery options to QR-scanned customers.
+New : Notification - Notification now shows for new reservations.
+Improvement: Notification - improved UI and ability to see all notifications.
+Improvement: Extensions – External install support for Aisentic and Optiontics from the About Us page.
+Fix: Reservation – Double charging on reservation checkout resolved.
+Fix: Checkout – Edit location button modal not opening in checkout fixed.
 
 = 3.0.13 ( June 03, 2026 ) =
 NEW: WhatsApp Integration – Send notification via whatsapp from automation.

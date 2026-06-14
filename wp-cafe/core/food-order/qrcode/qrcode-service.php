@@ -24,6 +24,10 @@ class Qrcode_Service implements Hookable_Service_Contract, Switchable_Service_Co
         // Register table session handler for QR code functionality
         $table_session_handler = new Table_Session_Handler();
         $table_session_handler->register();
+
+        // Gate Pickup/Delivery visibility for QR (dine-in) sessions.
+        $fulfillment_gate = new Qr_Fulfillment_Gate();
+        $fulfillment_gate->register();
     }
 
     /**

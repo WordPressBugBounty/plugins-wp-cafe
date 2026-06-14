@@ -33,6 +33,7 @@ class Settings_Controller extends Base_Rest_Controller {
         'enable_floating_location_widget',
         'reservation_booking_amount',
         'multiply_booking_amount_with_guests',
+        'reservation_partial_payment',
         'restaurant_type',
         'reservation_status',
         'enable_reservation_pending_message',
@@ -44,6 +45,27 @@ class Settings_Controller extends Base_Rest_Controller {
         'restaurant_schedule',
         'enable_local_payment',
         'enable_woocommerce_payments',
+
+        // Currency display formatting — non-sensitive; required by the front-end
+        // price renderer (reservation form + restaurant-management panel).
+        'currency',
+        'currency_symbol_position',
+        'currency_price_separator',
+        'currency_decimals',
+    ];
+
+    /**
+     * Integration credentials / webhook URLs. Stripped from the response for
+     * any caller without `manage_options`.
+     */
+    private const SENSITIVE_SETTING_KEYS = [
+        'whatsapp_token',
+        'whatsapp_facebook_app_id',
+        'whatsapp_facebook_app_secret',
+        'whatsapp_from_number_id',
+        'whatsapp_business_account_id',
+        'whatsapp_admin_number',
+        'fluentcrm_webhook_url',
     ];
 
     /**
@@ -102,43 +124,60 @@ class Settings_Controller extends Base_Rest_Controller {
      */
     public function get_settings( $request ) {
         $settings = Settings::get();
-    
+
         $settings = apply_filters( 'wpcafe_settings', $settings );
+        $settings = is_array( $settings ) ? $settings : [];
+
+        $settings = $this->filter_sensitive_settings( $settings );
 
         return $this->response( $settings );
     }
 
     /**
-     * Check permissions for accessing settings.
+     * Gate the full settings payload (which includes credentials) to store
+     * admins. The per-user panel caps (`wpcafe_view_own_*`) are deliberately
+     * excluded: they are granted to every subscriber/customer on activation, so
+     * trusting them would expose credentials. Panel views use `/settings/public`.
      *
+     * Must return a strict bool — WordPress treats any non-`WP_Error`/non-false
+     * return (e.g. `$this->error()`) as "granted", so do not return that here.
+     *
+     * @param \WP_REST_Request|null $request The request object.
      * @return bool
      */
-    public function get_settings_check_permissions() {
-        if ( current_user_can( 'manage_options' ) ) {
-            return true;
+    public function get_settings_check_permissions( $request = null ) {
+        $can_read = current_user_can( 'manage_options' ) || current_user_can( 'manage_woocommerce' );
+        $can_read = (bool) apply_filters( 'wpcafe_settings_read_permission', $can_read, $request );
+
+        if ( ! $can_read ) {
+            return false;
         }
 
-        // Allow any user with a restaurant panel capability to read settings.
-        // The reservation form (and other panel views) needs settings such as
-        // reservation_form_customization to render correctly. Update is still
-        // restricted to manage_options via update_settings_check_permissions().
-        $panel_caps = [
-            'manage_woocommerce',
-            'wpcafe_view_own_orders',
-            'wpcafe_view_all_orders',
-            'wpcafe_manage_orders',
-            'wpcafe_view_own_reservations',
-            'wpcafe_view_all_reservations',
-            'wpcafe_manage_reservations',
-        ];
-
-        foreach ( $panel_caps as $cap ) {
-            if ( current_user_can( $cap ) ) {
-                return true;
-            }
+        if ( $request instanceof \WP_REST_Request && ! $this->verify_rest_nonce( $request ) ) {
+            return false;
         }
 
-        return false;
+        return true;
+    }
+
+    /**
+     * Remove credential keys from the payload unless the caller is a full
+     * administrator. Defense-in-depth so secrets never reach non-admins.
+     *
+     * @param  array $settings Full settings payload.
+     * @return array
+     */
+    private function filter_sensitive_settings( array $settings ): array {
+        $expose_secrets = (bool) apply_filters( 'wpcafe_settings_expose_sensitive', current_user_can( 'manage_options' ) );
+
+        if ( $expose_secrets ) {
+            return $settings;
+        }
+
+        $sensitive_keys = apply_filters( 'wpcafe_sensitive_setting_keys', self::SENSITIVE_SETTING_KEYS );
+        $sensitive_keys = is_array( $sensitive_keys ) ? $sensitive_keys : self::SENSITIVE_SETTING_KEYS;
+
+        return array_diff_key( $settings, array_flip( $sensitive_keys ) );
     }
 
     /**
@@ -161,6 +200,24 @@ class Settings_Controller extends Base_Rest_Controller {
         $all_settings = Settings::get();
         $public_keys  = apply_filters( 'wpcafe_public_setting_keys', self::PUBLIC_SETTING_KEYS );
         $public       = array_intersect_key( $all_settings, array_flip( $public_keys ) );
+
+        /*
+         * Hand the reservation form just enough to show the deposit: whether it is
+         * on, and Deposet's rate and type. The form does the same sum itself so the
+         * amount updates live as the guest count changes, without asking the server
+         * each time. The real deposit is still worked out on the server when the
+         * reservation is created, so these values are only for display.
+         */
+        if ( wpc_is_deposet_active() && ! empty( $all_settings['reservation_partial_payment'] ) ) {
+            $public['wpc_deposit'] = [
+                'enabled' => true,
+                'type'    => get_option( 'deposet_type', 'percentage' ),
+                'amount'  => (float) get_option( 'deposet_amount', '50' ),
+            ];
+        } else {
+            $public['wpc_deposit'] = [ 'enabled' => false ];
+        }
+
         return $this->response( $public );
     }
 
@@ -201,6 +258,9 @@ class Settings_Controller extends Base_Rest_Controller {
         $settings = Settings::get();
 
         $settings = apply_filters( 'wpcafe_settings', $settings );
+        $settings = is_array( $settings ) ? $settings : [];
+
+        $settings = $this->filter_sensitive_settings( $settings );
 
         return $this->response( $settings );
     }
