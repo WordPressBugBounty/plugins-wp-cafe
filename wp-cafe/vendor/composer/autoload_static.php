@@ -175,6 +175,7 @@ class ComposerStaticInitbdc3519fc299ae9554f63327562135f0
         'WpCafe\\Init' => __DIR__ . '/../..' . '/base/init.php',
         'WpCafe\\Integrations\\Fluent_Crm' => __DIR__ . '/../..' . '/core/integrations/fluent-crm.php',
         'WpCafe\\Integrations\\Integration_Service_Provider' => __DIR__ . '/../..' . '/core/integrations/integration-service-provider.php',
+        'WpCafe\\Integrations\\Mail_Mint' => __DIR__ . '/../..' . '/core/integrations/mail-mint.php',
         'WpCafe\\Integrations\\Pabbly' => __DIR__ . '/../..' . '/core/integrations/pabbly.php',
         'WpCafe\\Integrations\\Zapier' => __DIR__ . '/../..' . '/core/integrations/zapier.php',
         'WpCafe\\Location\\Controllers\\Location_Controller' => __DIR__ . '/../..' . '/core/location/controllers/location-controller.php',

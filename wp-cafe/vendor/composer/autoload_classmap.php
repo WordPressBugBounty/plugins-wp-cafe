@@ -134,6 +134,7 @@ return array(
     'WpCafe\\Init' => $baseDir . '/base/init.php',
     'WpCafe\\Integrations\\Fluent_Crm' => $baseDir . '/core/integrations/fluent-crm.php',
     'WpCafe\\Integrations\\Integration_Service_Provider' => $baseDir . '/core/integrations/integration-service-provider.php',
+    'WpCafe\\Integrations\\Mail_Mint' => $baseDir . '/core/integrations/mail-mint.php',
     'WpCafe\\Integrations\\Pabbly' => $baseDir . '/core/integrations/pabbly.php',
     'WpCafe\\Integrations\\Zapier' => $baseDir . '/core/integrations/zapier.php',
     'WpCafe\\Location\\Controllers\\Location_Controller' => $baseDir . '/core/location/controllers/location-controller.php',

@@ -18,6 +18,26 @@ return [
 </svg>
 ',
     ],
+    'mail-mint' => [
+        'name' => 'mail-mint',
+        'slug' => 'mail-mint',
+        'type' => 'integration',
+        'status' => 'on',
+        'is_pro' => false,
+        'title' => __('Mail Mint', 'wp-cafe'),
+        'description' => __('Connect with Mail Mint to grow your email list from reservations and orders, and automate customer follow-ups.', 'wp-cafe'),
+        'notice' => '',
+        'demo_link' => '',
+        'settings_link' => '',
+        'doc_link' => 'https://support.themewinter.com/docs/plugins/plugin-docs/integrations/wpc-mailmint-integration/',
+        'icon' => '<svg width="40" height="40" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+<rect width="40" height="40" rx="8" fill="#FF6B35"/>
+<path d="M8 14C8 12.8954 8.89543 12 10 12H30C31.1046 12 32 12.8954 32 14V26C32 27.1046 31.1046 28 30 28H10C8.89543 28 8 27.1046 8 26V14Z" fill="white" fill-opacity="0.15"/>
+<path d="M8 14L20 21L32 14" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M10 12H30C31.1046 12 32 12.8954 32 14V26C32 27.1046 31.1046 28 30 28H10C8.89543 28 8 27.1046 8 26V14C8 12.8954 8.89543 12 10 12Z" stroke="white" stroke-width="2"/>
+</svg>
+',
+    ],
     'zapier' => [
         'name' => 'zapier',
         'slug' => 'zapier',

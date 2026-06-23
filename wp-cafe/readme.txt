@@ -3,7 +3,7 @@ Contributors: arraytics, ehsanriyadh
 Tags: restaurant, reservation, food menu, food delivery, booking, table reservation, WooCommerce, food pickup, takeout, online reservations, restaurant management system, online food ordering
 Requires at least: 6.2
 Tested up to: 7.0
-Stable tag: 3.0.14
+Stable tag: 3.0.15
 Requires PHP: 7.4
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
@@ -416,6 +416,10 @@ Note: WooCommerce is required for online food ordering functionality. It is free
 
 == Changelog ==
 
+= 3.0.15 ( June 22, 2026 ) =
+New: Integrations – Mail Mint integration added for sending reservation and order data via webhook.
+Improvement: Security – multiple security fixes for vulnerabilities.
+
 = 3.0.14 ( June 14, 2026 ) =
 New: QR Ordering – Admin toggle to show pickup and delivery options to QR-scanned customers.
 New : Notification - Notification now shows for new reservations.
@@ -543,124 +547,6 @@ Tweak: Dedicated Integrations page added to centralize all integrations.
 Tweak: Shortcode management page updated for better usability.
 Tweak: Settings data migration from older versions.
 Tweak: Shortcode performance optimized.
-
-= 2.2.42 ( November 12, 2025 ) =
-Fix: Delivery module toggle not functioning.
-
-= 2.2.41 ( October 16, 2025 ) =
-Fix: Invalid HTML elements in the head section fixed.
-
-= 2.2.40 ( September 28, 2025 ) =
-Tweak: Reservation list item filter updated.
-
-= 2.2.39 ( September 08, 2025 ) =
-Fix: Reservation list filter not working.
-
-= 2.2.38 ( August 14, 2025 ) =
-Fix: Reservation list time format fix.
-
-= 2.2.37 ( July 15, 2025 ) =
-New: Reservation list sort by date column added.
-Fix: Elementor Food Menu style 3 color control not working.
-
-= 2.2.36 ( June 04, 2025 ) =
-Tweak: Improved admin UI for better usability.
-
-= 2.2.35 ( May 21, 2025 ) =
-Tweak: Improved admin dashboard notification experience.
-
-= 2.2.34 ( May 6, 2025 ) =
-Fix: Reservation form submission without guest issue.
-Fix: WordPress 6.8 compatibility.
-New: Extra field support in email template tags.
-Fix: FluentCRM webhook URL validation filter.
-
-= 2.2.33 ( April 12, 2025 ) =
-Fix: Mini-cart UX update.
-Fix: Custom date format fix.
-Fix: Booking cancel feature on reservation forms.
-Fix: Dynamic late booking time.
-Tweak: Food and reservation list sync improved.
-Security: LFI vulnerability patched for Food Menu Tab Shortcode.
-
-= 2.2.32 ( March 17, 2025 ) =
-Fix: Checkout conflict with third party plugin fixed.
-Fix: Local timezone setting improvement.
-Security: LFI vulnerability patched for Food Menu Shortcode.
-
-= 2.2.31 ( December 8, 2024 ) =
-Fix: Reservation list time format fix.
-Fix: Multiple items incorrectly added to minicart.
-
-= 2.2.30 ( September 8, 2024 ) =
-Fix: Reservation list incorrect date format.
-Fix: Seat capacity functionality improvement.
-
-= 2.2.29 ( July 25, 2024 ) =
-Fix: WooCommerce dependency error.
-Fix: Shortcode generation issue fix.
-Security: LFI vulnerability patched for Food Menu List widget.
-Tweak: Improved Gutenberg blocks.
-
-= 2.2.28 ( July 4, 2024 ) =
-New: Location Gutenberg checkout block.
-Security: Gutenberg block security improvements.
-Fix: Single product add to cart issue fix.
-
-= 2.2.27 ( June 13, 2024 ) =
-Security: Reservation form security improvements.
-New: Pickup/Delivery Gutenberg checkout block.
-Fix: QR Reservation table name not appearing.
-
-= 2.2.26 ( May 30, 2024 ) =
-Security: Sanitization and validation improvements for reservation form.
-
-= 2.2.25 ( May 20, 2024 ) =
-Fix: WooCommerce product image visibility.
-Fix: Add to Cart functionality not working.
-
-= 2.2.24 ( May 09, 2024 ) =
-Security: Security performance issue fixed.
-
-= 2.2.23 ( March 10, 2024 ) =
-Security: Broken Access Control vulnerability fixed.
-
-= 2.2.22 ( February 13, 2024 ) =
-New: Bricks Builder compatibility added.
-Fix: Timepicker issue in reservation.
-Fix: Deprecated date time issue.
-Fix: Next button inactive issue in reservation form.
-
-= 2.2.21 ( January 15, 2024 ) =
-New: Filter by Status option added to Reservations list.
-Fix: Dashboard markup validation issue fixed.
-Fix: Pro settings field condition added.
-
-= 2.2.19 ( November 05, 2023 ) =
-Fix: Reservation email notification guest number.
-Fix: Manual reservation email not delivered to user and admin.
-
-= 2.2.18 ( October 22, 2023 ) =
-Tweak: PHP & JS script optimization.
-Tweak: WordPress compatibility check.
-Fix: Multiple form issue fix with reservation form.
-
-= 2.2.17 ( September 18, 2023 ) =
-Tweak: PHP & JS script optimization.
-Fix: Reservation form validation updated.
-
-= 2.2.16 ( July 20, 2023 ) =
-Fix: WooCommerce mini-cart Ajax functionality issue fixed.
-
-= 2.2.15 ( June 21, 2023 ) =
-Fix: Astra theme conflict issue.
-
-= 2.2.14 ( April 26, 2023 ) =
-Tweak: PHP & JS script optimization.
-
-= 2.2.13 ( April 02, 2023 ) =
-Fix: Reservation exception date timezone issue.
-Fix: Elementor widget bug fix.
 
 == Upgrade Notice ==
 

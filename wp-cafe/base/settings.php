@@ -104,6 +104,7 @@ class Settings {
             'reservation_confirmation_button_text'    => 'string',
             'reservation_cancellation_button_text'    => 'string',
             'fluentcrm_webhook_url'                   => 'string',
+            'mailmint_webhook_url'                    => 'string',
             'whatsapp_facebook_app_id'                => 'string',
             'whatsapp_facebook_app_secret'            => 'string',
             'whatsapp_token'                          => 'string',

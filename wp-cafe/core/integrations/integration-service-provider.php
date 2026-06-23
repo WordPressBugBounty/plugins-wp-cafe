@@ -3,6 +3,7 @@
 namespace WpCafe\Integrations;
 use WpCafe\Providers\Base_Service_Provider;
 use WpCafe\Integrations\Fluent_Crm;
+use WpCafe\Integrations\Mail_Mint;
 use WpCafe\Integrations\Pabbly;
 use WpCafe\Integrations\Zapier;
 
@@ -19,6 +20,7 @@ class Integration_Service_Provider extends Base_Service_Provider {
      */
     protected $services = [
         Fluent_Crm::class,
+        Mail_Mint::class,
         Pabbly::class,
         Zapier::class,
     ];

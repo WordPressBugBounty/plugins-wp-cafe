@@ -66,6 +66,7 @@ class Settings_Controller extends Base_Rest_Controller {
         'whatsapp_business_account_id',
         'whatsapp_admin_number',
         'fluentcrm_webhook_url',
+        'mailmint_webhook_url',
     ];
 
     /**

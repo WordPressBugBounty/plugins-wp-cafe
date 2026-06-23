@@ -14,6 +14,14 @@ use Ens\Core\SDK;
 class Email_Notification implements Hookable_Service_Contract {
 
 	/**
+	 * REST route prefix the bundled email-notification SDK registers its flow
+	 * endpoints under: plugin_slug ('wp-cafe') . '/v1/' . rest_base
+	 * ('notification-flow'). Kept here so the permission lock-down below targets
+	 * exactly those routes and nothing else.
+	 */
+	private const FLOW_ROUTE_PREFIX = '/wp-cafe/v1/notification-flow';
+
+	/**
 	 * Trigger registry instance
 	 *
 	 * @var Trigger_Registry
@@ -67,7 +75,60 @@ class Email_Notification implements Hookable_Service_Contract {
                 ->init();
 
 			add_filter( 'ens_wpc_available_actions', [ $this, 'get_available_actions' ] );
+			add_filter( 'rest_endpoints', [ $this, 'secure_notification_flow_endpoints' ] );
 		}
+	}
+
+	/**
+	 * Restrict the SDK's notification-flow REST routes to administrators.
+	 *
+	 * @param array $endpoints Map of route regex => one handler or a list of handlers.
+	 * @return array
+	 */
+	public function secure_notification_flow_endpoints( $endpoints ) {
+		if ( ! is_array( $endpoints ) ) {
+			return $endpoints;
+		}
+
+		foreach ( $endpoints as $route => $handlers ) {
+			if ( strpos( $route, self::FLOW_ROUTE_PREFIX ) !== 0 || ! is_array( $handlers ) ) {
+				continue;
+			}
+
+			if ( isset( $handlers['callback'] ) || isset( $handlers['permission_callback'] ) ) {
+				$endpoints[ $route ]['permission_callback'] = [ self::class, 'check_notification_flow_permission' ];
+				continue;
+			}
+
+			foreach ( $handlers as $index => $handler ) {
+				if ( is_array( $handler ) && ( isset( $handler['callback'] ) || isset( $handler['permission_callback'] ) ) ) {
+					$endpoints[ $route ][ $index ]['permission_callback'] = [ self::class, 'check_notification_flow_permission' ];
+				}
+			}
+		}
+
+		return $endpoints;
+	}
+
+	/**
+	 * Permission gate for the notification-flow REST routes.
+	 *
+	 * @param \WP_REST_Request|null $request Current request (unused; kept for the callback signature).
+	 * @return true|\WP_Error True when allowed, WP_Error otherwise.
+	 */
+	public static function check_notification_flow_permission( $request = null ) {
+		$can = current_user_can( 'manage_options' );
+		$can = (bool) apply_filters( 'wpcafe_notification_flow_permission', $can, $request );
+
+		if ( ! $can ) {
+			return new \WP_Error(
+				'wpcafe_rest_forbidden',
+				__( 'You do not have permission to manage email notification flows.', 'wp-cafe' ),
+				[ 'status' => rest_authorization_required_code() ]
+			);
+		}
+
+		return true;
 	}
 
 	/**

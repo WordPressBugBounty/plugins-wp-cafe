@@ -431,7 +431,7 @@ if ( ! function_exists( 'wpc_get_addons_icon_url' ) ) {
      * @return string
      */
     function wpc_get_addons_icon_url($name) {
-        
+
         return wpcafe()->assets_url . '/images/addons/' . $name . '.svg';
     }
 }
@@ -485,7 +485,7 @@ if ( ! function_exists( 'wpc_get_reservation_schedule' ) ) {
 
         $override_reservation_schedule = wpc_get_option('override_reservation_schedule', false);
         $reservation_schedule = wpc_get_option('reservation_schedule', []);
-        
+
         if ( $override_reservation_schedule && ! empty( $reservation_schedule ) ) {
             return $reservation_schedule;
         }
@@ -517,7 +517,7 @@ if ( ! function_exists( 'wpc_get_reservation_slot_interval' ) ) {
 
         $override_reservation_schedule = wpc_get_option('override_reservation_schedule', false);
         $reservation_slot_interval = wpc_get_option('reservation_slot_interval', 30);
-        
+
         if ( $override_reservation_schedule && ! empty( $reservation_slot_interval ) ) {
             return $reservation_slot_interval;
         }
@@ -630,6 +630,32 @@ if ( ! function_exists( 'wpc_get_reservation_capacity' ) ) {
     }
 }
 
+if ( ! function_exists( 'wpc_get_reservation_booking_config' ) ) {
+    /**
+     * Get the authoritative reservation booking-price configuration.
+     *
+     * @param int|null $location_id Optional location ID for per-location settings.
+     * @return array{amount: float, multiply: bool} Booking amount and whether to multiply it by the guest count.
+     */
+    function wpc_get_reservation_booking_config( $location_id = null ) {
+        if ( $location_id ) {
+            $location = Location_Model::find( $location_id );
+
+            if ( $location && $location->override_reservation ) {
+                return [
+                    'amount'   => (float) $location->reservation_booking_amount,
+                    'multiply' => (bool) $location->multiply_booking_amount_with_guests,
+                ];
+            }
+        }
+
+        return [
+            'amount'   => (float) wpc_get_option( 'reservation_booking_amount', 0 ),
+            'multiply' => (bool) wpc_get_option( 'multiply_booking_amount_with_guests', false ),
+        ];
+    }
+}
+
 if ( ! function_exists( 'wpc_get_reservation_advanced' ) ) {
     /**
      * Get reservation advanced booking setting (minimum lead time before reservation)
@@ -652,7 +678,7 @@ if ( ! function_exists( 'wpc_get_reservation_advanced' ) ) {
                 return $location->reservation_advanced;
             }
         }
-        
+
         return wpc_get_option( 'reservation_advanced', ['value' => 30, 'unit' => 'minutes'] );
     }
 }
@@ -679,7 +705,7 @@ if ( ! function_exists( 'wpc_get_reservation_early_booking_time' ) ) {
                 return $location->reservation_early_booking_time;
             }
         }
-        
+
         return wpc_get_option( 'reservation_early_booking_time', 'any_time' );
     }
 }

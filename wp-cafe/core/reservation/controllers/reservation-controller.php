@@ -37,12 +37,19 @@ class Reservation_Controller extends Base_Rest_Controller {
     protected $rest_base = 'reservations';
 
     /**
+     * Per-request cache of invoice+email lookups.
+     *
+     * @var array<string, Reservation_Model|null>
+     */
+    private $reservation_lookup_cache = [];
+
+    /**
      * Register all routes related to reservation
      *
      * @return void
      */
     public function register_routes(): void {
-        
+
         register_rest_route( $this->namespace,
             '/' . $this->rest_base, [
             [
@@ -62,7 +69,7 @@ class Reservation_Controller extends Base_Rest_Controller {
             ],
         ] );
 
-        register_rest_route($this->namespace, '/' . $this->rest_base . '/(?P<id>[\d]+)', 
+        register_rest_route($this->namespace, '/' . $this->rest_base . '/(?P<id>[\d]+)',
             [
                 [
                     'methods'             => WP_REST_Server::READABLE,
@@ -212,11 +219,14 @@ class Reservation_Controller extends Base_Rest_Controller {
             unset( $data['food_items'] );
         }
 
-        $data['invoice'] = 'WPC' . wp_rand( 1000, 9999 );
+        $data['invoice'] = $this->generate_invoice_number();
 
         if ( empty( $data['status'] ) ) {
             $data['status'] = wpc_get_option( 'reservation_status', 'pending' );
         }
+
+        // Price the reservation from trusted server settings, never the client.
+        $this->set_server_calculated_total( $data );
 
         $this->apply_partial_payment( $data );
 
@@ -295,6 +305,33 @@ class Reservation_Controller extends Base_Rest_Controller {
     }
 
     /**
+     * Work out the reservation price on the server and overwrite any figure the
+     * client sent.
+     *
+     * @param array $data Reservation data, changed in place.
+     * @return void
+     */
+    private function set_server_calculated_total( array &$data ): void {
+        $branch_id   = ! empty( $data['branch_id'] ) ? absint( $data['branch_id'] ) : null;
+        $total_guest = max( 1, (int) ( $data['total_guest'] ?? 1 ) );
+
+        $config = wpc_get_reservation_booking_config( $branch_id );
+        $amount = (float) $config['amount'];
+
+        $data['booking_amount'] = $amount;
+        $data['total_price']    = $config['multiply'] ? $amount * $total_guest : $amount;
+    }
+
+    /**
+     * Build a hard-to-guess invoice reference for a reservation.
+     *
+     * @return string Invoice reference, e.g. "WPC3F9A2B7C1D4".
+     */
+    private function generate_invoice_number(): string {
+        return 'WPC' . strtoupper( bin2hex( random_bytes( 6 ) ) );
+    }
+
+    /**
      * Issue a one-time, short-lived payment token for the reservation.
      *
      * Returns the raw token to the caller and stores only its SHA-256 hash
@@ -328,7 +365,7 @@ class Reservation_Controller extends Base_Rest_Controller {
                 WC()->session = new \WC_Session_Handler();
                 WC()->session->init();
             }
-            
+
             if ( WC()->session ) {
                 $session_data = [
                     'reservation_id' => $reservation->id,
@@ -419,7 +456,7 @@ class Reservation_Controller extends Base_Rest_Controller {
         if ( isset( $request['date_range'] ) && is_array( $request['date_range'] ) && count( $request['date_range'] ) === 2 ) {
             $start_date = sanitize_text_field( $request['date_range'][0] );
             $end_date = sanitize_text_field( $request['date_range'][1] );
-            
+
             if ( ! empty( $start_date ) && ! empty( $end_date ) ) {
                 $filter['date_range'] = [ $start_date, $end_date ];
             }
@@ -427,7 +464,7 @@ class Reservation_Controller extends Base_Rest_Controller {
             // Fallback for non-parsed array notation
             $start_date = sanitize_text_field( $request['date_range[0]'] );
             $end_date = sanitize_text_field( $request['date_range[1]'] );
-            
+
             if ( ! empty( $start_date ) && ! empty( $end_date ) ) {
                 $filter['date_range'] = [ $start_date, $end_date ];
             }
@@ -497,7 +534,7 @@ class Reservation_Controller extends Base_Rest_Controller {
                 return $this->error( __( 'You do not have permission to view this reservation.', 'wp-cafe' ), 403 );
             }
         }
-        
+
         $response = new Reservation_Resource( $reservation );
 
         return $this->response( $response );
@@ -585,7 +622,7 @@ class Reservation_Controller extends Base_Rest_Controller {
      */
     public function update_item_permissions_check($request): bool {
         return $this->can_manage_reservations();
-    }   
+    }
 
     /**
      * Delete reservation.
@@ -656,7 +693,7 @@ class Reservation_Controller extends Base_Rest_Controller {
 
                 do_action('wpcafe_after_reservation_delete', $deleted_item);
 
-                $deleted[] = $deleted_item; 
+                $deleted[] = $deleted_item;
             }
 
         }
@@ -794,7 +831,7 @@ class Reservation_Controller extends Base_Rest_Controller {
      * Separates custom fields from reservation data.
      *
      * Extracts fields that are defined in form customization settings
-     * but are not part of the Reservation_Model into a separate 
+     * but are not part of the Reservation_Model into a separate
      * custom_fields array.
      *
      * @param array $data The reservation data from request.
@@ -928,9 +965,9 @@ class Reservation_Controller extends Base_Rest_Controller {
 
     /**
      * Create food items from woocommerce cart items
-     * 
+     *
      * @param int $reservation_id
-     * 
+     *
      * @return array Array of Reservation_Item_Model instances
      */
     public function create_food_items_from_woocart( $reservation_id ) {
@@ -953,7 +990,7 @@ class Reservation_Controller extends Base_Rest_Controller {
 
         foreach ( $cart->get_cart() as $cart_item ) {
             $product = $cart_item['data'];
-            
+
             if ( ! ( $product instanceof \WC_Product ) ) {
                 continue;
             }
@@ -1250,6 +1287,11 @@ class Reservation_Controller extends Base_Rest_Controller {
             return null;
         }
 
+        $cache_key = $invoice . '|' . $email;
+        if ( array_key_exists( $cache_key, $this->reservation_lookup_cache ) ) {
+            return $this->reservation_lookup_cache[ $cache_key ];
+        }
+
         $args = [
             'post_type' => 'wpc_reservation',
             'post_status' => ['confirmed', 'pending', 'cancelled'],
@@ -1266,16 +1308,18 @@ class Reservation_Controller extends Base_Rest_Controller {
 
         $posts = get_posts($args);
 
-        if (empty($posts)) {
-            return null;
+        $reservation = null;
+
+        if ( ! empty( $posts ) ) {
+            $found = new Reservation_Model( $posts[0] );
+
+            // Only a match when the email also lines up.
+            if ( $found->email === $email ) {
+                $reservation = $found;
+            }
         }
 
-        $reservation = new Reservation_Model($posts[0]);
-        
-        // Verify email matches
-        if ($reservation->email !== $email) {
-            return null;
-        }
+        $this->reservation_lookup_cache[ $cache_key ] = $reservation;
 
         return $reservation;
     }
@@ -1316,10 +1360,14 @@ class Reservation_Controller extends Base_Rest_Controller {
             return $this->error( __( 'Reservation already cancelled', 'wp-cafe' ) );
         }
 
-        $reservation->update([
-            'status' => 'cancelled',
-            'notes'  => $notes,
-        ]);
+        $update = [ 'status' => 'cancelled' ];
+
+        if ( '' !== $notes ) {
+            $existing        = trim( (string) $reservation->notes );
+            $update['notes'] = '' !== $existing ? $existing . "\n" . $notes : $notes;
+        }
+
+        $reservation->update( $update );
 
         do_action( 'wpcafe_after_reservation_cancelled', $reservation );
 
@@ -1327,17 +1375,20 @@ class Reservation_Controller extends Base_Rest_Controller {
     }
 
     /**
-     * Permission check for canceling a reservation
+     * Permission check for canceling a reservation.
      *
      * @param \WP_REST_Request $request
-     * @return bool
+     * @return bool|\WP_Error True when the caller owns the booking, WP_Error/false otherwise.
      */
-    public function cancel_reservation_permissions_check($request): bool {
+    public function cancel_reservation_permissions_check($request) {
+        if ( ! $this->check_rate_limit() ) {
+            return new \WP_Error( 'rate_limited', __( 'Too many requests. Please try again later.', 'wp-cafe' ), [ 'status' => 429 ] );
+        }
         if ( ! $this->verify_rest_nonce( $request ) ) {
             return false;
         }
-        $invoice     = $request->get_param( 'invoice' );
-        $email       = $request->get_param( 'email' );
+        $invoice     = sanitize_text_field( $request->get_param( 'invoice' ) ?? '' );
+        $email       = sanitize_email( $request->get_param( 'email' ) ?? '' );
         $reservation = $this->find_reservation_by_invoice_and_email( $invoice, $email );
         return (bool) $reservation;
     }
