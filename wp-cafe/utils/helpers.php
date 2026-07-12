@@ -238,6 +238,257 @@ if ( ! function_exists( 'wpc_post_uses_shortcode' ) ) {
     }
 }
 
+if ( ! function_exists( 'wpc_food_menu_shortcode' ) ) {
+    /**
+     * Build a food-menu shortcode string from a chosen template + display options.
+     *
+     * Single source for everywhere a food list/tab is rendered from saved config
+     * rather than hand-written markup: the reservation form's food field (REST),
+     * the "Reservation with Food" Elementor widget, and the Bricks element. Keeps
+     * the template allowlist and category fallback in one place so every caller
+     * renders identically. Location filtering, tab switching and the add-to-cart
+     * variation popup are built into the food-menu shortcode itself (it reads the
+     * selected location from the session), so callers only pass display options.
+     *
+     * @param string $template Shortcode tag. Anything other than the allowed
+     *                         food-menu tags falls back to `wpc_food_menu_list`.
+     * @param array  $atts     Shortcode attributes. `wpc_food_categories` may be an
+     *                         array of term IDs or a CSV string; empty = all
+     *                         categories. Empty/null values are skipped so the
+     *                         shortcode's own default applies.
+     * @return string Shortcode string ready for `do_shortcode()`.
+     */
+    function wpc_food_menu_shortcode( string $template, array $atts = [] ): string {
+        $allowed_templates = [ 'wpc_food_menu_list', 'wpc_food_menu_tab' ];
+        if ( ! in_array( $template, $allowed_templates, true ) ) {
+            $template = 'wpc_food_menu_list';
+        }
+
+        // Normalize categories to CSV and fall back to every product category when
+        // none are chosen, matching the old wrapper's behaviour.
+        $categories = $atts['wpc_food_categories'] ?? '';
+        if ( is_array( $categories ) ) {
+            $categories = implode( ',', array_map( 'absint', $categories ) );
+        }
+        if ( '' === $categories ) {
+            $terms      = get_terms( [
+                'taxonomy'   => 'product_cat',
+                'hide_empty' => false,
+                'fields'     => 'ids',
+            ] );
+            $categories = is_array( $terms ) ? implode( ',', $terms ) : '';
+        }
+        $atts['wpc_food_categories'] = $categories;
+
+        $attr_string = '';
+        foreach ( $atts as $key => $value ) {
+            if ( '' === $value || null === $value ) {
+                continue;
+            }
+            $attr_string .= sprintf( ' %s="%s"', sanitize_key( $key ), esc_attr( (string) $value ) );
+        }
+
+        return sprintf( '[%s%s]', $template, $attr_string );
+    }
+}
+
+if ( ! function_exists( 'wpc_get_reservation_food_menu_fields' ) ) {
+    /**
+     * Pull the saved food_menu field config from the reservation form settings.
+     *
+     * Shared by the REST controller (which renders the food list) and the
+     * reservation form shortcode (which must enqueue the card CSS up-front,
+     * because the list itself loads later over AJAX where wp_enqueue_style can
+     * no longer reach the page).
+     *
+     * @return array The food_menu field's `food_menu_fields`, or [] when the form has no food_menu field.
+     */
+    function wpc_get_reservation_food_menu_fields(): array {
+        $customization = wpc_get_option( 'reservation_form_customization', [] );
+
+        if ( ! is_array( $customization ) ) {
+            return [];
+        }
+
+        foreach ( $customization as $step ) {
+            if ( ! isset( $step['fields'] ) || ! is_array( $step['fields'] ) ) {
+                continue;
+            }
+
+            foreach ( $step['fields'] as $field ) {
+                if ( isset( $field['type'], $field['food_menu_fields'] )
+                    && $field['type'] === 'food_menu'
+                    && is_array( $field['food_menu_fields'] ) ) {
+                    return $field['food_menu_fields'];
+                }
+            }
+        }
+
+        return [];
+    }
+}
+
+if ( ! function_exists( 'wpcafe_frontend_shortcode_tags' ) ) {
+    /**
+     * Allowlist of shortcode tags whose presence on a page requires WP Cafe's
+     * frontend assets. Pro and sibling plugins extend it via the
+     * `wpcafe_frontend_shortcode_tags` filter.
+     *
+     * @return string[]
+     */
+    function wpcafe_frontend_shortcode_tags() {
+        $tags = [
+            // Base
+            'wpc_reservation_form',
+            'food_location_filter',
+            'wpc_food_menu_list',
+            'wpc_food_menu_tab',
+            'wpc_food_location_menu',
+            'wpc_restaurant_management_dashboard',
+            // Pro
+            'wpc_reservation_form_pro',
+            'wpc_visual_reservation_form',
+            'wpc_reservation_with_food',
+            'wpc_one_page_checkout',
+            'wpc_pickup_delivery_checkout',
+            'wpc_pickup_delivery_search',
+            'wpc_pickup_delivery_widget',
+            'wpc_product_filter',
+            'wpc_pro_business_hour',
+            'wpc_pro_food_menu_list',
+            'wpc_pro_food_menu_tab',
+            'wpc_pro_food_menu_loadmore',
+            'wpc_pro_menu_slider',
+            'wpc_pro_menu_tab_with_slider',
+            'wpc_pro_menu_category_list',
+            'wpc_pro_menu_location_list',
+        ];
+
+        return apply_filters( 'wpcafe_frontend_shortcode_tags', $tags );
+    }
+}
+
+if ( ! function_exists( 'wpcafe_post_has_frontend_markup' ) ) {
+    /**
+     * Whether a post renders any WP Cafe surface — a shortcode or Gutenberg block
+     * in its content, or a wpcafe widget/element inside an Elementor or Bricks
+     * layout tree (page builders store markup outside post_content).
+     *
+     * The builder scan is a deliberate substring match: erring toward "load" is the
+     * safe direction, because a false positive only enqueues unused assets while a
+     * false negative ships an unstyled page.
+     *
+     * @param  int  $post_id  Queried post ID.
+     * @return bool
+     */
+    function wpcafe_post_has_frontend_markup( $post_id ) {
+        $post_id = (int) $post_id;
+        if ( $post_id <= 0 ) {
+            return false;
+        }
+
+        $post = get_post( $post_id );
+        if ( $post instanceof \WP_Post && is_string( $post->post_content ) && '' !== $post->post_content ) {
+            // Block markup, not [shortcodes]: base/Pro Gutenberg blocks serialize as
+            // `<!-- wp:wpc/... -->`; the Divi-builder addon's modules serialize as
+            // `<!-- wp:wpcafe-divi/... -->` (Pro receipt blocks as `wp:wpcafe/...`).
+            if ( false !== stripos( $post->post_content, 'wp:wpc/' )
+                || false !== stripos( $post->post_content, 'wp:wpcafe' ) ) {
+                return true;
+            }
+            foreach ( wpcafe_frontend_shortcode_tags() as $tag ) {
+                if ( has_shortcode( $post->post_content, $tag ) ) {
+                    return true;
+                }
+            }
+        }
+
+        // Elementor stores widgets as `"widgetType":"wpc-..."`, Bricks elements
+        // similarly, and embedded shortcodes appear as `[wpc_...`. Match any marker.
+        foreach ( [ '_elementor_data', '_bricks_page_content_2' ] as $meta_key ) {
+            $data = get_post_meta( $post_id, $meta_key, true );
+            if ( ! is_string( $data ) || '' === $data ) {
+                continue;
+            }
+            if ( false !== stripos( $data, 'wpcafe' )
+                || false !== stripos( $data, 'wpc-' )
+                || false !== stripos( $data, '[wpc_' ) ) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+}
+
+if ( ! function_exists( 'wpcafe_should_load_frontend' ) ) {
+    /**
+     * Decide whether WP Cafe's frontend assets should load on the current request.
+     *
+     * Historically the card/grid CSS, the jQuery public bundle and — through Pro's
+     * dependency chain — the 800 KB+ React frontend.js were enqueued on EVERY page.
+     * This gate keeps them where WP Cafe actually renders and drops them elsewhere.
+     *
+     * Runs on `wp_enqueue_scripts` (before the_content), so it detects markup in the
+     * queried post / builder tree, WooCommerce context, or the global location
+     * selector. Surfaces no scan can see (FSE template parts, classic text widgets,
+     * theme `do_shortcode()`) opt in via the `wpcafe_force_enqueue_frontend` filter.
+     *
+     * Fail-safe: any positive signal loads the assets.
+     *
+     * @return bool
+     */
+    function wpcafe_should_load_frontend() {
+        // Both Base and Pro call this on `wp_enqueue_scripts`; the result is
+        // stable for the request once the main query is resolved, so the markup
+        // scan below only needs to run once per request. Memoize it.
+        static $should_load = null;
+        if ( null !== $should_load ) {
+            return $should_load;
+        }
+
+        // Any positive signal loads the assets (fail-safe): start optimistic and
+        // let only the final markup scan turn it off.
+        $should_load = true;
+
+        // Block/builder editors and REST previews must keep working; gate front end only.
+        if ( is_admin() ) {
+            return $should_load;
+        }
+
+        // Documented escape hatch for embeds no content scan can detect.
+        if ( apply_filters( 'wpcafe_force_enqueue_frontend', false ) ) {
+            return $should_load;
+        }
+
+        // Dokan vendor store pages (wpcafe-multivendor) render WP Cafe product cards,
+        // but are an author-archive query whose queried object is a WP_User — so the
+        // markup scan below can't see them. Guarded so it no-ops without Dokan.
+        if ( function_exists( 'dokan_is_store_page' ) && dokan_is_store_page() ) {
+            return $should_load;
+        }
+
+        // WooCommerce surfaces render product cards / mini-cart / checkout that rely
+        // on WP Cafe's public CSS+JS even with no WP Cafe shortcode on the page.
+        if ( ( function_exists( 'is_woocommerce' ) && is_woocommerce() )
+            || ( function_exists( 'is_cart' ) && is_cart() )
+            || ( function_exists( 'is_checkout' ) && is_checkout() )
+            || ( function_exists( 'is_shop' ) && is_shop() )
+            || ( function_exists( 'is_account_page' ) && is_account_page() ) ) {
+            return $should_load;
+        }
+
+        // The location selector can be configured to show on arbitrary pages.
+        if ( function_exists( 'wpc_get_option' )
+            && 'dont_show' !== wpc_get_option( 'display_location_selector', 'dont_show' ) ) {
+            return $should_load;
+        }
+
+        $should_load = wpcafe_post_has_frontend_markup( get_queried_object_id() );
+        return $should_load;
+    }
+}
+
 if ( ! function_exists( 'wpc_sanitize_yes_no' ) ) {
     /**
      * Sanitize a yes/no toggle value.
@@ -443,6 +694,18 @@ if ( ! function_exists('wpc_get_pages') ) {
      * @return array
      */
     function wpc_get_pages() {
+        static $result = null;
+
+        if ( null !== $result ) {
+            return $result;
+        }
+
+        $cached = wp_cache_get( 'wpc_all_pages', 'wpcafe' );
+        if ( false !== $cached ) {
+            $result = $cached;
+            return $result;
+        }
+
         $pages = get_pages( array(
             'sort_order'  => 'asc',
             'sort_column' => 'post_title',
@@ -457,6 +720,8 @@ if ( ! function_exists('wpc_get_pages') ) {
                 'title' => $page->post_title,
             );
         }
+
+        wp_cache_set( 'wpc_all_pages', $result, 'wpcafe' );
 
         return $result;
     }
@@ -1014,6 +1279,38 @@ if ( ! function_exists( 'wpc_product_label_icon_html' ) ) {
     }
 }
 
+if ( ! function_exists( 'wpc_cart_has_reservation' ) ) {
+    /**
+     * Whether the current cart/session holds a reservation.
+     *
+     * Reservation checkouts stash the booking under the `wpc_reservation_data`
+     * session key and tag the cart line with `reservation_id`. Either signal
+     * means the shopper is paying for a booking, not just food.
+     *
+     * @return bool
+     */
+    function wpc_cart_has_reservation(): bool {
+        if ( ! function_exists( 'WC' ) || ! WC()->session ) {
+            return false;
+        }
+
+        $session_data = WC()->session->get( 'wpc_reservation_data' );
+        if ( ! empty( $session_data['reservation_id'] ) ) {
+            return true;
+        }
+
+        if ( WC()->cart ) {
+            foreach ( WC()->cart->get_cart() as $cart_item ) {
+                if ( ! empty( $cart_item['reservation_id'] ) ) {
+                    return true;
+                }
+            }
+        }
+
+        return false;
+    }
+}
+
 if ( ! function_exists( 'wpc_product_labels' ) ) {
     /**
      * Render the product label badge list for a product.
@@ -1088,5 +1385,40 @@ if ( ! function_exists( 'wpc_product_labels' ) ) {
         } else {
             echo wp_kses_post( $output );
         }
+    }
+}
+
+if ( ! function_exists( 'wpc_get_terms_map' ) ) {
+    /**
+     * Build a [ term_id => name ] map for a taxonomy.
+     *
+     * Consolidates the duplicated `get_terms() -> keyed-array` pattern that was
+     * copy-pasted into Wpc_Utilities::get_menu_category() (Base) and
+     * Utilities::get_menu_location() (Pro). Those methods now delegate here.
+     *
+     * @param  string $taxonomy Taxonomy slug (e.g. 'product_cat', 'wpcafe_location').
+     * @return array<int,string> Map of term_id => term name; [] on invalid taxonomy/failure.
+     */
+    function wpc_get_terms_map( $taxonomy ) {
+        $map = [];
+
+        $terms = get_terms( [
+            'taxonomy'   => $taxonomy,
+            'hide_empty' => false,
+        ] );
+
+        // get_terms() returns a WP_Error on an unregistered taxonomy — fail to [].
+        if ( is_wp_error( $terms ) || empty( $terms ) ) {
+            return [];
+        }
+
+        foreach ( $terms as $term ) {
+            // Guard preserved from the Base copy; Pro's copy lacked it (harmless gain).
+            if ( is_object( $term ) ) {
+                $map[ $term->term_id ] = $term->name;
+            }
+        }
+
+        return $map;
     }
 }

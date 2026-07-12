@@ -27,6 +27,12 @@ class Food_Location_Filter extends Base_Shortcode {
      * @return  []                [return description]
      */
     public function render($atts = [], $content = null) {
+        // FE2: results render WP Cafe product cards (initial + AJAX), so the
+        // shared card stylesheet must be present on the page.
+        wp_enqueue_style( 'wpc-card-core' );
+        wp_enqueue_style( 'wpc-popup' );
+        wp_enqueue_style( 'wpc-pagination' );
+
         ob_start();
 
         Wpc_Utilities::select_food_locations_filter($atts);

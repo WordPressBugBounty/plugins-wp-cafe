@@ -49,17 +49,17 @@ class WC_Payment extends Abstract_Payment {
             }
         }
 
-        if ( $cart->is_empty() ) {
-            $product_id = $this->generate_generic_product();
-            $this->disable_deposet_for_product( $product_id );
+        /*
+         * Always add the reservation line so the booking fee is charged. It
+         * carries the `reservation_id` so modify_cart_item_price() prices it
+         * from the booking (food, when present, is its own lines above). Before
+         * this was gated on an empty cart, so a reservation-with-food cart
+         * collected only the food and never the booking amount.
+         */
+        $product_id = $this->generate_generic_product();
+        $this->disable_deposet_for_product( $product_id );
 
-            $item_data = [
-                'reservation_id' => $data['reservation_id'],
-            ];
-
-            // Add reservation product with meta
-            $cart->add_to_cart( $product_id, 1, 0, [], $item_data );
-        }
+        $cart->add_to_cart( $product_id, 1, 0, [], [ 'reservation_id' => $data['reservation_id'] ] );
 
         // Redirect to checkout
         return new Payment_Response(

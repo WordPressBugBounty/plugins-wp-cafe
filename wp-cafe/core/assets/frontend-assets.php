@@ -52,12 +52,29 @@ class Frontend_Assets extends Base_Assets {
      */
     public function enqueue() {
 
-        wp_enqueue_style( 'wpcafe-frontend-style' );
+        // BE1/FE1/FE2: only load the (historically sitewide) card/grid CSS, the
+        // jQuery public bundle and the forced WC scripts where WP Cafe actually
+        // renders. Registration stays unconditional in register_styles_scripts(),
+        // so sibling plugins that depend on these handles still resolve them.
+        if ( ! wpcafe_should_load_frontend() ) {
+            return;
+        }
+
+
         wp_enqueue_style( 'wpc-public' );
         wp_enqueue_script( 'wpc-public' );
+        wp_enqueue_script( 'wpc-popup' );
         wp_enqueue_style( 'wpc-icon' );
         wp_enqueue_style( 'dashicons' );
         wp_enqueue_style( 'wpc-product-labels' );
+
+        // Load card CSS in the head. The per-shortcode enqueues run inside
+        // the_content (after </head>) so WP prints them in the footer, and the
+        // cards reflow once that CSS applies (CLS). Dedupes with those.
+        wp_enqueue_style( 'wpc-card-core' );
+        wp_enqueue_style( 'wpc-popup' );
+        wp_enqueue_style( 'wpc-pagination' );
+        wp_enqueue_style( 'wpc-food-menu-tab' );
 
         // Force-enqueue WooCommerce's frontend scripts so the food-menu
         // shortcode + customize popup work on arbitrary pages. WC only
@@ -80,7 +97,7 @@ class Frontend_Assets extends Base_Assets {
              wp_enqueue_style( 'flatpicker' );
         }
 
-        
+
         $form_data                        = [];
         $form_data['settings']            = Settings::get();
         $form_data['wpc_ajax_url']        = admin_url( 'admin-ajax.php' );
@@ -145,12 +162,14 @@ class Frontend_Assets extends Base_Assets {
             ],
             'wpcafe-frontend-scripts'     => [
                 'src'       => wpcafe()->assets_url . '/build/js/frontend.js',
-                'deps'      => ['wp-i18n', 'wp-data','wp-api-fetch'],
+                // wpcafe-vendor-forms: bundle externalizes rhf/zod/resolvers to
+                // the shared global, so the provider must print first.
+                'deps'      => ['wp-i18n', 'wp-data','wp-api-fetch', 'wpcafe-vendor-forms'],
                 'in_footer' => true,
             ],
             'wpcafe-restaurant-management-scripts' => [
                 'src'       => wpcafe()->assets_url . '/build/js/restaurant-management.js',
-                'deps'      => ['wp-i18n', 'wp-element', 'wp-api-fetch'],
+                'deps'      => ['wp-i18n', 'wp-element', 'wp-api-fetch', 'wpcafe-vendor-forms'],
                 'in_footer' => true,
             ],
             'wpc-flatpicker'     => [
@@ -159,22 +178,30 @@ class Frontend_Assets extends Base_Assets {
                 'in_footer' => true,
             ],
             'wpc-public'    => [
-                'src'       => wpcafe()->assets_url . '/js/wpc-public.js',
+                'src'       => wpcafe()->assets_url . '/build/js/wpc-public.js',
+                'deps'      => ['jquery'],
+                'in_footer' => true,
+            ],
+            // Popup behaviour (FE2). Split out of wpc-public.js — opener +
+            // add-to-cart for the customize/variation popup. Loaded alongside
+            // wpc-public; carries the wpc_obj localization (Product_Popup_Service).
+            'wpc-popup'     => [
+                'src'       => wpcafe()->assets_url . '/build/js/wpc-popup.js', // Phase 10: bundled.
                 'deps'      => ['jquery'],
                 'in_footer' => true,
             ],
             'wpc-location-selector'    => [
-                'src'       => wpcafe()->assets_url . '/js/location-selector.js',
-                'deps'      => ['jquery'],
+                'src'       => wpcafe()->assets_url . '/build/js/location-selector.js',
+                'deps'      => [],
                 'in_footer' => true,
-            ], 
+            ],
             'wpc-tip'    => [
-                'src'       => wpcafe()->assets_url . '/js/tip.js',
+                'src'       => wpcafe()->assets_url . '/build/js/tip.js', // Phase 10: bundled.
                 'deps'      => ['jquery'],
                 'in_footer' => true,
             ],
             'wpc-mini-cart' => [
-                'src'       => wpcafe()->assets_url . '/js/mini-cart.js',
+                'src'       => wpcafe()->assets_url . '/build/js/mini-cart.js', // Phase 10: bundled.
                 'deps'      => ['jquery'],
                 'in_footer' => true,
             ],
@@ -201,6 +228,37 @@ class Frontend_Assets extends Base_Assets {
             ],
             'wpc-public'    => [
                 'src' => wpcafe()->assets_url . '/css/wpc-public.css',
+            ],
+            // Mini-cart styles (FE2). Split out of wpc-public.css and enqueued by
+            // the mini-cart module wherever the mini-cart renders. Theme-compat
+            // mini-cart overrides intentionally stay in wpc-public.css.
+            'wpc-minicart' => [
+                'src' => wpcafe()->assets_url . '/css/wpc-minicart.css',
+            ],
+            // Shared food product-card primitive (FE2). Registered here, enqueued
+            // via wp_enqueue_style( 'wpc-card-core' ) (or widget get_style_depends)
+            // only where a card renders, so it stays off non-card pages.
+            'wpc-card-core' => [
+                'src' => wpcafe()->assets_url . '/css/card-core.css',
+            ],
+            // Customize/variation popup inner styles (FE2). Split out of
+            // wpc-public.css and enqueued next to wpc-card-core wherever a food
+            // card can open the popup. The base overlay (incl. display:none)
+            // stays in wpc-public.css since the modal shell prints sitewide.
+            'wpc-popup' => [
+                'src' => wpcafe()->assets_url . '/css/wpc-popup.css',
+            ],
+            // Food-menu tab navigation (FE2). Split out of wpc-public.css and
+            // enqueued only by the [wpc_food_menu_tab] shortcode and the
+            // matching Elementor widgets (those that render .wpc-food-tab-wrapper).
+            // Cascade order relies on global enqueue — no explicit deps.
+            'wpc-food-menu-tab' => [
+                'src' => wpcafe()->assets_url . '/css/food-menu-tab.css',
+            ],
+            // Menu pagination nav (FE2). Split out of wpc-public.css and enqueued
+            // next to wpc-card-core wherever a food-menu list renders.
+            'wpc-pagination' => [
+                'src' => wpcafe()->assets_url . '/css/wpc-pagination.css',
             ],
             'wpc-location-selector'    => [
                 'src' => wpcafe()->assets_url . '/css/location-selector.css',

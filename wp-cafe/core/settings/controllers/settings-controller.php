@@ -67,6 +67,7 @@ class Settings_Controller extends Base_Rest_Controller {
         'whatsapp_admin_number',
         'fluentcrm_webhook_url',
         'mailmint_webhook_url',
+        'zoho_flow_webhook_url',
     ];
 
     /**
@@ -199,6 +200,14 @@ class Settings_Controller extends Base_Rest_Controller {
      */
     public function get_public_settings( $request ) {
         $all_settings = Settings::get();
+
+        // Run the same filter the admin endpoints use so computed defaults are
+        // present. Currency/decimals/etc. are injected here from WooCommerce
+        // (see Default_Settings::add_default_seetings); without this the raw
+        // saved option is returned and the front-end shows a stale currency.
+        $all_settings = apply_filters( 'wpcafe_settings', $all_settings );
+        $all_settings = is_array( $all_settings ) ? $all_settings : [];
+
         $public_keys  = apply_filters( 'wpcafe_public_setting_keys', self::PUBLIC_SETTING_KEYS );
         $public       = array_intersect_key( $all_settings, array_flip( $public_keys ) );
 

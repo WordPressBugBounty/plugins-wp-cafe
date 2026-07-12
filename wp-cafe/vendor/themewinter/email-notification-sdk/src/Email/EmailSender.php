@@ -22,7 +22,19 @@ class EmailSender {
     /**
      * EmailSender constructor.
      *
+     * Expected $args keys:
+     *   - action_name   string
+     *   - receiver_type string
+     *   - to            string
+     *   - from          string
+     *   - subject       string
+     *   - message       string
+     *   - action_data   array
+     *   - count         int
+     *
      * @since 1.0.0
+     *
+     * @param array $args
      */
     public function __construct( $identifier, $action_name, $receiverType, $to, $from, $subject, $message, $action_data, $count ) {
         $this->identifier  = $identifier;
@@ -38,9 +50,6 @@ class EmailSender {
      * Send an email.
      *
      * @since 1.0.0
-     *
-     * @param \WP_Post $flow
-     * @param array    $data
      *
      * @return void
      */
@@ -72,7 +81,7 @@ class EmailSender {
     protected function get_headers() {
         $mime_version = "MIME-Version: 1.0" . "\r\n";
         $content_type = "Content-type:text/html;charset=UTF-8" . "\r\n";
-        
+
         $headers = [
             $mime_version,
             $content_type,
@@ -97,6 +106,9 @@ class EmailSender {
      * @return string
      */
     public function replace_placeholders( $template, $data ) {
+        if ( ! is_array( $data ) ) {
+            return $template;
+        }
         foreach ( $data as $key => $value ) {
             if ( !is_array( $value ) ) {
                 $template = str_replace( '{{' . $key . '}}', $value, $template );

@@ -205,6 +205,20 @@ class Wpc_Location_Menu extends Widget_Base
             ]
         );
 
+        if ( class_exists( 'Wpcafe_Multivendor' ) ) {
+            $this->add_control(
+                'wpc_show_vendor',
+                [
+                    'label'        => esc_html__( 'Show Vendor', 'wp-cafe' ),
+                    'type'         => \Elementor\Controls_Manager::SWITCHER,
+                    'label_on'     => esc_html__( 'Show', 'wp-cafe' ),
+                    'label_off'    => esc_html__( 'Hide', 'wp-cafe' ),
+                    'return_value' => 'yes',
+                    'default'      => 'no',
+                ]
+            );
+        }
+
         $this->add_control(
             'show_pagination',
             [
@@ -895,6 +909,7 @@ class Wpc_Location_Menu extends Widget_Base
         $title_link_show      	= $settings["title_link_show"];
         $wpc_desc_limit      	= $settings["wpc_desc_limit"];
         $wpc_show_desc      	= $settings["wpc_show_desc"];
+        $wpc_show_vendor      	= $settings["wpc_show_vendor"] ?? 'no';
         $wpc_delivery_time_show = $settings["wpc_delivery_time_show"];
         $show_pagination        = isset($settings["show_pagination"]) ? $settings["show_pagination"] : 'yes';
 
@@ -916,6 +931,7 @@ class Wpc_Location_Menu extends Widget_Base
             'title_link_show'       => $title_link_show,
             'wpc_menu_col'          => $wpc_menu_col,
             'wpc_show_desc'         => $wpc_show_desc,
+            'wpc_show_vendor'       => $wpc_show_vendor,
             'wpc_desc_limit'        => $wpc_desc_limit,
             'wpc_delivery_time_show'=> $wpc_delivery_time_show,
             'show_item_status'      => $show_item_status,

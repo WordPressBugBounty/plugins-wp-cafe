@@ -30,6 +30,11 @@ class Food_Location_Menu extends Base_Shortcode {
             return;
         }
 
+        // FE2: load the shared card stylesheet only where a card actually renders.
+        wp_enqueue_style( 'wpc-card-core' );
+        wp_enqueue_style( 'wpc-popup' );
+        wp_enqueue_style( 'wpc-pagination' );
+
         $atts = shortcode_atts(
             [
                 'wpc_food_categories'    => '',
@@ -46,6 +51,7 @@ class Food_Location_Menu extends Base_Shortcode {
                 'wpc_delivery_time_show' => 'yes',
                 'show_item_status'       => 'yes',
                 'show_item_label'       => 'no',
+                'wpc_show_vendor'        => 'no',
                 'wpc_menu_order'         => 'DESC',
                 'wpc_nav_position'       => 'top',
                 'location_alignment'     => 'center',

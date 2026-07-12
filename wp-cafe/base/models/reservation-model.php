@@ -28,6 +28,7 @@ class Reservation_Model extends Post_Model {
         'deposit_value'    => '',
         'remaining_amount' => '',
         'is_partial_payment' => '',
+        'payment_amount_type' => '',
         'currency'      => '',
         'payment_method'=> '',
         'payment_intent'=> '',
@@ -90,6 +91,23 @@ class Reservation_Model extends Post_Model {
         }
 
         return $booking;
+    }
+
+    /**
+     * The reservation's own charge — the table booking fee (or its deposit),
+     * with no food added.
+     *
+     * In a "reservation with food" checkout the food is added as its own
+     * WooCommerce cart lines, so the reservation line must carry only the
+     * booking amount; get_chargeable_amount() would count the food a second
+     * time. Partial payment still takes only the deposit for the booking.
+     *
+     * @return float
+     */
+    public function get_booking_charge(): float {
+        return ( $this->is_partial_payment === 'yes' && (float) $this->deposit_value > 0 )
+            ? (float) $this->deposit_value
+            : (float) $this->total_price;
     }
 
     /**
@@ -275,6 +293,13 @@ class Reservation_Model extends Post_Model {
         $start_time = self::convert_time_to_timestamp( $date, $start_time );
         $end_time   = self::convert_time_to_timestamp( $date, $end_time );
 
+        // Cache per request: the scheduler calls this once per slot in a date-range loop.
+        static $cache = [];
+        $cache_key = $date . '|' . $start_time . '|' . $end_time . '|' . $branch_id;
+        if ( isset( $cache[ $cache_key ] ) ) {
+            return $cache[ $cache_key ];
+        }
+
         // Ensure blocking statuses is an array
         $blocking_statuses = wpc_get_option( 'block_timeslot_statuses', ['confirmed'] );
         $blocking_statuses = self::expand_with_wc_equivalents( $blocking_statuses );
@@ -323,6 +348,17 @@ class Reservation_Model extends Post_Model {
             $guest_count = get_post_meta( $reservation->ID, 'total_guest', true );
             $total_guest += intval( $guest_count );
         }
+
+        $total_guest = (int) apply_filters(
+            'wpcafe_booked_guest_count',
+            $total_guest,
+            $date,
+            $start_time,
+            $end_time,
+            $branch_id
+        );
+
+        $cache[ $cache_key ] = $total_guest;
         return $total_guest;
     }
 

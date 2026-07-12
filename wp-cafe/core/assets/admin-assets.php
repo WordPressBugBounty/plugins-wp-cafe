@@ -27,8 +27,6 @@ class Admin_Assets extends Base_Assets {
             return;
         }
 
-        wp_enqueue_style( 'wpc-admin' );
-
         wp_enqueue_media();
 
         wp_enqueue_style( 'wpcafe-admin-style' );
@@ -91,13 +89,16 @@ class Admin_Assets extends Base_Assets {
                     'wp-api-fetch',
                     'wp-data',
                     'wp-element',
-                    'wp-i18n'
+                    'wp-i18n',
+                    // Bundle externalizes react-hook-form/zod/resolvers to the
+                    // shared global; load the provider first. See vendor-forms.ts.
+                    'wpcafe-vendor-forms',
                 ],
                 'in_footer' => true,
             ],
             'wpcafe-migration-notice' => [
                 'src'       => wpcafe()->assets_url . '/js/migration-notice.js',
-                'deps'      => ['jquery'],
+                'deps'      => [], // Converted to vanilla JS — no jQuery dependency.
                 'in_footer' => true,
             ],
             'wpcafe-beacon-livechat' => [
@@ -121,9 +122,6 @@ class Admin_Assets extends Base_Assets {
         $styles = [
             'wpcafe-admin-style'    => [
                 'src' => wpcafe()->assets_url . '/build/css/admin.css',
-            ],
-            'wpc-admin' => [
-                'src' => wpcafe()->assets_url . '/css/wpc-admin.css',
             ],
         ];
 

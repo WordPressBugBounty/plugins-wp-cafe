@@ -5,155 +5,151 @@ if ( ! defined( 'ABSPATH' ) ) exit;
 
 use WpCafe\Contracts\Hookable_Service_Contract;
 use WpCafe\Contracts\Switchable_Service_Contract;
+use WpCafe\Traits\Integration_Data_Helper;
 
 /**
  * Mail Mint integration service.
  *
- * Sends contact data (name, email, phone) to a Mail Mint webhook on three
+ * Sends contact and order/reservation data to a Mail Mint webhook on three
  * events: restaurant onboarding, reservation creation, and WooCommerce order.
  *
  * @since 2.6.0
  */
 class Mail_Mint implements Hookable_Service_Contract, Switchable_Service_Contract {
 
-    /**
-     * Register hooks.
-     *
-     * @return void
-     */
-    public function register() {
-        add_filter( 'wpcafe_settings', [ $this, 'send_mail_mint_data' ] );
-        add_action( 'wpcafe_after_reservation_create', [ $this, 'send_mail_mint_reservation_data' ] );
-        add_action( 'woocommerce_checkout_order_processed', [ $this, 'send_mail_mint_woocommerce_order_data' ] );
-    }
+	use Integration_Data_Helper;
 
-    /**
-     * Send restaurant onboarding data to Mail Mint on settings save.
-     *
-     * @param array $data Settings data passed through the wpcafe_settings filter.
-     * @return array Unmodified settings data.
-     */
-    public function send_mail_mint_data( $data ) {
-        if ( ! wpc_is_integration_enable( 'mail-mint' ) ) {
-            return $data;
-        }
+	/**
+	 * Register hooks.
+	 *
+	 * @return void
+	 */
+	public function register() {
+		add_filter( 'wpcafe_settings', [ $this, 'send_mail_mint_data' ] );
+		add_action( 'wpcafe_after_reservation_create', [ $this, 'send_mail_mint_reservation_data' ] );
+		add_action( 'woocommerce_checkout_order_processed', [ $this, 'send_mail_mint_woocommerce_order_data' ] );
+	}
 
-        if ( ! isset( $data['restaurant_type'] ) ) {
-            return $data;
-        }
+	/**
+	 * Send restaurant onboarding data to Mail Mint on settings save.
+	 *
+	 * @param array $data Settings data passed through the wpcafe_settings filter.
+	 * @return array Unmodified settings data.
+	 */
+	public function send_mail_mint_data( $data ) {
+		if ( ! wpc_is_integration_enable( 'mail-mint' ) ) {
+			return $data;
+		}
 
-        $name    = ! empty( $data['restaurant_name'] ) ? $data['restaurant_name'] : '';
-        $email   = ! empty( $data['restaurant_email'] ) ? $data['restaurant_email'] : '';
-        $phone   = ! empty( $data['restaurant_phone'] ) ? $data['restaurant_phone'] : '';
-        $address = ! empty( $data['restaurant_location']['address'] ) ? $data['restaurant_location']['address'] : '';
+		if ( ! isset( $data['restaurant_type'] ) ) {
+			return $data;
+		}
 
-        [ $first_name, $last_name ] = $this->split_name( $name );
+		$restaurant = $this->build_restaurant_payload( $data );
 
-        $this->send_to_webhook( [
-            'first_name' => $first_name,
-            'last_name'  => $last_name,
-            'email'      => $email,
-            'phone_number'      => $phone,
-            'address_line_1'    => $address,
-        ] );
+		[ $first_name, $last_name ] = $this->split_name( $restaurant['name'] );
 
-        return $data;
-    }
+		$this->send_webhook( 'mailmint_webhook_url', [
+			'first_name'      => $first_name,
+			'last_name'       => $last_name,
+			'email'           => $restaurant['email'],
+			'phone_number'    => $restaurant['phone'],
+			'address_line_1'  => $restaurant['address'],
+			'custom_fields'   => [
+				'source'        => 'wpcafe_restaurant_onboarding',
+				'restaurant'    => $restaurant,
+			],
+		], true );
 
-    /**
-     * Send reservation contact data to Mail Mint after a reservation is created.
-     *
-     * @param object $reservation Reservation object with name, email, and phone properties.
-     * @return object The original reservation object.
-     */
-    public function send_mail_mint_reservation_data( $reservation ) {
-        if ( ! wpc_is_integration_enable( 'mail-mint' ) ) {
-            return;
-        }
+		return $data;
+	}
 
-        [ $first_name, $last_name ] = $this->split_name( $reservation->name );
+	/**
+	 * Send reservation data to Mail Mint after a reservation is created.
+	 *
+	 * @param object $reservation Reservation object.
+	 * @return object The original reservation object.
+	 */
+	public function send_mail_mint_reservation_data( $reservation ) {
+		if ( ! wpc_is_integration_enable( 'mail-mint' ) ) {
+			return $reservation;
+		}
 
-        $this->send_to_webhook( [
-            'first_name' => $first_name,
-            'last_name'  => $last_name,
-            'email'      => $reservation->email,
-            'phone'      => $reservation->phone,
-        ] );
+		[ $first_name, $last_name ] = $this->split_name( $reservation->name );
 
-        return $reservation;
-    }
+		$reservation_data = $this->build_reservation_payload( $reservation );
 
-    /**
-     * Send billing contact data to Mail Mint when a WooCommerce order is processed.
-     *
-     * @param int $order_id WooCommerce order ID.
-     * @return void
-     */
-    public function send_mail_mint_woocommerce_order_data( $order_id ) {
-        if ( ! wpc_is_integration_enable( 'mail-mint' ) ) {
-            return;
-        }
+		$this->send_webhook( 'mailmint_webhook_url', [
+			'first_name'    => $first_name,
+			'last_name'     => $last_name,
+			'email'         => $reservation->email,
+			'phone'         => $reservation->phone,
+			'custom_fields' => [
+				'source'      => 'wpcafe_reservation',
+				'reservation' => $reservation_data,
+			],
+		], true );
 
-        $order = wc_get_order( $order_id );
+		return $reservation;
+	}
 
-        if ( ! $order ) {
-            return;
-        }
+	/**
+	 * Send billing and order data to Mail Mint when a WooCommerce order is processed.
+	 *
+	 * @param int $order_id WooCommerce order ID.
+	 * @return void
+	 */
+	public function send_mail_mint_woocommerce_order_data( $order_id ) {
+		if ( ! wpc_is_integration_enable( 'mail-mint' ) ) {
+			return;
+		}
 
-        $first_name = trim( $order->get_billing_first_name() );
-        $last_name  = trim( $order->get_billing_last_name() );
-        $email      = $order->get_billing_email();
-        $phone      = $order->get_billing_phone();
+		$order = wc_get_order( $order_id );
 
-        // Only send if all required fields are present.
-        if ( ( empty( $first_name ) && empty( $last_name ) ) || empty( $email ) || empty( $phone ) ) {
-            return;
-        }
+		if ( ! $order ) {
+			return;
+		}
 
-        $this->send_to_webhook( [
-            'first_name' => $first_name,
-            'last_name'  => $last_name,
-            'email'      => $email,
-            'phone'      => $phone,
-        ] );
-    }
+		$first_name = trim( $order->get_billing_first_name() );
+		$last_name  = trim( $order->get_billing_last_name() );
+		$email      = $order->get_billing_email();
+		$phone      = $order->get_billing_phone();
 
-    /**
-     * Split a full name into first and last name on the first space.
-     * "John" → ["John", ""], "John Doe Smith" → ["John", "Doe Smith"].
-     *
-     * @param string $full_name
-     * @return array{0: string, 1: string}
-     */
-    private function split_name( string $full_name ): array {
-        $parts = explode( ' ', trim( $full_name ), 2 );
-        return [ $parts[0] ?? '', $parts[1] ?? '' ];
-    }
+		if ( ( empty( $first_name ) && empty( $last_name ) ) || empty( $email ) || empty( $phone ) ) {
+			return;
+		}
 
-    /**
-     * POST JSON-encoded data to the configured Mail Mint webhook URL.
-     *
-     * @param array $data Data to send.
-     * @return void
-     */
-    private function send_to_webhook( array $data ) {
-        $webhook_url = wpc_get_option( 'mailmint_webhook_url' );
+		$order_data = $this->build_order_payload( $order );
 
-        if ( ! $webhook_url ) {
-            return;
-        }
+		$this->send_webhook( 'mailmint_webhook_url', [
+			'first_name'    => $first_name,
+			'last_name'     => $last_name,
+			'email'         => $email,
+			'phone'         => $phone,
+			'custom_fields' => [
+				'source' => 'wpcafe_woocommerce_order',
+				'order'  => $order_data,
+			],
+		], true );
+	}
 
-        wp_remote_post( $webhook_url, [
-            'body' => json_encode( $data ),
-        ] );
-    }
+	/**
+	 * Split a full name into first and last name on the first space.
+	 *
+	 * @param string $full_name
+	 * @return array{0: string, 1: string}
+	 */
+	private function split_name( string $full_name ): array {
+		$parts = explode( ' ', trim( $full_name ), 2 );
+		return [ $parts[0] ?? '', $parts[1] ?? '' ];
+	}
 
-    /**
-     * Check if Mail Mint integration is enabled.
-     *
-     * @return bool
-     */
-    public function is_enable() {
-        return wpc_is_integration_enable( 'mail-mint' );
-    }
+	/**
+	 * Check if Mail Mint integration is enabled.
+	 *
+	 * @return bool
+	 */
+	public function is_enable() {
+		return wpc_is_integration_enable( 'mail-mint' );
+	}
 }

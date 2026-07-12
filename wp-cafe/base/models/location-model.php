@@ -256,8 +256,8 @@ class Location_Model {
     public $reservation_status;
 
     /**
-     * store restaurant slot interval 
-     * 
+     * store restaurant slot interval
+     *
      * @var int
      */
     public $slot_interval;
@@ -289,9 +289,9 @@ class Location_Model {
      */
     public $delivery_slot_interval;
 
-    /** 
+    /**
      * Enable reservation
-     * 
+     *
      * @var bool
      */
     public $enable_reservation;
@@ -305,7 +305,7 @@ class Location_Model {
 
     /**
      * Layout of seatmap.
-     * 
+     *
      * @var object
      */
     public $visual_table_layout;
@@ -431,6 +431,8 @@ class Location_Model {
 
         $locations = [];
         if ( ! is_wp_error( $terms ) ) {
+            update_termmeta_cache( wp_list_pluck( $terms, 'term_id' ) );
+
             foreach ( $terms as $term ) {
                 $locations[] = self::find( $term->term_id );
             }
@@ -475,7 +477,7 @@ class Location_Model {
                     'value' => $search,
                     'compare' => 'LIKE',
                 ],
-                
+
             ];
         }
 

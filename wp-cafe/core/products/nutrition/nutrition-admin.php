@@ -418,7 +418,7 @@ class Nutrition_Admin implements Hookable_Service_Contract {
         wp_enqueue_script(
             'wpcafe-nutrition-admin',
             $base_url . 'nutrition.js',
-            [ 'jquery' ],
+            [], // Converted to vanilla JS — no jQuery dependency.
             $version,
             true
         );

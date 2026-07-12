@@ -30,6 +30,13 @@ class Food_Menu_Tab extends Base_Shortcode {
      */
     public function render( $atts = [], $content = null ) {
         if (! class_exists('Woocommerce') ) { return; }
+
+        // FE2: load the shared card stylesheet only where a card actually renders.
+        wp_enqueue_style( 'wpc-card-core' );
+        wp_enqueue_style( 'wpc-popup' );
+        wp_enqueue_style( 'wpc-food-menu-tab' );
+        wp_enqueue_style( 'wpc-pagination' );
+
         $settings = array();
         $atts     = Wpc_Utilities::replace_qoute( $atts );
 

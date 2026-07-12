@@ -28,6 +28,11 @@ class Food_Menu_List extends Base_Shortcode {
     public function render($atts = [], $content = null) {
         if (!class_exists('Woocommerce')) { return; }
 
+        // FE2: load the shared card stylesheet only where a card actually renders.
+        wp_enqueue_style( 'wpc-card-core' );
+        wp_enqueue_style( 'wpc-popup' );
+        wp_enqueue_style( 'wpc-pagination' );
+
         $atts = Wpc_Utilities::replace_qoute( $atts );
         $atts = shortcode_atts(
             [

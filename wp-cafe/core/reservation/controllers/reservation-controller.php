@@ -261,9 +261,10 @@ class Reservation_Controller extends Base_Rest_Controller {
      *
      * The form sends deposit numbers too, but we ignore them and recalculate using
      * the Deposet plugin's own settings, so the stored figures can always be
-     * trusted. A deposit is only taken for WooCommerce online payments (paying at
-     * the venue is always the full amount), and only when both the WP Cafe toggle
-     * and the Deposet plugin are switched on.
+     * trusted. A deposit is only taken when the customer chose to pay a deposit,
+     * uses WooCommerce online payment (paying at the venue is always the full
+     * amount), and only when both the WP Cafe toggle and the Deposet plugin are
+     * switched on.
      *
      * total_price keeps the full amount. deposit_value and remaining_amount hold
      * the split, and is_partial_payment ('yes'/'no') tells the checkout whether to
@@ -275,8 +276,9 @@ class Reservation_Controller extends Base_Rest_Controller {
     private function apply_partial_payment( array &$data ): void {
         $is_wc        = ( $data['payment_method'] ?? '' ) === 'wc';
         $toggle_on    = ! empty( wpc_get_option( 'reservation_partial_payment' ) );
+        $wants_deposit = ( $data['payment_amount_type'] ?? 'deposit' ) === 'deposit';
 
-        if ( $is_wc && $toggle_on && wpc_is_deposet_active() ) {
+        if ( $is_wc && $toggle_on && wpc_is_deposet_active() && $wants_deposit ) {
             $total = (float) ( $data['total_price'] ?? 0 );
             $calc  = \Deposet\Helpers\Utilities::calculate_checkout_deposit(
                 $total,
@@ -787,7 +789,8 @@ class Reservation_Controller extends Base_Rest_Controller {
         /*
          * Clean up the deposit fields the form sends. We do not rely on these
          * values — apply_partial_payment() works them out again — but we still
-         * sanitize them so anything stored is a clean number or yes/no.
+         * sanitize them so anything stored is a clean number, yes/no, or a
+         * known payment amount type.
          */
         if ( isset( $data['deposit_value'] ) ) {
             $data['deposit_value'] = floatval( $data['deposit_value'] );
@@ -797,6 +800,9 @@ class Reservation_Controller extends Base_Rest_Controller {
         }
         if ( isset( $data['is_partial_payment'] ) ) {
             $data['is_partial_payment'] = $data['is_partial_payment'] ? 'yes' : 'no';
+        }
+        if ( isset( $data['payment_amount_type'] ) ) {
+            $data['payment_amount_type'] = in_array( $data['payment_amount_type'], [ 'full', 'deposit' ], true ) ? $data['payment_amount_type'] : 'deposit';
         }
         if ( isset( $data['seats'] ) && is_array( $data['seats'] ) ) {
             $data['seats'] = array_values( array_filter( array_map(
@@ -971,13 +977,17 @@ class Reservation_Controller extends Base_Rest_Controller {
      * @return array Array of Reservation_Item_Model instances
      */
     public function create_food_items_from_woocart( $reservation_id ) {
+        // Bail before touching WC(): on sites without WooCommerce active the
+        // WC() function is undefined and calling it fatals the whole request.
+        if ( ! function_exists( 'WC' ) || ! class_exists( 'WooCommerce' ) ) {
+            return [];
+        }
+
         if ( function_exists('wc_load_cart') && is_null( WC()->cart ) ) {
             wc_load_cart();
         }
 
-        $cart_available = WC()->cart ? true : false; // Check if WooCommerce is active and cart is available
-
-        if ( ! class_exists('WooCommerce') || ! $cart_available ) {
+        if ( ! WC()->cart ) {
             return [];
         }
 
@@ -1404,17 +1414,37 @@ class Reservation_Controller extends Base_Rest_Controller {
 
         $branch_id = $request->get_param('branch_id');
 
+        // JS serializes undefined/null as the literal strings "undefined"/"null".
+        if ( $branch_id === 'undefined' || $branch_id === 'null' ) {
+            $branch_id = null;
+        }
+
+        // The food-menu shortcode resolves its location from the session, so set
+        // it before rendering — passing a location attribute would be ignored.
         if ( ! empty($branch_id) ) {
-            $selected_location = ! empty($branch_id) ? intval($branch_id) : '';
-            Session::set( 'selected_location', $selected_location );
+            Session::set( 'selected_location', intval($branch_id) );
         }
 
         if ( wpc_is_module_enable('food_ordering') ) {
-            $shortcode_attributes = $this->get_food_menu_attributes_from_settings();
-            $content = do_shortcode("[wpc_reservation_with_food {$shortcode_attributes}]");
+            $reservation_date = $this->sanitize_reservation_date( $request->get_param( 'date' ) );
+
+            // Thread the customer's selected reservation date into the timed-product
+            // rule evaluators for the duration of this shortcode render, then
+            // always reset (even on exception) so the value never leaks.
+            if ( class_exists( '\\WpCafePro\\FoodOrder\\TimedProduct\\Timed_Products_Conditions' ) ) {
+                \WpCafePro\FoodOrder\TimedProduct\Timed_Products_Conditions::set_reference_date( $reservation_date );
+                try {
+                    $content = do_shortcode( $this->build_food_menu_shortcode() );
+                } finally {
+                    \WpCafePro\FoodOrder\TimedProduct\Timed_Products_Conditions::reset_reference_date();
+                }
+            } else {
+                $content = do_shortcode( $this->build_food_menu_shortcode() );
+            }
         }
 
-        // Return empty string if content has no food menu items
+        // No card markup means nothing to show; hand back "" so the React form
+        // hides the food-menu field instead of rendering an empty box.
         if ( ! empty($content) && strpos($content, 'wpc-food-menu-item') === false ) {
             $content = "";
         }
@@ -1423,69 +1453,52 @@ class Reservation_Controller extends Base_Rest_Controller {
     }
 
     /**
+     * Sanitize and validate a date string received from a REST request param.
+     *
+     * Returns the value unchanged when it matches Y-m-d, null otherwise.
+     * Callers can safely pass the return value to set_reference_date() — that
+     * method also validates format, so the double-check is defense-in-depth.
+     *
+     * @param mixed $date Raw request param value.
+     * @return string|null Sanitized Y-m-d string, or null if invalid/empty.
+     */
+    private function sanitize_reservation_date( $date ): ?string {
+        if ( empty( $date ) ) {
+            return null;
+        }
+        $clean = sanitize_text_field( wp_unslash( (string) $date ) );
+        return preg_match( '/^\d{4}-\d{2}-\d{2}$/', $clean ) ? $clean : null;
+    }
+
+    /**
      * Get food menu attributes from reservation form customization settings
      *
-     * @return string Formatted shortcode attributes string
+     * The saved food_menu field stores a `template` (the shortcode tag) plus a few
+     * display options. We render that shortcode directly instead of the old
+     * `wpc_reservation_with_food` wrapper, which has been removed.
+     *
+     * @return string Shortcode string, e.g. `[wpc_food_menu_tab style="style-2" ...]`.
      */
-    private function get_food_menu_attributes_from_settings(): string {
-        $reservation_form_customization = wpc_get_option('reservation_form_customization', []);
+    private function build_food_menu_shortcode(): string {
+        $fields = $this->get_reservation_food_menu_fields();
 
-        if ( ! is_array($reservation_form_customization) ) {
-            return '';
-        }
+        return wpc_food_menu_shortcode( $fields['template'] ?? 'wpc_food_menu_list', [
+            'style'               => $fields['style'] ?? 'style-1',
+            'wpc_food_categories' => $fields['wpc_food_categories'] ?? '',
+            'wpc_show_desc'       => $fields['wpc_show_desc'] ?? 'yes',
+            'show_thumbnail'      => $fields['show_thumbnail'] ?? 'yes',
+            'wpc_cart_button'     => $fields['wpc_cart_button'] ?? 'yes',
+            'no_of_product'       => isset($fields['no_of_product']) ? (int) $fields['no_of_product'] : -1,
+        ] );
+    }
 
-        $food_menu_fields = [];
-
-        foreach ( $reservation_form_customization as $step ) {
-            if ( ! isset($step['fields']) || ! is_array($step['fields']) ) {
-                continue;
-            }
-
-            foreach ( $step['fields'] as $field ) {
-                if ( isset($field['type']) && $field['type'] === 'food_menu' && isset($field['food_menu_fields']) && is_array($field['food_menu_fields']) ) {
-                    $food_menu_fields = $field['food_menu_fields'];
-                    break 2;
-                }
-            }
-        }
-
-        if ( empty( $food_menu_fields ) ) {
-            return '';
-        }
-
-        // Map the settings to shortcode attributes
-        $attributes = [];
-
-        if ( isset($food_menu_fields['wpc_food_categories']) && is_array($food_menu_fields['wpc_food_categories']) ) {
-            $categories_csv = implode(',', $food_menu_fields['wpc_food_categories']);
-            $attributes[] = "wpc_food_categories=\"{$categories_csv}\"";
-        }
-
-        if ( isset($food_menu_fields['style']) ) {
-            $attributes[] = "style=\"{$food_menu_fields['style']}\"";
-        }
-
-        if ( isset($food_menu_fields['template']) ) {
-            $attributes[] = "template=\"{$food_menu_fields['template']}\"";
-        }
-
-        if ( isset($food_menu_fields['wpc_show_desc']) ) {
-            $attributes[] = "wpc_show_desc=\"{$food_menu_fields['wpc_show_desc']}\"";
-        }
-
-        if ( isset($food_menu_fields['show_thumbnail']) ) {
-            $attributes[] = "show_thumbnail=\"{$food_menu_fields['show_thumbnail']}\"";
-        }
-
-        if ( isset($food_menu_fields['wpc_cart_button']) ) {
-            $attributes[] = "wpc_cart_button=\"{$food_menu_fields['wpc_cart_button']}\"";
-        }
-
-        if ( isset($food_menu_fields['no_of_product']) ) {
-            $attributes[] = "no_of_product=\"{$food_menu_fields['no_of_product']}\"";
-        }
-
-        return implode(' ', $attributes);
+    /**
+     * Pull the saved food_menu field config from the reservation form settings.
+     *
+     * @return array The `food_menu_fields` array, or [] when no food_menu field is configured.
+     */
+    private function get_reservation_food_menu_fields(): array {
+        return wpc_get_reservation_food_menu_fields();
     }
 
     /**

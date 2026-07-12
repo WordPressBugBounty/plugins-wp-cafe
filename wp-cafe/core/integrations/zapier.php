@@ -5,107 +5,101 @@ if ( ! defined( 'ABSPATH' ) ) exit;
 
 use WpCafe\Contracts\Hookable_Service_Contract;
 use WpCafe\Contracts\Switchable_Service_Contract;
+use WpCafe\Traits\Integration_Data_Helper;
 
 /**
-* Zapier Service
+ * Zapier integration service.
+ *
+ * Sends restaurant onboarding, reservation, and order data to a Zapier webhook.
  *
  * @since 1.0.0
  */
 class Zapier implements Hookable_Service_Contract, Switchable_Service_Contract {
 
-    /**
-     * Register Services
-     *
-     * @return  void
-     */
-    public function register() {
-        add_action('wpcafe_after_reservation_create', [$this, 'send_zapier_reservation_data']);
-        add_action('woocommerce_checkout_order_processed', [$this, 'send_zappier_order_data']);
-    }
+	use Integration_Data_Helper;
 
-    /**
-     * Send reservation data to Zappier after a reservation is created.
-     *
-     * This function is hooked to the 'wpcafe_after_reservation_create' action and sends
-     * the reservation's name, email, and phone to the configured Zapier webhook URL,
-     * if the integration is enabled and a webhook URL is set.
-     *
-     * @param object $reservation The reservation object containing reservation details.
-     * @return object The original reservation object.
-     */
-    public function send_zapier_reservation_data( $reservation ) {
+	/**
+	 * Register Services
+	 *
+	 * @return void
+	 */
+	public function register() {
+		add_filter( 'wpcafe_settings', [ $this, 'send_zapier_restaurant_data' ] );
+		add_action( 'wpcafe_after_reservation_create', [ $this, 'send_zapier_reservation_data' ] );
+		add_action( 'woocommerce_checkout_order_processed', [ $this, 'send_zapier_order_data' ] );
+	}
 
-        if ( ! wpc_is_integration_enable('zapier') ) {
-            return;
-        }
-        
-        $webhook_url = wpc_get_option('zapier_webhook_url');
+	/**
+	 * Send restaurant onboarding data to Zapier on settings save.
+	 *
+	 * @param array $data Settings data.
+	 * @return array
+	 */
+	public function send_zapier_restaurant_data( $data ) {
+		if ( ! wpc_is_integration_enable( 'zapier' ) ) {
+			return $data;
+		}
 
-        if ( ! $webhook_url ) {
-            return;
-        }
-        
-        $reservation_data = [
-            'name' => $reservation->name,
-            'email' => $reservation->email,
-            'phone' => $reservation->phone,
-        ];
+		if ( ! isset( $data['restaurant_type'] ) ) {
+			return $data;
+		}
 
-        $response = wp_remote_post( $webhook_url, [
-            'body' => json_encode( $reservation_data ),
-        ] );
-        
-        return $reservation;
-    }
+		$this->send_webhook( 'zapier_webhook_url', [
+			'source'     => 'wpcafe_restaurant_onboarding',
+			'restaurant' => $this->build_restaurant_payload( $data ),
+		], true );
 
-    /**
-     * Send order data to Zappier after a WooCommerce order is processed.
-     *
-     * This function is hooked to the 'woocommerce_checkout_order_processed' action and sends
-     * the order's customer details and order information to the configured Pabbly webhook URL,
-     * if the integration is enabled and a webhook URL is set.
-     *
-     * @param int $order_id The WooCommerce order ID.
-     * @return void
-     */
-    public function send_zappier_order_data( $order_id ) {
+		return $data;
+	}
 
-        if ( ! $this->is_enable() ) {
-            return;
-        }
+	/**
+	 * Send reservation data to Zapier after a reservation is created.
+	 *
+	 * @param object $reservation Reservation object.
+	 * @return object
+	 */
+	public function send_zapier_reservation_data( $reservation ) {
+		if ( ! wpc_is_integration_enable( 'zapier' ) ) {
+			return $reservation;
+		}
 
-        $webhook_url = wpc_get_option('zapier_webhook_url');
+		$this->send_webhook( 'zapier_webhook_url', [
+			'source'      => 'wpcafe_reservation',
+			'reservation' => $this->build_reservation_payload( $reservation ),
+		], true );
 
-        if ( ! $webhook_url ) {
-            return;
-        }
+		return $reservation;
+	}
 
-        $order = wc_get_order( $order_id );
+	/**
+	 * Send order data to Zapier when a WooCommerce order is processed.
+	 *
+	 * @param int $order_id WooCommerce order ID.
+	 * @return void
+	 */
+	public function send_zapier_order_data( $order_id ) {
+		if ( ! wpc_is_integration_enable( 'zapier' ) ) {
+			return;
+		}
 
-        if ( ! $order ) {
-            return;
-        }
+		$order = wc_get_order( $order_id );
 
-        $order_data = [
-            'name' => $order->get_billing_first_name() . ' ' . $order->get_billing_last_name(),
-            'email' => $order->get_billing_email(),
-            'phone' => $order->get_billing_phone(),
-        ];
+		if ( ! $order ) {
+			return;
+		}
 
-        $response = wp_remote_post( $webhook_url, [
-            'body' => json_encode( $order_data ),
-        ] );
+		$this->send_webhook( 'zapier_webhook_url', [
+			'source' => 'wpcafe_woocommerce_order',
+			'order'  => $this->build_order_payload( $order ),
+		], true );
+	}
 
-        return;
-    }
-
-    /**
-     * Check if zapier is enabled
-     *
-     * @return  bool
-     */
-    public function is_enable() {
-        return wpc_is_integration_enable('zapier');
-    }
+	/**
+	 * Check if Zapier integration is enabled.
+	 *
+	 * @return bool
+	 */
+	public function is_enable() {
+		return wpc_is_integration_enable( 'zapier' );
+	}
 }
-

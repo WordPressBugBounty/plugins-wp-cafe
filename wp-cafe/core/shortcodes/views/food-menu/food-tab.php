@@ -12,6 +12,12 @@ if( is_array( $food_menu_tabs ) && count( $food_menu_tabs )>0 ){
     
 apply_filters( 'cafetics/elementor/control/search_data' , $settings , $unique_id , 'wpc-food-menu-tab' );
 
+// Caller may not extract every var into scope (e.g. wpc-food-location has no
+// price-show control), so default it here to avoid undefined-variable warnings.
+if ( ! isset( $wpc_price_show ) ) {
+    $wpc_price_show = is_array($settings) && isset($settings['wpc_price_show']) ? $settings['wpc_price_show'] : 'yes';
+}
+
 $wpc_menu_count = is_array($settings) && isset($settings['wpc_menu_count']) ? $settings['wpc_menu_count'] : 5;
 $wpc_show_desc  = is_array($settings) && isset($settings['wpc_show_desc']) ? $settings['wpc_show_desc'] : 'yes';
 $wpc_show_vendor  = is_array($settings) && isset($settings['wpc_show_vendor']) ? $settings['wpc_show_vendor'] : 'no';

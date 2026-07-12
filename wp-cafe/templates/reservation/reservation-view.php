@@ -17,24 +17,30 @@ if ( empty( $reservation_data ) || ! is_array( $reservation_data ) ) {
     return;
 }
 
+// Order-received / my-account pages reuse this card read-only: the booking is
+// already placed, so the Discard button (and its AJAX assets) are skipped.
+$reservation_is_order_context = ! empty( $reservation_context ) && 'order' === $reservation_context;
+
 // Get settings for colors
 $settings = Settings::get();
 $primary_color = isset( $settings['primary_color'] ) && $settings['primary_color'] ? $settings['primary_color'] : '#f00f0fff';
 $secondary_color = isset( $settings['secondary_color'] ) && $settings['secondary_color'] ? $settings['secondary_color'] : '#f5f5f5';
 
-// Register and enqueue the discard reservation stylesheet
-wp_register_style( 'wpc-discard-reservation', wpcafe()->assets_url . '/css/discard-reservation.css', [], wpcafe()->version );
-wp_enqueue_style( 'wpc-discard-reservation' );
+if ( ! $reservation_is_order_context ) {
+    // Register and enqueue the discard reservation stylesheet
+    wp_register_style( 'wpc-discard-reservation', wpcafe()->assets_url . '/css/discard-reservation.css', [], wpcafe()->version );
+    wp_enqueue_style( 'wpc-discard-reservation' );
 
-// Register and enqueue the discard reservation script
-wp_register_script( 'wpc-discard-reservation', wpcafe()->assets_url . '/js/discard-reservation.js', [ 'wp-i18n' ], wpcafe()->version, true );
-wp_enqueue_script( 'wpc-discard-reservation' );
+    // Register and enqueue the discard reservation script
+    wp_register_script( 'wpc-discard-reservation', wpcafe()->assets_url . '/js/discard-reservation.js', [ 'wp-i18n' ], wpcafe()->version, true );
+    wp_enqueue_script( 'wpc-discard-reservation' );
 
-// Localize script with color settings
-wp_localize_script( 'wpc-discard-reservation', 'wpcDiscardReservationColors', [
-    'primary' => esc_attr( $primary_color ),
-    'secondary' => esc_attr( $secondary_color ),
-] );
+    // Localize script with color settings
+    wp_localize_script( 'wpc-discard-reservation', 'wpcDiscardReservationColors', [
+        'primary' => esc_attr( $primary_color ),
+        'secondary' => esc_attr( $secondary_color ),
+    ] );
+}
 
 // Get show_reservation_end_time from reservation form customization (React form: end_time; legacy: to_time).
 $show_reservation_end_time = 'off';
@@ -125,6 +131,13 @@ if ( ! empty($form_customization) && is_array($form_customization) ) {
         </p>
     <?php endif; ?>
 
+    <?php if ( ! empty( $reservation_data['table_name'] ) ) : ?>
+        <p class="wpc-reservation-field wpc-reservation-table">
+            <strong class="wpc-reservation-label"><?php echo esc_html__( 'Table', 'wp-cafe' ); ?> : </strong>
+            <span class="wpc-reservation-value"><?php echo esc_html( $reservation_data['table_name'] ); ?></span>
+        </p>
+    <?php endif; ?>
+
     <?php if ( ! empty( $reservation_data['custom_fields'] ) && is_array( $reservation_data['custom_fields'] ) ) : ?>
         <?php
         $custom_field_labels = [];
@@ -149,9 +162,11 @@ if ( ! empty($form_customization) && is_array($form_customization) ) {
         <?php endforeach; ?>
     <?php endif; ?>
 
-    <div class="wpc-reservation-actions" style="margin-top: 20px; padding-top: 0;">    
-        <button id="wpc-discard-reservation" style="color: <?php echo esc_attr( $primary_color ); ?>;" class="button" data-nonce="<?php echo esc_attr( sanitize_text_field( wp_create_nonce('wpc_discard_reservation') ) ); ?>">
-            <?php echo esc_html__( 'Discard Reservation', 'wp-cafe' ); ?>
-        </button>
-    </div>
+    <?php if ( ! $reservation_is_order_context ) : ?>
+        <div class="wpc-reservation-actions" style="margin-top: 20px; padding-top: 0;">
+            <button id="wpc-discard-reservation" style="color: <?php echo esc_attr( $primary_color ); ?>;" class="button" data-nonce="<?php echo esc_attr( sanitize_text_field( wp_create_nonce('wpc_discard_reservation') ) ); ?>">
+                <?php echo esc_html__( 'Discard Reservation', 'wp-cafe' ); ?>
+            </button>
+        </div>
+    <?php endif; ?>
 </div>

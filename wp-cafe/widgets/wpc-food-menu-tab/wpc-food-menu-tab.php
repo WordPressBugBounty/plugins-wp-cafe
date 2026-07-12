@@ -829,6 +829,17 @@ class Wpc_Food_Menu_Tab extends Widget_Base {
         $this->end_controls_section();
     }
 
+    /**
+     * FE2: declare the shared food product-card stylesheet. Elementor enqueues
+     * registered style deps in the head when the widget is on the page, so the
+     * card stays styled after Stage 3 removes the block from wpc-public.css.
+     *
+     * @return array
+     */
+    public function get_style_depends() {
+        return [ 'wpc-card-core', 'wpc-popup', 'wpc-food-menu-tab', 'wpc-pagination' ];
+    }
+
     protected function render() {
         //check if woocommerce exists
         if (!class_exists('Woocommerce')) { return; }

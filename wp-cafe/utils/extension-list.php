@@ -205,6 +205,26 @@ return [
 ',
     ],
 
+    'order_delay' => [
+        'name' => 'order_delay',
+        'slug' => 'order_delay',
+        'type' => 'module',
+        'parent' => 'food_ordering',
+        'status' => 'on',
+        'is_pro' => true,
+        'title' => __('Order Delay', 'wp-cafe'),
+        'description' => __('Reschedule a delivery or pickup order from the order edit screen. Open the order, set a new time, and click Update. The change is logged and the customer is emailed.', 'wp-cafe'),
+        'notice' => '',
+        'demo_link' => '',
+        'settings_link' => '',
+        'doc_link' => 'https://themewinter.com/docs/plugins/plugin-docs/food-ordering/how-to-use-order-delay-notification-in-wpcafe/',
+        'icon' => '<svg width="26" height="26" viewBox="0 0 26 26" fill="none" xmlns="http://www.w3.org/2000/svg">
+<path d="M13 23.8327C18.9831 23.8327 23.8333 18.9824 23.8333 12.9993C23.8333 7.01626 18.9831 2.16602 13 2.16602C7.01692 2.16602 2.16667 7.01626 2.16667 12.9993C2.16667 18.9824 7.01692 23.8327 13 23.8327Z" stroke="#525266" stroke-width="1.625"/>
+<path d="M13 7.58398V12.9998L16.25 15.1673" stroke="#525266" stroke-width="1.625" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>
+',
+    ],
+
     'receipt-layout' => [
         'name' => 'receipt-layout',
         'slug' => 'receipt-layout',

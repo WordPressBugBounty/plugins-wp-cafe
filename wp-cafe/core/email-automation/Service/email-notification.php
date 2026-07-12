@@ -46,7 +46,11 @@ class Email_Notification implements Hookable_Service_Contract {
 	 */
 	public function register() {
 		if ( class_exists( SDK::class ) ) {
-			add_filter( 'notification_sdk_email_body', [ $this, 'wrap_email_body' ], 10, 2 );
+			// The SDK applies its body filter prefixed with the configured hook_prefix
+			// ('wpcafe'), i.e. `wpcafe_notification_sdk_email_body`. Hooking the bare
+			// name silently never fired, so no automation email got the branded
+			// wrapper. Match the prefixed name so wrapping actually applies.
+			add_filter( 'wpcafe_notification_sdk_email_body', [ $this, 'wrap_email_body' ], 10, 1 );
 			add_filter( 'wpcafe_ens_whatsapp_credentials', [ $this, 'map_whatsapp_credentials' ] );
 			add_action( 'wpcafe_ens_whatsapp_send_error', [ $this, 'log_whatsapp_error' ], 10, 4 );
 			add_action( 'wpcafe_ens_whatsapp_request',    [ $this, 'log_whatsapp_request' ], 10, 4 );

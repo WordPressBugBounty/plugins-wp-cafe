@@ -42,12 +42,29 @@ class Settings {
      *
      * @return  void
      */
+    /**
+     * Positive-integer settings that must be > 0 to be meaningful.
+     * A value of 0 (which absint() produces for null/empty inputs) means
+     * "not configured" — skip the update so the previous DB value is preserved.
+     */
+    private const POSITIVE_INT_KEYS = [
+        'reservation_maximum_guest',
+        'reservation_minimum_guest',
+        'reservation_total_seat_capacity',
+        'slot_interval',
+        'reservation_booking_amount',
+    ];
+
     public static function update( $options = [] ) {
         $settings = self::get();
 
         $options = self::sanitize( $options );
 
         foreach ( $options as $name => $value ) {
+            // Don't overwrite a positive-integer field with 0 (sent as null/empty from the form).
+            if ( in_array( $name, self::POSITIVE_INT_KEYS, true ) && $value === 0 ) {
+                continue;
+            }
             $settings[$name] = $value;
         }
 
@@ -105,6 +122,7 @@ class Settings {
             'reservation_cancellation_button_text'    => 'string',
             'fluentcrm_webhook_url'                   => 'string',
             'mailmint_webhook_url'                    => 'string',
+            'zoho_flow_webhook_url'                   => 'string',
             'whatsapp_facebook_app_id'                => 'string',
             'whatsapp_facebook_app_secret'            => 'string',
             'whatsapp_token'                          => 'string',
@@ -154,6 +172,7 @@ class Settings {
             'block_timeslot_statuses'                  => 'string_array',
             'restaurant_type'                          => 'string_array',
             'custom_holidays'                          => 'string_array',
+            'mailpoet_list_ids'                        => 'string_array',
 
             // Schedules
             'restaurant_schedule'                      => 'schedule',

@@ -1,20 +1,20 @@
 === WPCafe - Restaurant Menu, Online Food Ordering & Table Booking System ===
 Contributors: arraytics, ehsanriyadh
-Tags: restaurant, reservation, food menu, food delivery, booking, table reservation, WooCommerce, food pickup, takeout, online reservations, restaurant management system, online food ordering
+Tags: restaurant, reservation, booking, food menu, food delivery, table reservation, WooCommerce, food pickup, takeout, online reservations, restaurant management system, online food ordering
 Requires at least: 6.2
 Tested up to: 7.0
-Stable tag: 3.0.15
+Stable tag: 3.0.16
 Requires PHP: 7.4
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
-Restaurant menu plugin for online food ordering, delivery, pickup, table reservation & booking - QR ordering, visual table layouts & multi-location.
+Restaurant management solution for restaurant menus, online food ordering, delivery, pickup, QR ordering, and table reservations with WooCommerce.
 
 == Description ==
 
 [**WPCafe**](https://themewinter.com/wp-cafe/) is a **restaurant menu and online food ordering plugin for WordPress** built for restaurants, cafes, cloud kitchens, takeaway businesses, catering services, and multi-location food chains.
 
-WPCafe lets you create a responsive **restaurant menu**, accept **online food orders** through WooCommerce, manage **food delivery and pickup** schedules, handle **table reservations and restaurant booking**, and run your entire restaurant business from one WordPress dashboard.
+WPCafe lets you create a responsive restaurant menu, accept online food orders through WooCommerce, manage food delivery and pickup schedules, handle table reservations, and run your entire restaurant business from one WordPress dashboard. Powered by AI-assisted restaurant management, WPCafe also helps streamline restaurant operations with QR ordering, visual table layouts, live kitchen alerts, automated workflows, and multi-location management.
 
 [youtube https://www.youtube.com/watch?v=GrxLsKyNaYg]
 
@@ -349,6 +349,10 @@ Most restaurants are ready to accept their first online order within 30 minutes 
 
 Yes. WPCafe Pro supports multi-branch restaurant management. You can assign different menus, delivery zones, pickup schedules, and reservation capacities for each location — all managed from a single WordPress dashboard.
 
+= How does AI help restaurant owners in WPCafe? =
+
+WPCafe uses AI restaurant agent to reduce repetitive tasks and improve daily restaurant operations. Combined with QR ordering, live kitchen alerts, reservation management, and multi-location support, AI helps restaurant owners manage their business from a single WordPress dashboard.
+
 = Is WPCafe mobile-friendly? =
 
 Yes. All food menus, ordering flows, and reservation forms are fully responsive. Customers can browse the menu, place orders, and book tables on any device — mobile, tablet, or desktop.
@@ -416,6 +420,17 @@ Note: WooCommerce is required for online food ordering functionality. It is free
 
 == Changelog ==
 
+= 3.0.16 ( July 12, 2026 ) =
+New: Integrations – MailPoet integration for sending reservation and order data.
+New: Integrations – Zoho Flow integration.
+New: Payment – Customer choice between full payment and deposit at checkout.
+New: Location – Clear selected location option.
+New: Products – Vendor name display across shortcodes.
+Improvement: Performance – Backend caching and frontend performance.
+Improvement: Mini cart – Sitewide mini cart with image icon support.
+Improvement: Security – Security hardening and guardrail improvements.
+Fix: Currency – Resolved currency display issue in reservation form.
+
 = 3.0.15 ( June 22, 2026 ) =
 New: Integrations – Mail Mint integration added for sending reservation and order data via webhook.
 Improvement: Security – multiple security fixes for vulnerabilities.
@@ -437,116 +452,6 @@ FIX: Fatal error occurring on custom field reservation bookings.
 New: Checkout – Tipping support for block-based checkout.
 New: Elementor – Item label style controls across menu widgets.
 Fix: Checkout – HTML tags showing in one-page checkout cards.
-
-= 3.0.11 ( May 13, 2026 ) =
-New: Food label – Product labels feature for displaying customizable badges on menu items
-New: Food nutrition – Nutritional and allergen info cards with detailed ingredient breakdown
-New: Frontend – Floating location widget with revamped location selector
-New: Shortcode – Pagination support for food menu shortcodes with per-page configuration
-New: Elementor – Support for pro shortcodes inside Elementor widgets
-New: Minicart – Tax settings with option to include tax in minicart total
-New: Reservation – Customizable thank you page message
-New: Checkout – ASAP option settings for pickup and delivery
-Fix: Email – Reminder email date and time mismatch resolved
-Fix: Reservation – Shortcode not rendering inside the editor fixed
-Fix: Reservation – Date range input validation in admin filter
-Fix: Reservation – Form style and attribute rendering issues
-Fix: Elementor – Pagination controller not working for Elementor widgets
-Fix: Elementor – Food location filtering widget behavior inside shortcode
-Fix: Theme – Ocean theme font-size compatibility conflict resolved
-Tweak: Performance – reduced admin page script size for faster loading.
-Tweak: Admin – Sidebar menu items rearranged for better usability
-
-= 3.0.10 ( May 05, 2026 ) =
-New: Restaurant Management – Frontend dashboard panel with orders, reservations, profile management, role-based access control, and authentication flow (login/logout)
-New: Checkout – Support for WooCommerce block-based checkout with location selection block
-Fix: Elementor – Compatibility issue with WPC Menu Tab widget resolved
-Fix: Email – Reservation emails now include status and table number
-Fix: Form – Validation errors now display actual field names instead of generic messages
-Fix: Product – Removed hardcoded overwrite of product attribute values
-Tweak: Integration – Optiontics integration updated
-Tweak: Admin – WooCommerce inactive notice added on shortcode generation page
-
-= 3.0.9 ( April 30, 2026 ) =
-New: Added new email trigger for reservation updates - sends notification when reservation fields are updated.
-New: Added support for custom reservation form fields in email notifications.
-Fix: Fixed PHP fatal error when using woocommerce payment gateways for food order.
-Fix: Fixed end time showing when end time field is configured to be hidden in reservation form customization.
-Fix: Fixed reservation payment process failure on woocommerce payment gateways.
-FIx: Fixed showing both pickup and delivery date/time on thank you page regardless of order type.
-Tweak: Security improvements.
-
-= 3.0.8 ( April 04, 2026 ) =
-Fix: Translation issue fixes.
-Fix: Location wise filtering issue fixed for reservation list.
-
-= 3.0.7 ( March 16, 2026 ) =
-New: Email automation trigger support for reservation status updates.
-Security: Security improvements across the plugin.
-
-= 3.0.6 ( February 01, 2026 ) =
-Fix: Media library not loading in admin dashboard.
-Tweak: Sidebar UI for admin dashboard improved.
-
-= 3.0.5 ( January 27, 2026 ) =
-New: Sidebar UI for admin dashboard.
-Fix: Custom time format validation error for reservation.
-Fix: Console error for English (US) language fixed.
-Fix: Custom time format support for reservation list.
-Tweak: Dashboard load speed improvement.
-Tweak: Improved error messages for settings page validations.
-
-= 3.0.4 ( January 22, 2026 ) =
-New: Dark mode support for the admin panel.
-Fix: Maximum number of guest selection issue fixed.
-Fix: Time conversion error for reservation start time in emails fixed.
-Tweak: Major performance improvements across the plugin.
-
-= 3.0.3 ( January 1, 2026 ) =
-New: Option to attach images to restaurant locations.
-Fix: Elementor food menu and tab rendering error fixed.
-Fix: Location-wise filtering not working in shop page fixed.
-Fix: Location-wise filtering not working in food menu list and tab shortcode fixed.
-Fix: 24h time format compatibility added to admin schedule settings.
-Fix: 24h time format compatibility added to pickup & delivery time selector on checkout page.
-Fix: Reservation timezone issue on reservation details in checkout page fixed.
-Tweak: Sidebar menu items now include unique class names.
-
-= 3.0.2 ( December 23, 2025 ) =
-New: Multi-vendor marketplace support added (Dokan integration).
-Tweak: 24-hour format support in time picker UI.
-Fix: Guest number selection freezing the reservation form fixed.
-
-= 3.0.1 ( December 14, 2025 ) =
-Fix: Email automation creating duplicate demo data resolved.
-Fix: Old location popup appearing for existing users fixed.
-Fix: Minicart not opening issue resolved.
-Fix: Incorrect display of reservation start and end times fixed.
-Fix: Mobile responsiveness issues for minicart style 1 resolved.
-Fix: Empty reservations being created during data migration prevented.
-Fix: Sidebar toggler not appearing in mobile view fixed.
-
-= 3.0.0 ( December 08, 2025 ) =
-New: Dashboard now shows total customer insights.
-New: Dashboard section displaying food orders and reservation list at a glance.
-New: Dashboard top-selling items list added.
-New: Dedicated Food Menu page with guided navigation to menu items, categories, and branch settings in WooCommerce.
-New: Single and multi-location management.
-New: Automated email notifications for reservation creation, cancellation, and reminders.
-New: Global schedule management with override rules for pickup, delivery, and reservation.
-New: Fully customizable reservation form builder.
-New: Version rollback system for safe version control.
-New: Modules page to manage food ordering, reservations, and addons independently.
-New: QR code generation for food menus and reservations.
-New: Tip feature added to the free version.
-New: Elementor addon introduced.
-New: OpenStreetMap integration for delivery zones.
-New: Deposet integration for deposit and partial payment support.
-Tweak: Improved mini-cart settings fields for clarity.
-Tweak: Dedicated Integrations page added to centralize all integrations.
-Tweak: Shortcode management page updated for better usability.
-Tweak: Settings data migration from older versions.
-Tweak: Shortcode performance optimized.
 
 == Upgrade Notice ==
 

@@ -67,6 +67,12 @@ abstract class Base_Assets implements Hookable_Service_Contract {
             'wpcafe-i18n' => [
                 'src' => wpcafe()->assets_url . '/build/js/i18n-loader.js',
             ],
+            // Shared form-vendor global (react-hook-form / zod / resolvers).
+            // Base + Pro + multivendor bundles list this as a dependency (via
+            // their .asset.php), so it always prints before any consumer runs.
+            'wpcafe-vendor-forms' => [
+                'src' => wpcafe()->assets_url . '/build/js/vendor-forms.js',
+            ],
         ];
 
         foreach ( $scripts as $handle => $script ) {
@@ -232,6 +238,13 @@ abstract class Base_Assets implements Hookable_Service_Contract {
      * @return array<string, string>
      */
     private function get_translation_map( $locale, $domain ) {
+        // Glob is expensive; cache per locale+domain for the request lifetime.
+        static $cache = [];
+        $cache_key = $locale . '|' . $domain;
+        if ( isset( $cache[ $cache_key ] ) ) {
+            return $cache[ $cache_key ];
+        }
+
         $directories = $this->get_translation_directories();
         $map         = [];
 
@@ -267,6 +280,7 @@ abstract class Base_Assets implements Hookable_Service_Contract {
             }
         }
 
+        $cache[ $cache_key ] = $map;
         return $map;
     }
 

@@ -68,6 +68,14 @@ class Mini_Cart {
             return;
         }
 
+        // Mini-cart styles (split out of wpc-public.css). The footer mini-cart
+        // renders on the wp_footer hook sitewide, so load its CSS here.
+        wp_enqueue_style( 'wpc-minicart' );
+        // Cart-icon glyph font (<i class="wpcafe-cart_icon">) lives in wpc-icon.css.
+        wp_enqueue_style( 'wpc-icon' );
+
+        // Mini-cart behaviour (open/close panel + qty handlers). Enqueued here so it loads sitewide with the footer mini-cart, not just on gated pages.
+        wp_enqueue_script( 'wpc-mini-cart' );
         wp_enqueue_script( 'wc-cart-fragments' );
         // Localize nonce data for AJAX requests.
         wp_localize_script( 'jquery', 'wpc_cart_nonce_data', [ 'nonce'    => wp_create_nonce( 'wpc_cart_nonce' ), 'ajax_url' => admin_url( 'admin-ajax.php' ) ] );

@@ -186,7 +186,24 @@ class Location_Selector implements Hookable_Service_Contract {
             WC()->cart->empty_cart();
         }
 
+        // location_id === 0 means "clear selection". The session and the cookie
+        // mirror must both be wiped, else wpc_selected_location_id() rehydrates
+        // the session from the surviving cookie and the clear silently fails.
+        if ( 0 === $location_id ) {
+            Session::delete( 'selected_location' );
+            setcookie( 'wpc_selected_location', '', time() - 3600, COOKIEPATH ?: '/', COOKIE_DOMAIN, is_ssl(), false );
+            unset( $_COOKIE['wpc_selected_location'] );
+
+            wp_send_json_success([
+                'message' => __( 'Location cleared', 'wp-cafe' ),
+            ]);
+        }
+
         Session::set( 'selected_location', $location_id );
+        // Mirror to the cookie so the choice survives session expiry, matching
+        // the read fallback in wpc_selected_location_id().
+        setcookie( 'wpc_selected_location', (string) $location_id, time() + ( 30 * DAY_IN_SECONDS ), COOKIEPATH ?: '/', COOKIE_DOMAIN, is_ssl(), false );
+        $_COOKIE['wpc_selected_location'] = (string) $location_id;
 
         wp_send_json_success([
             'message' => __( 'Successfully updated location', 'wp-cafe' )

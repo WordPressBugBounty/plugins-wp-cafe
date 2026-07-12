@@ -168,6 +168,19 @@ class Wpc_Food_Location extends Widget_Base {
                 'default'      => 'yes',
             ]
         );
+        if ( class_exists( 'Wpcafe_Multivendor' ) ) {
+            $this->add_control(
+                'wpc_show_vendor',
+                [
+                    'label'        => esc_html__( 'Show Vendor', 'wp-cafe' ),
+                    'type'         => \Elementor\Controls_Manager::SWITCHER,
+                    'label_on'     => esc_html__( 'Show', 'wp-cafe' ),
+                    'label_off'    => esc_html__( 'Hide', 'wp-cafe' ),
+                    'return_value' => 'yes',
+                    'default'      => 'no',
+                ]
+            );
+        }
         $this->add_control(
             'wpc_desc_limit',
             [
@@ -798,6 +811,17 @@ class Wpc_Food_Location extends Widget_Base {
         $this->end_controls_section();
     }
 
+    /**
+     * FE2: declare the shared food product-card stylesheet. Elementor enqueues
+     * registered style deps in the head when the widget is on the page, so the
+     * card stays styled after Stage 3 removes the block from wpc-public.css.
+     *
+     * @return array
+     */
+    public function get_style_depends() {
+        return [ 'wpc-card-core', 'wpc-popup', 'wpc-food-menu-tab', 'wpc-pagination' ];
+    }
+
     protected function render() {
         //check if woocommerce exists
         if (!class_exists('Woocommerce')) { return; }
@@ -809,6 +833,7 @@ class Wpc_Food_Location extends Widget_Base {
         $show_item_status     = $settings["show_item_status"];
         $show_item_label      = isset( $settings["show_item_label"] ) ? $settings["show_item_label"] : 'no';
         $wpc_cart_button      = $settings["wpc_cart_button_show"];
+        $wpc_price_show       = $settings["wpc_price_show"] ?? 'yes';
         $wpc_desc_limit       = $settings["wpc_desc_limit"];
         $wpc_menu_order       = $settings["wpc_menu_order"];
         $title_link_show      = $settings["title_link_show"];

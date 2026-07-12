@@ -5,6 +5,8 @@ use Ens\Assets\Enqueue;
 use Ens\Flow\FlowAPI;
 use Ens\Flow\FlowCPT;
 use Ens\Hook\ActionListener;
+use Ens\Whatsapp\MetaCloudProvider;
+use Ens\Whatsapp\TemplatesAPI;
 
 /**
  * Class SDK
@@ -58,5 +60,8 @@ class SDK {
         ( new FlowAPI() )->init($this->identifier);
         ( new ActionListener() )->register($this->identifier);
         ( new Enqueue() )->init($this->identifier);
+        // Added for adding whatsapp support
+        ( new MetaCloudProvider( $this->identifier ) )->register();
+        ( new TemplatesAPI() )->init( $this->identifier );
     }
 }

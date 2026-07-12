@@ -29,12 +29,53 @@ return [
         'notice' => '',
         'demo_link' => '',
         'settings_link' => '',
-        'doc_link' => 'https://support.themewinter.com/docs/plugins/plugin-docs/integrations/wpc-mailmint-integration/',
+        'doc_link' => 'https://themewinter.com/docs/plugins/plugin-docs/integrations/how-to-add-mailmint-integration-with-wpcafe/',
         'icon' => '<svg width="40" height="40" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
 <rect width="40" height="40" rx="8" fill="#FF6B35"/>
 <path d="M8 14C8 12.8954 8.89543 12 10 12H30C31.1046 12 32 12.8954 32 14V26C32 27.1046 31.1046 28 30 28H10C8.89543 28 8 27.1046 8 26V14Z" fill="white" fill-opacity="0.15"/>
 <path d="M8 14L20 21L32 14" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
 <path d="M10 12H30C31.1046 12 32 12.8954 32 14V26C32 27.1046 31.1046 28 30 28H10C8.89543 28 8 27.1046 8 26V14C8 12.8954 8.89543 12 10 12Z" stroke="white" stroke-width="2"/>
+</svg>
+',
+    ],
+    'mailpoet' => [
+        'name' => 'mailpoet',
+        'slug' => 'mailpoet',
+        'type' => 'integration',
+        'status' => 'on',
+        'is_pro' => false,
+        'title' => __('MailPoet', 'wp-cafe'),
+        'description' => __('Add reservation and order customers to your MailPoet lists to grow your newsletter and automate follow-ups.', 'wp-cafe'),
+        'notice' => '',
+        'demo_link' => '',
+        'settings_link' => '',
+        'doc_link' => 'https://themewinter.com/docs/plugins/plugin-docs/integrations/how-to-integrate-mailpoet-in-wpcafe/',
+        'icon' => '<svg width="40" height="40" viewBox="0 0 256 256" fill="none" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<rect width="256" height="256" rx="19" fill="url(#pattern0_7092_1894)"/>
+<defs>
+<pattern id="pattern0_7092_1894" patternContentUnits="objectBoundingBox" width="1" height="1">
+<use xlink:href="#image0_7092_1894" transform="scale(0.00390625)"/>
+</pattern>
+<image id="image0_7092_1894" width="256" height="256" preserveAspectRatio="none" xlink:href="data:image/png;base64,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"/>
+</defs>
+</svg>
+',
+    ],
+    'zoho-flow' => [
+        'name' => 'zoho-flow',
+        'slug' => 'zoho-flow',
+        'type' => 'integration',
+        'status' => 'on',
+        'is_pro' => false,
+        'title' => __('Zoho Flow', 'wp-cafe'),
+        'description' => __('Connect with Zoho Flow to push reservations and orders into your Zoho apps and automate workflows.', 'wp-cafe'),
+        'notice' => '',
+        'demo_link' => '',
+        'settings_link' => '',
+        'doc_link' => 'https://themewinter.com/docs/plugins/plugin-docs/integrations/how-to-integrate-zoho-flow-with-wpcafe/',
+        'icon' => '<svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 48 48" fill="none">
+  <rect width="48" height="48" rx="8" fill="#E42527"></rect>
+  <path d="M14 16H34L14 32H34" stroke="#fff" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round" fill="none"></path>
 </svg>
 ',
     ],

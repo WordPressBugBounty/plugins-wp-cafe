@@ -21,6 +21,11 @@ class Checkout_Process implements Hookable_Service_Contract {
 
         add_filter( 'woocommerce_get_cart_item_from_session', [ $this, 'modify_cart_item_price' ], 10, 2 );
 
+        // Charge the booking fee on a reservation-with-food cart. That flow goes
+        // straight to checkout with only the food in the cart (it never runs the
+        // generic-product payment path), so without this the booking is free.
+        add_action( 'woocommerce_cart_calculate_fees', [ $this, 'add_reservation_booking_fee' ] );
+
         add_action( 'woocommerce_payment_complete', [ $this, 'handle_payment_complete' ], 10, 1 );
 
         add_action( 'woocommerce_order_status_changed', [ $this, 'handle_order_status_changed' ], 10, 3 );
@@ -36,6 +41,15 @@ class Checkout_Process implements Hookable_Service_Contract {
          */
         add_action( 'woocommerce_before_calculate_totals', [ $this, 'suppress_deposet_checkout_ui' ], 1 );
         add_action( 'woocommerce_before_checkout_form', [ $this, 'suppress_deposet_checkout_ui' ], 5 );
+
+        /*
+         * Show the booking the customer made on the order-received and "my
+         * account" order pages. At checkout the card comes from the session, but
+         * that is cleared once the order exists, so here we rebuild it read-only
+         * from the reservation saved on the order. Priority 5 keeps it above the
+         * payment split below.
+         */
+        add_action( 'woocommerce_order_details_after_order_table', [ $this, 'display_reservation_summary_on_order' ], 5, 1 );
 
         /*
          * Show how the reservation payment splits up (full price, paid now, owed
@@ -62,14 +76,55 @@ class Checkout_Process implements Hookable_Service_Contract {
 
             $reservation = new Reservation_Model( $session_data['reservation_id'] );
             /*
-             * Price this one line as the whole amount to collect now: the deposit
-             * if partial payment is on, otherwise the full booking total. We do
-             * not add a separate fee on top — that would charge the customer twice.
+             * Price this line as the booking fee only (deposit when partial
+             * payment is on, otherwise the full booking total). Any food is added
+             * as its own cart lines, so this must not include it — get_booking_charge()
+             * excludes food, whereas get_chargeable_amount() would double-count it.
              */
-            $cart_item['data']->set_price( $reservation->get_chargeable_amount() );
+            $cart_item['data']->set_price( $reservation->get_booking_charge() );
         }
 
         return $cart_item;
+    }
+
+    /**
+     * Add the reservation booking amount as a cart fee.
+     *
+     * A reservation-with-food cart is built from the food the customer added in
+     * the booking form and then redirected straight to checkout, so it never
+     * runs the generic-product path that prices a plain reservation. Without a
+     * fee the booking is collected for free.
+     *
+     * If a generic reservation line is already present (the plain-reservation
+     * path), it carries the booking itself, so we skip the fee to avoid charging
+     * twice. The amount is booking-only — food is its own cart lines.
+     *
+     * @param \WC_Cart $cart The cart being calculated.
+     * @return void
+     */
+    public function add_reservation_booking_fee( $cart ) {
+        if ( ! function_exists( 'WC' ) || ! WC()->session ) {
+            return;
+        }
+
+        $session_data = WC()->session->get( 'wpc_reservation_data' );
+        if ( empty( $session_data['reservation_id'] ) ) {
+            return;
+        }
+
+        // A generic reservation line already carries the booking — don't double it.
+        foreach ( $cart->get_cart() as $cart_item ) {
+            if ( ! empty( $cart_item['reservation_id'] ) ) {
+                return;
+            }
+        }
+
+        $reservation = new Reservation_Model( $session_data['reservation_id'] );
+        $amount      = $reservation->get_booking_charge();
+
+        if ( $amount > 0 ) {
+            $cart->add_fee( __( 'Reservation', 'wp-cafe' ), $amount, false );
+        }
     }
 
     /**
@@ -201,6 +256,66 @@ class Checkout_Process implements Hookable_Service_Contract {
         }
 
         return $fields;
+    }
+
+    /**
+     * Render a read-only reservation summary on the order pages.
+     *
+     * The checkout card is driven by the WC session, which is wiped once the
+     * order is created. Here we rebuild the same card from the reservation
+     * linked to the order so the customer can still see what they booked.
+     * `$reservation_context = 'order'` tells the template to drop the Discard
+     * button — a placed booking can't be discarded from the receipt.
+     *
+     * @param \WC_Order $order The order being viewed.
+     * @return void
+     */
+    public function display_reservation_summary_on_order( $order ) {
+        if ( ! is_a( $order, 'WC_Order' ) ) {
+            return;
+        }
+
+        $reservation_id = $order->get_meta( 'reservation_id' );
+        if ( empty( $reservation_id ) ) {
+            return;
+        }
+
+        $reservation = new Reservation_Model( $reservation_id );
+
+        // The model exposes fields through a magic __get without __isset, so
+        // empty()/isset() on $reservation->name always reads false. Pull the
+        // values into locals first, then test and map them.
+        $name       = $reservation->name;
+        $date       = $reservation->date;
+        $start_time = $reservation->start_time;
+
+        // No usable booking on the model means nothing worth rendering.
+        if ( empty( $name ) && empty( $date ) && empty( $start_time ) ) {
+            return;
+        }
+
+        // The shared template keys off `reservation_date`; the model stores it
+        // as `date`. Map across so the same card renders on the receipt.
+        $custom_fields    = $reservation->custom_fields;
+        $reservation_data = [
+            'name'             => $name,
+            'email'            => $reservation->email,
+            'phone'            => $reservation->phone,
+            'reservation_date' => $date,
+            'total_guest'      => $reservation->total_guest,
+            'start_time'       => $start_time,
+            'end_time'         => $reservation->end_time,
+            'notes'            => $reservation->notes,
+            'branch_name'      => $reservation->branch_name,
+            'table_name'       => $reservation->table_name,
+            'custom_fields'    => is_array( $custom_fields ) ? $custom_fields : [],
+        ];
+        $reservation_context = 'order';
+
+        $template_path = wpcafe()->template_directory . '/reservation/reservation-view.php';
+        if ( file_exists( $template_path ) ) {
+            include $template_path;
+        }
     }
 
     /**

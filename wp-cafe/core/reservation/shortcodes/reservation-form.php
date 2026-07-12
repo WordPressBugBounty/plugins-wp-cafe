@@ -39,6 +39,21 @@ class Reservation_Form extends Base_Shortcode {
         wp_enqueue_style( 'wpcafe-frontend-style' );
         wp_enqueue_script( 'wpcafe-frontend-scripts' );
 
+        // The food list loads later over AJAX (get_food_list), so any assets the
+        // food shortcode enqueues server-side never reach this page. When the form
+        // has a food_menu field, enqueue them up-front:
+        //   - wpc-card-core: the card layout CSS (else the cards render unstyled)
+        //   - Optiontics frontend: the addon form's styles + live price calculator
+        //     (else the addon popup shows but its price never updates)
+        if ( ! empty( wpc_get_reservation_food_menu_fields() ) ) {
+            wp_enqueue_style( 'wpc-card-core' );
+            wp_enqueue_style( 'wpc-popup' );
+
+            if ( function_exists( 'optiontics_enqueue_frontend' ) ) {
+                optiontics_enqueue_frontend();
+            }
+        }
+
         ob_start();
 
         ?>

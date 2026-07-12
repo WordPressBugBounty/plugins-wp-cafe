@@ -72,8 +72,46 @@ $cart_link        = wpc_get_option('mini_cart_empty_button_link', get_permalink(
                             echo '<a href="' . esc_url( $product_permalink ) . '">' . Wpc_Utilities::wpc_render( $thumbnail ) . Wpc_Utilities::wpc_kses( $product_name ) . '</a>'; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
                         }
 
-                        // Meta data.
+                        // Labeled discount line, right under the product name: "You pay
+                        // $X (was $Y, save $Z)". The add-on list renders below it. Pro-only
+                        // helper, so guard with class_exists; returns has_discount=false
+                        // (no line) when the discount module is off or not applicable.
+                        $wpc_item_discount = class_exists( '\WpCafePro\FoodOrder\Discount\Discount' )
+                            ? \WpCafePro\FoodOrder\Discount\Discount::get_cart_item_discount_display( $cart_item )
+                            : array( 'has_discount' => false );
+
+                        if ( ! empty( $wpc_item_discount['has_discount'] ) ) :
+                            ?>
+                            <div class="wpc-minicart-discount">
+                                <span class="wpc-minicart-discount-pay">
+                                    <?php echo esc_html__( 'You pay', 'wp-cafe' ) . ' '; ?>
+                                    <?php echo wp_kses_post( wc_price( $wpc_item_discount['pay'] ) ); ?>
+                                </span>
+                                <span class="wpc-minicart-discount-note">
+                                    (<?php echo esc_html__( 'was', 'wp-cafe' ) . ' '; ?>
+                                    <del><?php echo wp_kses_post( wc_price( $wpc_item_discount['was'] ) ); ?></del>,
+                                    <span class="wpc-minicart-discount-save">
+                                        <?php
+                                        /* translators: %s: amount saved, e.g. $2.00 */
+                                        printf( esc_html__( 'save %s', 'wp-cafe' ), wp_kses_post( wc_price( $wpc_item_discount['save'] ) ) );
+                                        ?>
+                                    </span>)
+                                </span>
+                            </div>
+                            <?php
+                        endif;
+
+                        // Meta data (add-ons etc). Suppress the discount module's own
+                        // breakdown rows here — the labeled line above replaces them in
+                        // the compact carts; the full cart page still shows them.
+                        $wpc_suppress_discount_rows = class_exists( '\WpCafePro\FoodOrder\Discount\Checkout_Discount_Display' );
+                        if ( $wpc_suppress_discount_rows ) {
+                            \WpCafePro\FoodOrder\Discount\Checkout_Discount_Display::$suppress_item_data = true;
+                        }
                         echo wc_get_formatted_cart_item_data( $cart_item ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+                        if ( $wpc_suppress_discount_rows ) {
+                            \WpCafePro\FoodOrder\Discount\Checkout_Discount_Display::$suppress_item_data = false;
+                        }
                         ?>
 
                         <div class="mini-cart-quantity-wrapper">

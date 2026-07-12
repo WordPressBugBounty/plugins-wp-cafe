@@ -5,6 +5,7 @@ use DateTime;
 use Ens\Config;
 use Ens\Email\EmailSender;
 use Ens\Utils\Helpers;
+use Ens\Whatsapp\WhatsappSender;
 
 /**
  * Class FlowManager
@@ -313,6 +314,34 @@ class FlowManager {
                 $current_node_id = $this->get_next_node_id( $edges, $node['id'] );
                 break;
 
+            case 'whatsapp':
+                if ( !isset( $node['data'] ) || !is_array( $node['data'] ) ) {
+                    $current_node_id = null;
+                    break;
+                }
+
+                $receiverType = $node['data']['receiverType'] ?? null;
+                if ( $receiverType && isset( $hook_data[$receiverType] ) ) {
+                    $user_number = $hook_data[$receiverType];
+                    $user_number = apply_filters(
+                        Helpers::get_hook_name( $this->identifier, 'notification_sdk_to_whatsapp_numbers' ),
+                        $hook_data[$receiverType],
+                        $hook_data,
+                        $action
+                    );
+
+                    if ( is_array( $user_number ) ) {
+                        foreach ( $user_number as $key => $number ) {
+                            $this->send_whatsapp_to_user( $receiverType, $number, $node['data'], $hook_data, $action, $key );
+                        }
+                    }
+                    else {
+                        $this->send_whatsapp_to_user( $receiverType, $user_number, $node['data'], $hook_data, $action );
+                    }
+                }
+                $current_node_id = $this->get_next_node_id( $edges, $node['id'] );
+                break;
+
             case 'end':
                 return;
 
@@ -498,5 +527,83 @@ class FlowManager {
 
         $email_sender = new EmailSender( $this->identifier, $action_name, $receiverType, $email, $from, $subject, $body, $action_data, $count );
         $email_sender->send();
+    }
+
+    /**
+     * Send WhatsApp message to user with loose validation.
+     *
+     * @since 1.0.0
+     *
+     * @param string $receiverType The type of receiver.
+     * @param mixed  $number       The recipient phone number.
+     * @param array  $data         The action node data (messageBody, etc.).
+     * @param array  $action_data  The hook payload.
+     * @param string $action_name  The triggered action name.
+     * @param int    $count        Iteration count when receiver is an array.
+     */
+    public function send_whatsapp_to_user( $receiverType, $number, $data, $action_data, $action_name, $count = 0 ) {
+        if ( ! is_scalar( $number ) ) {
+            return;
+        }
+        $number = trim( (string) $number );
+        if ( '' === $number ) {
+            return;
+        }
+
+        // Require at least 7 digits (E.164 sanity).
+        if ( strlen( preg_replace( '/\D/', '', $number ) ) < 7 ) {
+            return;
+        }
+
+        $message_type = isset( $data['messageType'] ) && 'template' === $data['messageType'] ? 'template' : 'text';
+
+        if ( 'template' === $message_type ) {
+            $template_name = trim( (string) ( $data['templateName'] ?? '' ) );
+            if ( '' === $template_name ) {
+                return;
+            }
+
+            $body_params = $data['templateBodyParams'] ?? [];
+            if ( is_string( $body_params ) ) {
+                // TagInput normally returns an array, but accept newline-separated string for resilience.
+                $body_params = array_values( array_filter( array_map( 'trim', preg_split( '/\r\n|\r|\n/', $body_params ) ), 'strlen' ) );
+            }
+            if ( ! is_array( $body_params ) ) {
+                $body_params = [];
+            }
+
+            $sender = new WhatsappSender( [
+                'action_name'   => $action_name,
+                'receiver_type' => $receiverType,
+                'to'            => $number,
+                'message'       => '',
+                'message_type'  => 'template',
+                'template'      => [
+                    'name'        => $template_name,
+                    'language'    => trim( (string) ( $data['templateLanguage'] ?? 'en_US' ) ) ?: 'en_US',
+                    'body_params' => $body_params,
+                ],
+                'action_data'   => $action_data,
+                'count'         => $count,
+            ] );
+            $sender->send();
+            return;
+        }
+
+        $message = $data['messageBody'] ?? '';
+        if ( '' === trim( (string) $message ) ) {
+            return;
+        }
+
+        $sender = new WhatsappSender( [
+            'action_name'   => $action_name,
+            'receiver_type' => $receiverType,
+            'to'            => $number,
+            'message'       => $message,
+            'message_type'  => 'text',
+            'action_data'   => $action_data,
+            'count'         => $count,
+        ] );
+        $sender->send();
     }
 }

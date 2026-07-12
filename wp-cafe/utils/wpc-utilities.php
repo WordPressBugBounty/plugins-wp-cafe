@@ -522,31 +522,13 @@ class Wpc_Utilities {
 	 * Menu category
 	 */
 	public static function get_menu_category( $id = null ) {
-		$menu_category = [];
-		try {
-
-			if ( is_null( $id ) ) {
-				$terms = get_terms( [
-					'taxonomy'   => 'product_cat',
-					'hide_empty' => false,
-				] );
-
-				foreach ( $terms as $cat ) {
-					if(is_object( $cat ) ){
-						$menu_category[$cat->term_id] = $cat->name;
-					}
-				}
-
-				return $menu_category;
-			} else {
-				// return single menu.
-				return get_post( $id );
-			}
-
-		} catch ( \Exception $es ) {
-			return [];
+		if ( ! is_null( $id ) ) {
+			// Preserved legacy branch: callers in the wild always pass no arg,
+			// but keep it so the public contract is unchanged.
+			return get_post( $id );
 		}
 
+		return wpc_get_terms_map( 'product_cat' );
 	}
 
 	/**
@@ -859,6 +841,26 @@ class Wpc_Utilities {
 	}
 
 	/**
+	 * Render the icon for the Customize/variation popup button.
+	 *
+	 * Accepts either the new settings array ({type, value}) — rendered as an
+	 * SVG/custom image via render_cart_icon() — or a legacy font-icon class
+	 * string, rendered as <i class="...">.
+	 *
+	 * @param  string|array $icon Icon payload (menu_popup_icon setting or class).
+	 * @return string HTML markup for the icon.
+	 */
+	public static function render_button_icon( $icon ) {
+		if ( is_array( $icon ) ) {
+			$is_custom = ( ( $icon['type'] ?? '' ) === 'custom' );
+			return self::render_cart_icon( $is_custom, $icon );
+		}
+
+		$icon = ! empty( $icon ) ? $icon : 'wpcafe-customize';
+		return '<i class="' . esc_attr( $icon ) . '"></i>';
+	}
+
+	/**
 	 * Add to cart button based on product type
 	 *
 	 * @param [type] $args [ $product, $cart_button, $wpc_btn_text='', $customize_btn= '', $widget_id=''].
@@ -876,6 +878,17 @@ class Wpc_Utilities {
 		$icon_type = '';
 		$icon_value = '';
 
+		// Widgets/older render paths pass the legacy 'wpc_cart_icon' string
+		// (unset on modern installs → the 'wpcafe-cart_icon' default). Prefer the
+		// new global Mini-cart-settings 'cart_icon' ({type,value}) so every card
+		// honours the configured icon, matching the free shortcode path.
+		if ( empty( $cart_icon ) || 'wpcafe-cart_icon' === $cart_icon ) {
+			$global_cart_icon = wpc_get_option( 'cart_icon' );
+			if ( ! empty( $global_cart_icon ) ) {
+				$cart_icon = $global_cart_icon;
+			}
+		}
+
 		if ( is_array($cart_icon) && !empty($cart_icon['type']) ) {
 			$icon_type = $cart_icon['type'];
 			$icon_value = !empty($cart_icon['value']) ? $cart_icon['value'] : '';
@@ -885,7 +898,15 @@ class Wpc_Utilities {
 
 		$is_custom_icon = ($icon_type === 'custom' && !empty($icon_value));
 
-		$customization_icon = !empty($settings['wpc_customization_icon']) ? $settings['wpc_customization_icon'] : 'wpcafe-customize';
+		// Customize/variation popup button icon: prefer the new global
+		// 'menu_popup_icon' ({type,value}) so variable/add-on products show the
+		// configured popup icon. Fall back to the legacy string class.
+		$menu_popup_icon = wpc_get_option( 'menu_popup_icon' );
+		if ( ! empty( $menu_popup_icon ) ) {
+			$customization_icon = $menu_popup_icon;
+		} else {
+			$customization_icon = !empty($settings['wpc_customization_icon']) ? $settings['wpc_customization_icon'] : 'wpcafe-customize';
+		}
 		// qr code parameter.
 		$html = self::qr_code_input();
 		$price_html = "";

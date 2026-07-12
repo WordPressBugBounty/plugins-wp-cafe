@@ -127,6 +127,10 @@ $require_location = (bool) wpc_get_option( 'require_location' );
         <div class="wpc-location-no-results" hidden><?php esc_html_e( 'No matches. Try another search.', 'wp-cafe' ); ?></div>
 
         <footer class="wpc-modal-footer">
+            <?php // Clearing only makes sense when a location exists and one is not mandatory. ?>
+            <?php if ( ! $require_location && ! empty( $selected_location_id ) ) : ?>
+                <button id="wpc-clearLocation" type="button" class="wpc-modal-clear-btn"><?php esc_html_e( 'Clear location', 'wp-cafe' ); ?></button>
+            <?php endif; ?>
             <?php if ( ! $require_location ) : ?>
                 <button type="button" class="wpc-modal-cancel-btn wpc-modal-close"><?php esc_html_e( 'Cancel', 'wp-cafe' ); ?></button>
             <?php endif; ?>

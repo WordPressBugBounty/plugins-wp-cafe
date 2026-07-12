@@ -603,7 +603,24 @@ class WooCommerce_Admin implements Hookable_Service_Contract {
             return;
         }
 
-        wp_add_inline_script( 'jquery', $this->wpc_get_link_param_script() );
+        $base_url = plugins_url( 'assets/admin/', WPCAFE_FILE );
+        $version  = defined( 'WPCAFE_VERSION' ) ? WPCAFE_VERSION : false;
+
+        wp_enqueue_script(
+            'wpc-woo-admin',
+            $base_url . 'woo-admin.js',
+            [], // Converted to vanilla JS — no jQuery dependency.
+            $version,
+            true
+        );
+
+        // admin_url() was previously interpolated into the inline string; pass it
+        // through localized data so the external file stays static.
+        wp_localize_script(
+            'wpc-woo-admin',
+            'wpcWooAdmin',
+            [ 'adminUrl' => admin_url() ]
+        );
     }
 
     /**
@@ -641,242 +658,6 @@ class WooCommerce_Admin implements Hookable_Service_Contract {
         return $location;
     }
  
-
-    /**
-     * Get JavaScript code to add wpcafe=true to all links and handle sidebar
-     *
-     * @return string JavaScript code
-     */
-    private function wpc_get_link_param_script() {
-        $admin_url = esc_js( admin_url() );
-        
-        return "
-        (function($) {
-            'use strict';
-            
-            // Sidebar functionality
-            function initSidebar() {
-                var sidebar = $('#woo-wpc-sidebar');
-                var toggleBtn = $('#sidebar-toggle');
-                var wpcontent = $('#wpcontent');
-                var topbar = $('.woo-wpc-topbar-wrapper');
-                
-                if (sidebar.length === 0) return;
-                
-                // Toggle sidebar
-                toggleBtn.on('click', function() {
-                    sidebar.toggleClass('collapsed');
-                    $('body').toggleClass('sidebar-collapsed');
-                    
-                    // Update wpcontent margin and topbar
-                    if (sidebar.hasClass('collapsed')) {
-                        wpcontent.css('margin-left', '80px');
-                        topbar.css({
-                            'width': 'calc(100% - 120px)',
-                            'margin-left': '80px'
-                        });
-                    } else {
-                        wpcontent.css('margin-left', '220px');
-                        topbar.css({
-                            'width': 'calc(100% - 260px)',
-                            'margin-left': '220px'
-                        });
-                    }
-                });
-                
-                // Handle sidebar link clicks
-                sidebar.on('click', '.sidebar-link', function(e) {
-                    var link = $(this);
-                    var href = link.attr('href');
-                    var isExternal = link.hasClass('external-link');
-                    var isExcluded = link.attr('data-wpcafe-exclude') === 'true';
-                    
-                    if (isExternal || href.indexOf('http') === 0) {
-                        return; // Let external links work normally
-                    }
-                    
-                    // If the link already has wpcafe parameter, let it work normally
-                    if (href.indexOf('wpcafe=') !== -1) {
-                        return; // Let the link work normally
-                    }
-                    
-                    e.preventDefault();
-                    
-                    if (href.indexOf('admin.php?page=wpcafe') !== -1) {
-                        // Internal WpCafe links
-                        window.location.href = href;
-                    } else if (isExcluded) {
-                        // Excluded links - navigate without wpcafe parameter
-                        window.location.href = href;
-                    } else {
-                        // Other admin links - add wpcafe parameter
-                        var separator = href.indexOf('?') !== -1 ? '&' : '?';
-                        var newHref = href + separator + 'wpcafe=true';
-                        window.location.href = newHref;
-                    }
-                });
-            }
-            
-            // Function to add wpcafe=true parameter to URL
-            function addWpcafeParam(url) {
-                if (!url) return url;
-                
-                if (url.indexOf('wpcafe=') !== -1) {
-                    return url;
-                }
-                
-                var separator = url.indexOf('?') !== -1 ? '&' : '?';
-                return url + separator + 'wpcafe=true';
-            }
-            
-            // Function to process links
-            function processLinks(links) {
-                links.each(function() {
-                    var link = $(this);
-                    var href = link.attr('href');
-                    
-                    if (!href || href.indexOf('http') === 0 && href.indexOf(window.location.origin) === -1) {
-                        return;
-                    }
-                    
-                    if (href.indexOf('#') === 0) {
-                        return;
-                    }
-                    
-                    // Skip excluded links
-                    if (link.hasClass('wp-wordpress-icon') || 
-                        link.attr('data-wpcafe-exclude') === 'true' ||
-                        link.attr('href') === '/wp-admin/' || 
-                        link.attr('href') === '{$admin_url}' ||
-                        link.attr('href') === '{$admin_url}index.php' ||
-                        link.text().toLowerCase().includes('wordpress') ||
-                        (link.find('svg').length > 0 && link.attr('href').includes('/wp-admin/'))) {
-                        return;
-                    }
-                    
-                    var adminUrl = '{$admin_url}';
-                    if (href.indexOf(adminUrl) !== -1 && !href.includes('?')) {
-                        return;
-                    }
-                    
-                    var newHref = addWpcafeParam(href);
-                    link.attr('href', newHref);
-                });
-            }
-            
-            // Mobile sidebar functionality using WordPress admin bar toggle
-            function initMobileSidebar() {
-                var wpAdminToggle = $('#wp-admin-bar-menu-toggle');
-                var sidebar = $('#woo-wpc-sidebar');
-                var overlay = $('#woo-wpc-sidebar-overlay');
-                var body = $('body');
-                
-                if (wpAdminToggle.length === 0 || sidebar.length === 0) return;
-                
-                // Hijack WordPress admin bar toggle for mobile sidebar
-                wpAdminToggle.on('click', function(e) {
-                    // Only handle on mobile
-                    if ($(window).width() <= 768) {
-                        e.preventDefault();
-                        e.stopPropagation();
-                        
-                        var isOpen = sidebar.hasClass('mobile-open');
-                        
-                        if (isOpen) {
-                            closeMobileSidebar();
-                        } else {
-                            openMobileSidebar();
-                        }
-                    }
-                });
-                
-                // Close sidebar when clicking overlay
-                overlay.on('click', function() {
-                    closeMobileSidebar();
-                });
-                
-                // Close sidebar when clicking a menu item on mobile
-                sidebar.on('click', '.sidebar-link', function() {
-                    if ($(window).width() <= 768) {
-                        setTimeout(closeMobileSidebar, 200);
-                    }
-                });
-                
-                // Close sidebar on escape key
-                $(document).on('keydown', function(e) {
-                    if (e.key === 'Escape' && sidebar.hasClass('mobile-open')) {
-                        closeMobileSidebar();
-                    }
-                });
-                
-                function openMobileSidebar() {
-                    sidebar.addClass('mobile-open');
-                    overlay.addClass('active');
-                    body.css('overflow', 'hidden');
-                }
-                
-                function closeMobileSidebar() {
-                    sidebar.removeClass('mobile-open');
-                    overlay.removeClass('active');
-                    body.css('overflow', '');
-                }
-            }
-            
-            // Initialize on document ready
-            $(document).ready(function() {
-                // Initialize sidebar
-                initSidebar();
-                initMobileSidebar();
-                
-                processLinks($('a[href]'));
-
-                // Helper function to add wpcafe parameter to form
-                function addWpcafeToForm(form) {
-                    if (form.length > 0 && form.find('input[name=\"wpcafe\"]').length === 0) {
-                        form.append('<input type=\"hidden\" name=\"wpcafe\" value=\"true\">');
-                    }
-                }
-
-                // Preserve wpcafe parameter in form submissions
-                // Handle WooCommerce order update button
-                $(document).on('click', 'button[name=\"save\"].save_order', function(e) {
-                    addWpcafeToForm($(this).closest('form'));
-                });
-
-                // Handle standard WordPress publish button (posts, pages, etc.)
-                $(document).on('click', '#publish', function(e) {
-                    addWpcafeToForm($(this).closest('form'));
-                });
-                
-                // Handle dynamically added content
-                if (window.MutationObserver) {
-                    var observer = new MutationObserver(function(mutations) {
-                        mutations.forEach(function(mutation) {
-                            if (mutation.type === 'childList') {
-                                mutation.addedNodes.forEach(function(node) {
-                                    if (node.nodeType === 1) {
-                                        var target = $(node);
-                                        processLinks(target.find('a[href]'));
-                                        if (target.is('a[href]')) {
-                                            processLinks(target);
-                                        }
-                                    }
-                                });
-                            }
-                        });
-                    });
-                    
-                    observer.observe(document.body, {
-                        childList: true,
-                        subtree: true
-                    });
-                }
-            });
-        })(jQuery);
-        ";
-    }
-
-    
 
     /**
      * Get topbar menu items with active state detection

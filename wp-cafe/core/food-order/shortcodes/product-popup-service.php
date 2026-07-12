@@ -45,6 +45,18 @@ class Product_Popup_Service implements Hookable_Service_Contract {
 	private const AJAX_ACTION = 'variaion_product_popup_content';
 
 	/**
+	 * AJAX action that adds the popup product to the cart.
+	 *
+	 * Variable/grouped products cannot go through WooCommerce's own
+	 * `wc-ajax=add_to_cart`: that endpoint derives the variation attributes
+	 * from the variation post, so an "any" attribute (stored empty) comes back
+	 * blank and WC rejects the add with "choose product options". This handler
+	 * instead passes the attributes the customer actually picked, so any-value
+	 * attributes get filled.
+	 */
+	private const AJAX_ADD_ACTION = 'wpcafe_popup_add_to_cart';
+
+	/**
 	 * Nonce action name. Stable string used by Pro's existing JS.
 	 */
 	private const NONCE_ACTION = 'wpcafe_product_popup_nonce';
@@ -58,6 +70,10 @@ class Product_Popup_Service implements Hookable_Service_Contract {
 		// AJAX handler — runs for both logged-in and anonymous users.
 		add_action( 'wp_ajax_' . self::AJAX_ACTION,        [ $this, 'ajax_popup_content' ] );
 		add_action( 'wp_ajax_nopriv_' . self::AJAX_ACTION, [ $this, 'ajax_popup_content' ] );
+
+		// Add-to-cart handler for the popup (variable/grouped products).
+		add_action( 'wp_ajax_' . self::AJAX_ADD_ACTION,        [ $this, 'ajax_add_to_cart' ] );
+		add_action( 'wp_ajax_nopriv_' . self::AJAX_ADD_ACTION, [ $this, 'ajax_add_to_cart' ] );
 
 		// Customize button HTML for variable / grouped products.
 		add_filter( 'wpcafe/shortcode/variation', [ $this, 'variation_button_html' ], 10, 4 );
@@ -126,6 +142,70 @@ class Product_Popup_Service implements Hookable_Service_Contract {
 	}
 
 	/**
+	 * Add the popup product to the cart.
+	 *
+	 * Used for variable/grouped products. Passes the attributes the customer
+	 * picked so WooCommerce can fill "any" variation attributes that it cannot
+	 * derive from the variation post. add_to_cart() fires
+	 * `woocommerce_add_cart_item_data`, so addon plugins (Optiontics) still read
+	 * their own $_POST fields and attach their selections.
+	 *
+	 * @return void Sends a JSON response (refreshed fragments on success).
+	 */
+	public function ajax_add_to_cart(): void {
+		check_ajax_referer( self::NONCE_ACTION, 'security' );
+
+		// phpcs:disable WordPress.Security.NonceVerification.Missing -- verified above.
+		$product_id   = isset( $_POST['product_id'] ) ? absint( wp_unslash( $_POST['product_id'] ) ) : 0;
+		$variation_id = isset( $_POST['variation_id'] ) ? absint( wp_unslash( $_POST['variation_id'] ) ) : 0;
+		$quantity     = empty( $_POST['quantity'] ) ? 1 : wc_stock_amount( wp_unslash( $_POST['quantity'] ) );
+
+		if ( $product_id <= 0 && $variation_id <= 0 ) {
+			wp_send_json_error( [ 'message' => __( 'Invalid product.', 'wp-cafe' ) ] );
+			return;
+		}
+
+		// A variation id may arrive in either field; normalise to parent + variation.
+		$resolved = wc_get_product( $variation_id > 0 ? $variation_id : $product_id );
+		if ( $resolved instanceof \WC_Product && $resolved->is_type( 'variation' ) ) {
+			$variation_id = $resolved->get_id();
+			$product_id   = $resolved->get_parent_id();
+		}
+
+		// Pull the chosen variation attributes straight from POST. These fill
+		// "any" attributes WC stores empty on the variation, so the add passes.
+		$variation = [];
+		foreach ( array_keys( $_POST ) as $key ) {
+			$key = (string) $key;
+			if ( 0 === strpos( $key, 'attribute_' ) ) {
+				$variation[ sanitize_title( wp_unslash( $key ) ) ] = sanitize_text_field( wp_unslash( $_POST[ $key ] ) );
+			}
+		}
+		// phpcs:enable
+
+		$added = WC()->cart->add_to_cart( $product_id, $quantity, $variation_id, $variation );
+
+		if ( false === $added ) {
+			$messages = [];
+			if ( function_exists( 'wc_get_notices' ) ) {
+				foreach ( wc_get_notices( 'error' ) as $notice ) {
+					$messages[] = is_array( $notice ) ? ( $notice['notice'] ?? '' ) : (string) $notice;
+				}
+				wc_clear_notices();
+			}
+			wp_send_json_error( [
+				'message'     => trim( implode( ' ', array_filter( $messages ) ) ) ?: __( 'Could not add to cart.', 'wp-cafe' ),
+				'product_url' => get_permalink( $product_id ),
+			] );
+			return;
+		}
+
+		// Echoes { fragments, cart_hash } and dies — the same shape the popup
+		// opener JS already consumes from WC's own add-to-cart response.
+		\WC_AJAX::get_refreshed_fragments();
+	}
+
+	/**
 	 * Render the product template inside the popup.
 	 *
 	 * @param  int $product_id Product ID.
@@ -174,7 +254,7 @@ class Product_Popup_Service implements Hookable_Service_Contract {
 	 * @param  string      $customization_icon Icon class.
 	 * @return string
 	 */
-	public function variation_button_html( $product, string $customize_btn = '', string $unique_id = '', string $customization_icon = 'wpcafe-customize' ): string {
+	public function variation_button_html( $product, string $customize_btn = '', string $unique_id = '', $customization_icon = 'wpcafe-customize' ): string {
 		if ( ! ( $product instanceof \WC_Product ) ) {
 			return '';
 		}
@@ -199,7 +279,7 @@ class Product_Popup_Service implements Hookable_Service_Contract {
 					<div class="wpc-add-to-cart">
 						<a href="#" id="product_popup%1$d%2$s" class="customize_button" data-product_id="%1$d">
 							%3$s
-							<i class="%4$s"></i>
+							%4$s
 						</a>
 					</div>
 				</div>
@@ -209,7 +289,9 @@ class Product_Popup_Service implements Hookable_Service_Contract {
 			// Button text may already contain HTML — let upstream filter
 			// decide. Mirrors prior Pro behaviour.
 			$customize_btn, // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
-			esc_attr( $customization_icon )
+			// Popup icon: new menu_popup_icon setting (array) → SVG/img, else
+			// legacy font class. Escaped inside render_button_icon().
+			Wpc_Utilities::render_button_icon( $customization_icon )
 		);
 	}
 
@@ -228,8 +310,12 @@ class Product_Popup_Service implements Hookable_Service_Contract {
 			return;
 		}
 		$printed = true;
+		// The shell prints sitewide, but its overlay styling (incl. display:none)
+		// lives in wpc-public.css, which only loads where WP Cafe renders. Inline
+		// display:none keeps it hidden on plain pages too; the popup opener
+		// (jQuery fadeIn) overrides this when a card opens it.
 		?>
-		<div class="wpc-product-popup-content" id="popup_wrapper">
+		<div class="wpc-product-popup-content" id="popup_wrapper" style="display:none;">
 			<div class="wpc-popup-wrap" id="product_popup">
 				<div class="wpc-popup-wrap-inner">
 					<button class="wpc-close wpc-btn" type="button" aria-label="<?php esc_attr_e( 'Close', 'wp-cafe' ); ?>">
@@ -250,21 +336,23 @@ class Product_Popup_Service implements Hookable_Service_Contract {
 	// =========================================================================
 
 	/**
-	 * Attach `wpc_obj` to the existing `wpc-public` script.
+	 * Attach `wpc_obj` to the `wpc-popup` script.
 	 *
-	 * Pro registers the same global on its own bundle; when both run, Pro's
-	 * later localization simply overwrites with identical values. Free now
-	 * guarantees the global exists even when Pro is absent.
+	 * The popup opener JS lives in wpc-popup.js (FE2 split from wpc-public.js),
+	 * so the ajax url + nonce it reads must ride on that handle. Pro registers
+	 * the same global on its own bundle; when both run, Pro's later
+	 * localization simply overwrites with identical values. Free guarantees the
+	 * global exists even when Pro is absent.
 	 *
 	 * @return void
 	 */
 	public function localize(): void {
-		if ( ! wp_script_is( 'wpc-public', 'registered' ) ) {
+		if ( ! wp_script_is( 'wpc-popup', 'registered' ) ) {
 			return;
 		}
 
 		wp_localize_script(
-			'wpc-public',
+			'wpc-popup',
 			'wpc_obj',
 			[
 				'ajax_url'            => admin_url( 'admin-ajax.php' ),
