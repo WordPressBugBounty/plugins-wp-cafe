@@ -8,7 +8,7 @@ defined( 'ABSPATH' ) || exit;
 
 do_action( 'woocommerce_before_mini_cart' );
 $settings       = $this->settings_obj;
-$min_order_amount = !empty($settings['min_order_amount']) ? floatval( $settings['min_order_amount'] ) : 0 ;
+$min_order_amount = wpc_get_cart_min_order_amount();
 $cart_link 		= !empty($settings['wpc_mini_empty_cart_link']) ? $settings['wpc_mini_empty_cart_link'] : get_permalink( wc_get_page_id( 'shop' ) );
 ?>
 
@@ -55,10 +55,12 @@ $cart_link 		= !empty($settings['wpc_mini_empty_cart_link']) ? $settings['wpc_mi
 							</a>
 						<?php endif; ?>
 						<?php
-						// Labeled discount line under the product name: "You pay $X
-						// (was $Y, save $Z)". Pro-only helper; no line when discounts
-						// are off or not applicable.
-						$wpc_item_discount = class_exists( '\WpCafePro\FoodOrder\Discount\Discount' )
+						/*
+						 * Labeled discount line under the product name: "You pay $X
+						 * (was $Y, save $Z)". Guard on method_exists — older pro builds
+						 * have the Discount class but not this method, which fatals.
+						 */
+						$wpc_item_discount = method_exists( '\WpCafePro\FoodOrder\Discount\Discount', 'get_cart_item_discount_display' )
 							? \WpCafePro\FoodOrder\Discount\Discount::get_cart_item_discount_display( $cart_item )
 							: array( 'has_discount' => false );
 
@@ -85,7 +87,9 @@ $cart_link 		= !empty($settings['wpc_mini_empty_cart_link']) ? $settings['wpc_mi
 
 						// Suppress the discount module's Main/Sale/Discount meta rows
 						// here — the labeled line above replaces them in the compact cart.
-						$wpc_suppress_discount_rows = class_exists( '\WpCafePro\FoodOrder\Discount\Checkout_Discount_Display' );
+						// Guard on property_exists — older pro builds have the class but
+						// not this static, and writing it fatals.
+						$wpc_suppress_discount_rows = property_exists( '\WpCafePro\FoodOrder\Discount\Checkout_Discount_Display', 'suppress_item_data' );
 						if ( $wpc_suppress_discount_rows ) {
 							\WpCafePro\FoodOrder\Discount\Checkout_Discount_Display::$suppress_item_data = true;
 						}
@@ -170,7 +174,8 @@ $cart_link 		= !empty($settings['wpc_mini_empty_cart_link']) ? $settings['wpc_mi
 			<?php  do_action( 'woocommerce_widget_shopping_cart_before_buttons' ); 
 
 
-			if( floatval(WC()->cart->subtotal) > floatval($min_order_amount) || $min_order_amount == 0 ) {
+			// `>=` because a subtotal that exactly meets the minimum qualifies.
+			if( $min_order_amount <= 0 || floatval(WC()->cart->subtotal) >= $min_order_amount ) {
 				$wpc_minicart_ordering_disabled = (bool) apply_filters( 'wpcafe_minicart_ordering_disabled', false );
 
 				if ( $wpc_minicart_ordering_disabled ) :

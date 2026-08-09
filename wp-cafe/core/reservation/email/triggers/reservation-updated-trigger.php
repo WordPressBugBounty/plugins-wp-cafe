@@ -145,6 +145,11 @@ class Reservation_Updated_Trigger extends Abstract_Trigger {
 				'value' => 'reservation_seat_names',
 				'type'  => 'string',
 			),
+			array(
+				'label' => __( 'Reservation Custom Fields', 'wp-cafe' ),
+				'value' => 'reservation_custom_fields',
+				'type'  => 'string',
+			),
 		);
 	}
 

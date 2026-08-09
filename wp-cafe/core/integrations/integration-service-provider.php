@@ -3,11 +3,14 @@
 namespace WpCafe\Integrations;
 use WpCafe\Providers\Base_Service_Provider;
 use WpCafe\Integrations\Fluent_Crm;
+use WpCafe\Integrations\Funnelkit;
+use WpCafe\Integrations\Uncanny_Automator;
 use WpCafe\Integrations\Mail_Mint;
 use WpCafe\Integrations\Mail_Poet;
 use WpCafe\Integrations\Pabbly;
 use WpCafe\Integrations\Zapier;
 use WpCafe\Integrations\Zoho_Flow;
+use WpCafe\Integrations\FlowMattic;
 use WpCafe\Integrations\Controllers\Mailpoet_Controller;
 
 /**
@@ -23,11 +26,14 @@ class Integration_Service_Provider extends Base_Service_Provider {
      */
     protected $services = [
         Fluent_Crm::class,
+        Funnelkit::class,
+        Uncanny_Automator::class,
         Mail_Mint::class,
         Mail_Poet::class,
         Pabbly::class,
         Zapier::class,
         Zoho_Flow::class,
+        FlowMattic::class,
         Mailpoet_Controller::class,
     ];
 

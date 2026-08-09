@@ -178,6 +178,75 @@ if ( ! function_exists( 'wpc_get_order_mode' ) ) {
     }
 }
 
+if ( ! function_exists( 'wpc_get_cart_min_order_amount' ) ) {
+    /**
+     * Minimum cart subtotal required before checkout is offered.
+     *
+     * Free core has no minimum of its own — pickup/delivery minimums are a pro
+     * feature, so pro supplies the real number through the filter.
+     *
+     * The 2.x `min_order_amount` key is deliberately not read here. The 3.0.0
+     * migration copied it into pickup_/delivery_minimum_order_amount and left
+     * the original in place, so reading it would ignore every later admin edit.
+     *
+     * @return float Minimum subtotal; 0 when there is no minimum.
+     */
+    function wpc_get_cart_min_order_amount() {
+        return (float) apply_filters( 'wpcafe_cart_min_order_amount', 0.0 );
+    }
+}
+
+if ( ! function_exists( 'wpc_aisentic_identity' ) ) {
+    /**
+     * Resolve the identity WP Cafe hands to Aisentic when the user connects.
+     *
+     * The consent UI shows these exact values before anything leaves the site,
+     * so the connect request must read them from here too - showing one email
+     * and sending another would break the consent.
+     *
+     * @return array{name:string,email:string,site_url:string}
+     */
+    function wpc_aisentic_identity() {
+        $name  = sanitize_text_field( (string) wpc_get_option( 'restaurant_name', '' ) );
+        $email = sanitize_email( (string) wpc_get_option( 'restaurant_email', '' ) );
+
+        if ( ! $name ) {
+            $name = get_bloginfo( 'name' );
+        }
+
+        if ( ! $email ) {
+            $email = sanitize_email( (string) get_option( 'admin_email', '' ) );
+        }
+
+        return [
+            'name'     => $name,
+            'email'    => $email,
+            'site_url' => site_url(),
+        ];
+    }
+}
+
+if ( ! function_exists( 'wpc_aisentic_is_registered' ) ) {
+    /**
+     * Whether Aisentic already holds a provider api key.
+     *
+     * Reads Aisentic's own settings, so a site the user registered from
+     * Aisentic's own screens counts as connected as well. Without that the
+     * dashboard banner would keep nagging people who are already set up.
+     *
+     * @return bool
+     */
+    function wpc_aisentic_is_registered() {
+        if ( function_exists( 'aisentic_get_option' ) ) {
+            return ! empty( aisentic_get_option( 'llmProviders.aisentic.apiKey', '' ) );
+        }
+
+        $settings = get_option( 'aisentic_settings', [] );
+
+        return ! empty( $settings['llmProviders']['aisentic']['apiKey'] );
+    }
+}
+
 if ( ! function_exists( 'wpc_get_option' ) ) {
     /**
      * Get wp cafe settings
@@ -1136,23 +1205,27 @@ if ( ! function_exists( 'wpcafe_our_plugins_list' ) ) {
                 </svg>
 ',
             ],
-            // Not on wordpress.org — install pulls the zip from download_url (github.com is allowlisted in Plugin_Controller).
+            /*
+             * Installs from the aisentic-public GitHub release, not wordpress.org,
+             * so the build ships ahead of the directory listing. github.com is
+             * allowlisted in Plugin_Controller.
+             */
             'aisentic' => [
                 'name'         => 'aisentic',
                 'slug'         => 'aisentic',
                 'title'        => __( 'Aisentic', 'wp-cafe' ),
-                'description'  => __( 'AI assistant for WordPress — automate content, replies and on-site tasks without leaving your dashboard.', 'wp-cafe' ),
+                'description'  => __( 'Add an AI chatbot so visitors can search your site and navigate features just by asking questions.', 'wp-cafe' ),
                 'is_pro'       => false,
                 'doc_link'     => 'https://support.themewinter.com/docs/plugins/docs/aisentic/',
                 'demo_link'    => '',
-                'download_url' => 'https://github.com/themewinter/aisentic-public/releases/download/v1.0.0/aisentic-1.0.0.zip',
+                'download_url' => 'https://wordpress.org/plugins/aisentic/',
                 'icon'         => '<svg width="155" height="35.838" viewBox="0 0 155 35.838" fill="none" xmlns="http://www.w3.org/2000/svg"><path width="40" height="40" rx="7.018" fill="#6443f9" d="M6.288 0H29.55A6.288 6.288 0 0 1 35.838 6.288V29.55A6.288 6.288 0 0 1 29.55 35.838H6.288A6.288 6.288 0 0 1 0 29.55V6.288A6.288 6.288 0 0 1 6.288 0z"/><path d="M17.919 3.772c0.609 0 1.193 0.244 1.623 0.676a2.303 2.303 0 0 1 0.216 3c-0.296 0.395 -0.71 0.685 -1.184 0.824v3.397h6.561c1.044 0 2.045 0.417 2.784 1.158a3.942 3.942 0 0 1 1.153 2.791v0.731h0.553a1.975 1.975 0 0 1 1.968 1.974v4.605c0 0.524 -0.207 1.026 -0.576 1.397a1.971 1.971 0 0 1 -1.392 0.578h-0.553v3.216a3.942 3.942 0 0 1 -1.153 2.792 3.942 3.942 0 0 1 -2.784 1.157h-14.434a3.942 3.942 0 0 1 -2.784 -1.157 3.942 3.942 0 0 1 -1.153 -2.791v-3.217h-0.553a1.971 1.971 0 0 1 -1.392 -0.578 1.971 1.971 0 0 1 -0.576 -1.396v-4.605c0 -0.524 0.207 -1.026 0.576 -1.396a1.971 1.971 0 0 1 1.392 -0.579h0.553v-0.731c0 -1.047 0.416 -2.052 1.153 -2.791a3.942 3.942 0 0 1 2.784 -1.158h6.561v-3.396a2.294 2.294 0 0 1 -1.64 -2.197c0 -0.61 0.242 -1.196 0.673 -1.628A2.294 2.294 0 0 1 17.919 3.772m-3.638 21.497a0.655 0.655 0 0 0 -0.908 0.787 0.663 0.663 0 0 0 0.31 0.384 9.291 9.291 0 0 0 8.472 0 0.659 0.659 0 0 0 -0.599 -1.171 8.028 8.028 0 0 1 -7.273 0m-0.627 -8.337a2.294 2.294 0 0 0 -1.623 0.675 2.308 2.308 0 0 0 0 3.258 2.294 2.294 0 0 0 3.92 -1.629c0 -0.611 -0.242 -1.197 -0.672 -1.629a2.294 2.294 0 0 0 -1.623 -0.675m8.529 0a2.294 2.294 0 0 0 -2.122 1.422 2.308 2.308 0 0 0 1.243 3.01 2.294 2.294 0 0 0 2.502 -0.499 2.308 2.308 0 0 0 0 -3.258 2.294 2.294 0 0 0 -1.624 -0.675" fill="#fff"/><path d="M148.257 29.181c-4.408 0 -7.453 -3.172 -7.453 -7.58 0 -4.407 3.044 -7.546 7.453 -7.546 2.569 0 4.661 1.141 5.929 2.949l-2.822 2.188c-0.507 -0.602 -1.395 -1.395 -3.012 -1.395 -2.188 0 -3.679 1.617 -3.679 3.805s1.491 3.805 3.679 3.805c1.617 0 2.474 -0.666 3.012 -1.331l2.822 2.123c-1.269 1.84 -3.361 2.982 -5.929 2.982m-14.589 -0.285v-13.69a0.896 0.896 0 0 1 0.896 -0.896h2.202a0.896 0.896 0 0 1 0.896 0.898l-0.03 13.688z" fill="#08002b"/><path d="M135.793 7.841a0.251 0.251 0 0 1 0.237 0.165l0.173 0.468c0.236 0.636 0.331 0.879 0.507 1.055s0.418 0.271 1.055 0.507l0.468 0.173a0.251 0.251 0 0 1 0 0.473l-0.468 0.173c-0.636 0.236 -0.879 0.332 -1.055 0.507s-0.271 0.418 -0.507 1.055l-0.173 0.469a0.252 0.252 0 0 1 -0.473 0l-0.173 -0.469c-0.236 -0.636 -0.332 -0.878 -0.507 -1.055 -0.176 -0.176 -0.418 -0.271 -1.055 -0.507l-0.469 -0.173a0.252 0.252 0 0 1 0 -0.473l0.469 -0.173c0.636 -0.236 0.879 -0.332 1.055 -0.507s0.271 -0.418 0.507 -1.055l0.173 -0.468a0.251 0.251 0 0 1 0.237 -0.165m-3.058 -1.344a0.251 0.251 0 0 1 0.237 0.165l0.074 0.201c0.106 0.285 0.136 0.352 0.184 0.4 0.048 0.048 0.116 0.079 0.4 0.185l0.201 0.073a0.253 0.253 0 0 1 0 0.473l-0.201 0.074c-0.285 0.106 -0.352 0.136 -0.4 0.184 -0.047 0.048 -0.078 0.116 -0.184 0.4l-0.074 0.201a0.252 0.252 0 0 1 -0.472 0l-0.074 -0.201c-0.106 -0.285 -0.136 -0.352 -0.185 -0.4s-0.115 -0.078 -0.4 -0.184l-0.201 -0.074a0.251 0.251 0 0 1 0 -0.473l0.201 -0.073c0.285 -0.106 0.352 -0.136 0.4 -0.185 0.048 -0.047 0.079 -0.115 0.185 -0.4l0.074 -0.201a0.251 0.251 0 0 1 0.236 -0.165" fill="#6443f9"/><path d="M127.903 28.895c-2.917 0 -4.281 -1.521 -4.281 -4.217v-7.356h-1.902V14.308h1.902v-3.575a0.896 0.896 0 0 1 0.896 -0.896h2.172a0.896 0.896 0 0 1 0.896 0.896v3.575h3.108v3.012h-3.108v6.722c0 1.713 1.046 1.776 1.967 1.776h0.983v3.076zm-22.202 0v-13.69a0.896 0.896 0 0 1 0.896 -0.896h2.172a0.896 0.896 0 0 1 0.896 0.896v0.499c1.11 -1.205 2.664 -1.617 4.091 -1.617 2.631 0 5.676 1.426 5.676 5.898v8.91h-3.964v-8.308c0 -2.569 -1.807 -3.172 -2.917 -3.172 -1.141 0 -2.886 0.603 -2.886 3.172v8.308zm-9.81 0.317c-4.472 0 -7.42 -3.266 -7.42 -7.61s2.854 -7.579 7.262 -7.579c4.344 0 7.008 3.234 7.008 7.58v1.078h-10.465c0.381 1.966 1.807 3.139 3.615 3.139 1.934 0 2.949 -0.887 3.457 -1.554l2.695 1.967c-1.269 1.838 -3.488 2.98 -6.152 2.98m-3.552 -9.037h6.691c-0.349 -1.713 -1.427 -3.013 -3.298 -3.013 -1.808 0 -3.013 1.174 -3.393 3.013M80.38 29.34c-3.584 0 -5.803 -1.744 -6.532 -3.519L76.541 24.012c0.349 0.824 2.061 2.157 3.9 2.157 1.364 0 2.093 -0.412 2.093 -1.364 0 -1.174 -1.871 -1.49 -3.012 -1.871s-5.042 -1.3 -5.042 -4.503c0 -3.107 2.726 -4.439 5.866 -4.439 3.172 0 5.295 1.491 6.025 3.076l-2.569 1.649c-0.444 -0.697 -2.029 -1.711 -3.584 -1.711 -1.299 0 -1.871 0.507 -1.871 1.236 0 1.174 1.808 1.49 2.949 1.871s5.105 1.395 5.105 4.534c0 3.076 -2.283 4.693 -6.025 4.693m-11.352 -17.185c-1.079 0 -2.189 -0.824 -2.189 -2.219 0 -1.364 1.111 -2.093 2.188 -2.093 1.046 0 2.189 0.729 2.189 2.093 0 1.395 -1.142 2.219 -2.188 2.219m-1.998 16.744V14.31h3.996l-0.032 14.586zM44.798 28.895 52.942 8.843a0.896 0.896 0 0 1 0.831 -0.559h1.9a0.896 0.896 0 0 1 0.831 0.56l8.113 20.051h-4.344l-1.332 -3.393h-8.467l-1.331 3.393zm7.167 -7.134h5.517l-2.76 -7.008z" fill="#08002b"/></svg>',
             ],
             'optiontics' => [
                 'name'         => 'optiontics',
                 'slug'         => 'optiontics',
                 'title'        => __( 'Optiontics', 'wp-cafe' ),
-                'description'  => __( 'Product add-ons / extras for food items — let customers pick toppings, sizes and other paid options along with the products.', 'wp-cafe' ),
+                'description'  => __( 'Add extra options to food items-toppings, sizes, and paid add-ons, so customers can customize their orders.', 'wp-cafe' ),
                 'is_pro'       => false,
                 'doc_link'     => 'https://support.themewinter.com/docs/plugins/plugin-docs/optiontics/how-to-create-product-options/',
                 'demo_link'    => '',
@@ -1218,6 +1291,100 @@ if ( ! function_exists( 'wpc_product_label_meta' ) ) {
             'fg'         => $foreground,
             'icon_type'  => $icon_type,
             'icon_value' => $icon_value,
+        ];
+    }
+}
+
+if ( ! function_exists( 'wpc_price_decimals' ) ) {
+    /**
+     * How many decimal places prices use on this store.
+     *
+     * Reads WP Cafe's own setting, which starts life as WooCommerce's
+     * `woocommerce_price_num_decimals`, so amounts we work out match the prices
+     * shown everywhere else. The same value reaches the form as
+     * `settings.currency_decimals`.
+     *
+     * @return int Number of decimal places (0 or more).
+     */
+    function wpc_price_decimals(): int {
+        $decimals = wpc_get_option( 'currency_decimals' );
+
+        if ( ! is_numeric( $decimals ) ) {
+            $decimals = function_exists( 'wc_get_price_decimals' ) ? wc_get_price_decimals() : 2;
+        }
+
+        return max( 0, (int) $decimals );
+    }
+}
+
+if ( ! function_exists( 'wpc_money_floor' ) ) {
+    /**
+     * Cut a money amount down to the store's decimal places, rounding down.
+     *
+     * A percentage deposit easily lands on more decimals than the store shows —
+     * half of 103.99 is 51.995. Rounding down means the amount taken now is
+     * never more than the customer's real share, and the leftover fraction goes
+     * into the balance, so the two still add up to the exact total.
+     *
+     * Do not swap this for round(): PHP's round() turns 51.995 into 52.00 while
+     * JavaScript gives 51.99, and the form would then show a different figure
+     * from the one charged. Multiplying out is not exact either (0.29 * 100 is
+     * 28.999999999999996, which floors to 0.28), so we trim to 6 more places
+     * first. floorMoney() in assets/src/helpers/deposit.ts is the same sum.
+     *
+     * @param float    $value    Amount to cut down.
+     * @param int|null $decimals Decimal places; defaults to the store's setting.
+     * @return float The cut-down amount.
+     */
+    function wpc_money_floor( float $value, ?int $decimals = null ): float {
+        $decimals = null === $decimals ? wpc_price_decimals() : max( 0, $decimals );
+        $factor   = pow( 10, $decimals );
+
+        return floor( round( $value * $factor, 6 ) ) / $factor;
+    }
+}
+
+if ( ! function_exists( 'wpc_reservation_deposit_split' ) ) {
+    /**
+     * Split a reservation total into "pay now" and "pay at the restaurant".
+     *
+     * One place for this sum so the booking form, the saved reservation and the
+     * checkout credit all land on the same figures. Returns null when there is
+     * no real part-payment to take (deposit turned off, nothing to pay, or a
+     * deposit that covers the whole amount) — the caller then charges in full.
+     *
+     * @param float $total Booking plus food, i.e. everything paid online.
+     * @return array|null ['deposit' => float, 'remaining' => float] or null.
+     */
+    function wpc_reservation_deposit_split( float $total ): ?array {
+        if ( $total <= 0 || ! function_exists( 'wpc_is_deposet_active' ) || ! wpc_is_deposet_active() ) {
+            return null;
+        }
+
+        if ( ! class_exists( '\Deposet\Helpers\Utilities' ) ) {
+            return null;
+        }
+
+        $calc = \Deposet\Helpers\Utilities::calculate_checkout_deposit(
+            $total,
+            get_option( 'deposet_type', 'percentage' ),
+            (float) get_option( 'deposet_amount', '50' )
+        );
+
+        if ( ! is_array( $calc ) ) {
+            return null;
+        }
+
+        $deposit = wpc_money_floor( (float) $calc['deposit_value'] );
+
+        if ( $deposit <= 0 || $deposit >= $total ) {
+            return null;
+        }
+
+        return [
+            'deposit'   => $deposit,
+            // From the cut-down deposit, so the two add back up to the total.
+            'remaining' => wpc_money_floor( $total - $deposit ),
         ];
     }
 }

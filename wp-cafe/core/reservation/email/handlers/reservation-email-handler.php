@@ -18,6 +18,14 @@ use WpCafe\Models\Reservation_Model;
 class Reservation_Email_Handler implements Hookable_Service_Contract {
 
 	/**
+	 * Placeholder token used for the bundled custom-fields tag.
+	 *
+	 * The SDK leaves this token untouched in the email body; a later filter
+	 * replaces it with the receiver-specific rendered table.
+	 */
+	public const CUSTOM_FIELDS_PLACEHOLDER = '__WPCAFE_RESERVATION_CUSTOM_FIELDS__';
+
+	/**
 	 * Register hooks
 	 *
 	 * @return void
@@ -263,6 +271,132 @@ class Reservation_Email_Handler implements Hookable_Service_Contract {
 	}
 
 	/**
+	 * Build a map of custom field IDs to their admin-defined labels.
+	 *
+	 * @return array<string,string>
+	 */
+	private function get_custom_field_label_map() {
+		$customization_settings = wpc_get_option( 'reservation_form_customization', [] );
+		$labels = [];
+
+		if ( ! is_array( $customization_settings ) ) {
+			return $labels;
+		}
+
+		foreach ( $customization_settings as $step ) {
+			foreach ( $step['fields'] ?? [] as $field ) {
+				$field_id = $field['id'] ?? '';
+				$label    = $field['label'] ?? '';
+
+				if ( $field_id && $label ) {
+					$labels[ $field_id ] = $label;
+				}
+			}
+		}
+
+		return $labels;
+	}
+
+	/**
+	 * Normalize a custom field value for display.
+	 *
+	 * Checkbox values are stored as arrays; render them comma-separated.
+	 *
+	 * @param mixed $value Raw field value.
+	 * @return string
+	 */
+	private function format_custom_field_value( $value ) {
+		if ( is_array( $value ) ) {
+			// Nested arrays/objects can only come from legacy or imported rows;
+			// drop them instead of letting strval() throw a conversion notice.
+			$value = array_filter(
+				array_map(
+					static function ( $item ) {
+						return is_scalar( $item ) ? (string) $item : '';
+					},
+					$value
+				)
+			);
+			return implode( ', ', $value );
+		}
+
+		return is_scalar( $value ) ? (string) $value : '';
+	}
+
+	/**
+	 * Render reservation custom fields as a styled HTML table.
+	 *
+	 * @param Reservation_Model $reservation
+	 * @return string HTML table or empty string if no custom fields.
+	 */
+	public function format_custom_fields_for_email_html( $reservation ) {
+		$custom_fields = $reservation->custom_fields ?? [];
+		if ( empty( $custom_fields ) || ! is_array( $custom_fields ) ) {
+			return '';
+		}
+
+		$labels = $this->get_custom_field_label_map();
+		$rows   = [];
+
+		foreach ( $custom_fields as $field_id => $value ) {
+			$value = $this->format_custom_field_value( $value );
+			if ( '' === $value ) {
+				continue;
+			}
+
+			$label = $labels[ $field_id ] ?? $field_id;
+			$rows[] = sprintf(
+				'<tr><td style="border:1px solid #ddd;padding:8px;background:#f5f5f5;font-weight:bold;">%s</td><td style="border:1px solid #ddd;padding:8px;">%s</td></tr>',
+				esc_html( $label ),
+				esc_html( $value )
+			);
+		}
+
+		if ( empty( $rows ) ) {
+			return '';
+		}
+
+		return sprintf(
+			'<table style="border-collapse:collapse;width:100%%;max-width:600px;border:1px solid #ddd;">%s</table>',
+			implode( '', $rows )
+		);
+	}
+
+	/**
+	 * Render reservation custom fields as plain text.
+	 *
+	 * Useful for WhatsApp or text-only contexts.
+	 *
+	 * @param Reservation_Model $reservation
+	 * @return string Plain text list or empty string if no custom fields.
+	 */
+	public function format_custom_fields_for_email_plain( $reservation ) {
+		$custom_fields = $reservation->custom_fields ?? [];
+		if ( empty( $custom_fields ) || ! is_array( $custom_fields ) ) {
+			return '';
+		}
+
+		$labels = $this->get_custom_field_label_map();
+		$lines  = [];
+
+		foreach ( $custom_fields as $field_id => $value ) {
+			$value = $this->format_custom_field_value( $value );
+			if ( '' === $value ) {
+				continue;
+			}
+
+			$label = $labels[ $field_id ] ?? $field_id;
+			$lines[] = $label . ': ' . $value;
+		}
+
+		if ( empty( $lines ) ) {
+			return '';
+		}
+
+		return implode( "\n", $lines );
+	}
+
+	/**
 	 * Send reservation created notification via email automation.
 	 *
 	 * @param Reservation_Model $reservation The reservation model instance.
@@ -313,6 +447,7 @@ class Reservation_Email_Handler implements Hookable_Service_Contract {
 			'reservation_food_order'    => $reservation->food_order ?? '',
 			'reservation_invoice'       => $reservation->invoice ?? '',
 			'reservation_seat_names'    => $this->get_seat_names( $reservation ),
+			'reservation_custom_fields'   => self::CUSTOM_FIELDS_PLACEHOLDER,
 		);
 
 		// Add custom field data to notification
@@ -375,6 +510,7 @@ class Reservation_Email_Handler implements Hookable_Service_Contract {
 			'reservation_food_order'    => $reservation->food_order ?? '',
 			'reservation_invoice'       => $reservation->invoice ?? '',
 			'reservation_seat_names'    => $this->get_seat_names( $reservation ),
+			'reservation_custom_fields'   => self::CUSTOM_FIELDS_PLACEHOLDER,
 		);
 
 		// Add custom field data to notification
@@ -450,6 +586,7 @@ class Reservation_Email_Handler implements Hookable_Service_Contract {
 			'reservation_food_order'         => $reservation->food_order ?? '',
 			'reservation_invoice'            => $reservation->invoice ?? '',
 			'reservation_seat_names'         => $this->get_seat_names( $reservation ),
+			'reservation_custom_fields'      => self::CUSTOM_FIELDS_PLACEHOLDER,
 		);
 
 		// Add custom field data to notification
@@ -511,6 +648,7 @@ class Reservation_Email_Handler implements Hookable_Service_Contract {
 			'reservation_food_order'         => $reservation->food_order ?? '',
 			'reservation_invoice'            => $reservation->invoice ?? '',
 			'reservation_seat_names'         => $this->get_seat_names( $reservation ),
+			'reservation_custom_fields'      => self::CUSTOM_FIELDS_PLACEHOLDER,
 		);
 
 		// Add custom field data to notification
@@ -552,12 +690,23 @@ class Reservation_Email_Handler implements Hookable_Service_Contract {
 			}
 		}
 
+		/*
+		 * Every known field gets a key, even when the customer left it blank —
+		 * the SDK only replaces placeholders it has data for, so skipping empty
+		 * fields would ship a raw {%custom_<id>%} token in the mail.
+		 *
+		 * Values are flattened first because the SDK ignores array values
+		 * outright (a checkbox field would leak its placeholder too), then tag
+		 * stripped rather than esc_html'd: this array feeds the WhatsApp text
+		 * as well, where HTML entities would show up literally.
+		 */
 		foreach ( $user_field_ids as $field_id ) {
-			// Only include if value actually exists in custom_fields
-			if ( isset( $custom_fields[ $field_id ] ) && ! empty( $custom_fields[ $field_id ] ) ) {
-				$key = 'custom_' . $field_id;
-				$custom_field_data[ $key ] = $custom_fields[ $field_id ];
-			}
+			$key   = 'custom_' . $field_id;
+			$value = isset( $custom_fields[ $field_id ] )
+				? wp_strip_all_tags( $this->format_custom_field_value( $custom_fields[ $field_id ] ) )
+				: '';
+
+			$custom_field_data[ $key ] = $value;
 		}
 
 		return $custom_field_data;

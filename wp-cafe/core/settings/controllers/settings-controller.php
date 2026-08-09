@@ -68,6 +68,7 @@ class Settings_Controller extends Base_Rest_Controller {
         'fluentcrm_webhook_url',
         'mailmint_webhook_url',
         'zoho_flow_webhook_url',
+        'flowmattic_webhook_url',
     ];
 
     /**
@@ -243,6 +244,13 @@ class Settings_Controller extends Base_Rest_Controller {
         foreach ( [ '_locale', '_fields', '_embed', '_jsonp', '_method' ] as $internal ) {
             unset( $params[ $internal ] );
         }
+
+        /*
+         * Keys owned by another screen. The settings form still carries them in
+         * its payload because it echoes back everything it loaded, so saving an
+         * old form would revert a newer value set elsewhere.
+         */
+        unset( $params['default_receipt_layout_id'] );
 
         Settings::update( $params );
 

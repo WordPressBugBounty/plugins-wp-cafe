@@ -167,8 +167,13 @@ trait Integration_Data_Helper {
 			return;
 		}
 
+		// Send the JSON Content-Type header so strict receivers (e.g. Uncanny
+		// Automator) parse the body as JSON. Without it WP defaults to
+		// x-www-form-urlencoded and Automator's auto-detect fails to read the
+		// fields. Lenient receivers (Fluent CRM, Pabbly) already decode raw JSON.
 		wp_remote_post( $url, [
-			'body'     => json_encode( $data ),
+			'headers'  => [ 'Content-Type' => 'application/json' ],
+			'body'     => wp_json_encode( $data ),
 			'blocking' => $blocking,
 		] );
 	}

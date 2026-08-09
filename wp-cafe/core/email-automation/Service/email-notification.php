@@ -4,6 +4,8 @@ namespace WpCafe\Email_Automation\Service;
 if ( ! defined( 'ABSPATH' ) ) exit;
 
 use WpCafe\Contracts\Hookable_Service_Contract;
+use WpCafe\Models\Reservation_Model;
+use WpCafe\Reservation\Email\Handlers\Reservation_Email_Handler;
 use Ens\Core\SDK;
 
 /**
@@ -51,6 +53,7 @@ class Email_Notification implements Hookable_Service_Contract {
 			// name silently never fired, so no automation email got the branded
 			// wrapper. Match the prefixed name so wrapping actually applies.
 			add_filter( 'wpcafe_notification_sdk_email_body', [ $this, 'wrap_email_body' ], 10, 1 );
+			add_filter( 'wpcafe_notification_sdk_email_message', [ $this, 'replace_reservation_custom_fields_placeholder' ], 10, 5 );
 			add_filter( 'wpcafe_ens_whatsapp_credentials', [ $this, 'map_whatsapp_credentials' ] );
 			add_action( 'wpcafe_ens_whatsapp_send_error', [ $this, 'log_whatsapp_error' ], 10, 4 );
 			add_action( 'wpcafe_ens_whatsapp_request',    [ $this, 'log_whatsapp_request' ], 10, 4 );
@@ -247,6 +250,77 @@ class Email_Notification implements Hookable_Service_Contract {
 			$to,
 			is_string( $response_body ) ? $response_body : wp_json_encode( $response_body )
 		) );
+	}
+
+	/**
+	 * Reservation trigger names that may carry the custom-fields placeholder.
+	 *
+	 * @return array<string>
+	 */
+	private function get_reservation_trigger_actions() {
+		return array(
+			'reservation_created',
+			'reservation_confirmed',
+			'reservation_pending',
+			'reservation_updated',
+			'reservation_cancelled',
+		);
+	}
+
+	/**
+	 * Replace the reservation custom-fields placeholder with a receiver-specific table.
+	 *
+	 * The placeholder is left untouched by the SDK's scalar placeholder engine.
+	 * This filter runs once per email recipient and swaps it for the formatted
+	 * HTML table, using different empty-state text for admin vs customer.
+	 *
+	 * @param string $message      The message content after SDK placeholder replacement.
+	 * @param string $receiver_type Receiver type (e.g. customer_email, admin_email).
+	 * @param string $action_name  The trigger action name.
+	 * @param array  $action_data  The notification data array.
+	 * @param int    $count        Email index.
+	 * @return string
+	 */
+	public function replace_reservation_custom_fields_placeholder( $message, $receiver_type, $action_name, $action_data, $count ) {
+		if ( ! is_string( $message ) || '' === $message ) {
+			return $message;
+		}
+
+		$placeholder = Reservation_Email_Handler::CUSTOM_FIELDS_PLACEHOLDER;
+		if ( strpos( $message, $placeholder ) === false ) {
+			return $message;
+		}
+
+		if ( ! in_array( $action_name, $this->get_reservation_trigger_actions(), true ) ) {
+			return $message;
+		}
+
+		$reservation_id = absint( $action_data['reservation_id'] ?? 0 );
+		$formatted      = '';
+
+		if ( $reservation_id ) {
+			try {
+				$reservation = Reservation_Model::find( $reservation_id );
+				if ( $reservation instanceof Reservation_Model ) {
+					$handler   = new Reservation_Email_Handler();
+					$formatted = $handler->format_custom_fields_for_email_html( $reservation );
+				}
+			} catch ( \Exception $e ) {
+				$formatted = '';
+			}
+		}
+
+		$is_admin = 'admin_email' === $receiver_type;
+
+		if ( '' === $formatted ) {
+			$replacement = $is_admin
+				? esc_html__( 'No extra field added', 'wp-cafe' )
+				: '';
+		} else {
+			$replacement = $formatted;
+		}
+
+		return str_replace( $placeholder, $replacement, $message );
 	}
 
 	/**

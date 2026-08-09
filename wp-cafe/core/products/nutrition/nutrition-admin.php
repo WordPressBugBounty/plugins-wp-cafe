@@ -39,9 +39,23 @@ class Nutrition_Admin implements Hookable_Service_Contract {
     public function render_panel() {
         global $post;
         if ( ! $post ) return;
+        self::render_panel_body( $post->ID );
+    }
 
-        $nutrition = wpc_product_nutrition( $post->ID );
-        $allergens = wpc_product_allergens( $post->ID );
+    /**
+     * Render the nutrition + allergen panel body for one product.
+     *
+     * Shared entry point so contexts outside the WooCommerce admin metabox
+     * (e.g. the WCFM vendor product manager in the multivendor addon) can
+     * render the identical UI. Includes its own nonce field, so a caller that
+     * embeds this in another form gets the nonce for free.
+     *
+     * @param int $product_id Product to load values from (0 when adding new).
+     * @return void
+     */
+    public static function render_panel_body( $product_id ) {
+        $nutrition = wpc_product_nutrition( $product_id );
+        $allergens = wpc_product_allergens( $product_id );
         $presets   = wpc_allergen_presets();
 
         $enabled            = ! empty( $nutrition['enabled'] );
@@ -285,8 +299,22 @@ class Nutrition_Admin implements Hookable_Service_Contract {
             return;
         }
 
-        $raw_nutrition = isset( $_POST['wpcafe_nutrition'] ) && is_array( $_POST['wpcafe_nutrition'] )
-            ? wp_unslash( $_POST['wpcafe_nutrition'] )
+        self::save_payload( $post_id, $_POST );
+    }
+
+    /**
+     * Sanitize a raw nutrition/allergen POST payload and persist the two meta
+     * blobs. Split out of save() so other contexts (WCFM vendor product
+     * manager) can reuse the identical sanitization + storage after doing
+     * their own capability/ownership/nonce checks.
+     *
+     * @param int   $product_id Product to write meta to.
+     * @param array $raw_post   Raw request array (slashed), typically $_POST.
+     * @return void
+     */
+    public static function save_payload( $product_id, array $raw_post ) {
+        $raw_nutrition = isset( $raw_post['wpcafe_nutrition'] ) && is_array( $raw_post['wpcafe_nutrition'] )
+            ? wp_unslash( $raw_post['wpcafe_nutrition'] )
             : [];
 
         $raw_format       = $raw_nutrition['format'] ?? 'fda';
@@ -296,14 +324,14 @@ class Nutrition_Admin implements Hookable_Service_Contract {
             'enabled'       => ! empty( $raw_nutrition['enabled'] ),
             'format'        => in_array( $raw_format, wpc_nutrition_formats(), true ) ? $raw_format : 'fda',
             'serving_label' => isset( $raw_nutrition['serving_label'] ) ? sanitize_text_field( $raw_nutrition['serving_label'] ) : '',
-            'serving_size'  => isset( $raw_nutrition['serving_size'] ) && '' !== $raw_nutrition['serving_size'] ? $this->sanitize_decimal( $raw_nutrition['serving_size'] ) : '',
+            'serving_size'  => isset( $raw_nutrition['serving_size'] ) && '' !== $raw_nutrition['serving_size'] ? self::sanitize_decimal( $raw_nutrition['serving_size'] ) : '',
             'serving_unit'  => in_array( $raw_serving_unit, wpc_nutrition_serving_units(), true ) ? $raw_serving_unit : 'g',
-            'ingredients'   => $this->sanitize_ingredients( $raw_nutrition['ingredients'] ?? [] ),
+            'ingredients'   => self::sanitize_ingredients( $raw_nutrition['ingredients'] ?? [] ),
         ];
 
         foreach ( wpc_nutrition_field_keys() as $k ) {
             $sanitized[ $k ] = isset( $raw_nutrition[ $k ] ) && '' !== $raw_nutrition[ $k ]
-                ? $this->sanitize_decimal( $raw_nutrition[ $k ] )
+                ? self::sanitize_decimal( $raw_nutrition[ $k ] )
                 : '';
         }
 
@@ -316,17 +344,17 @@ class Nutrition_Admin implements Hookable_Service_Contract {
                 if ( '' === $name ) continue;
                 $sanitized['vitamins'][] = [
                     'name'  => $name,
-                    'value' => isset( $row['value'] ) && '' !== $row['value'] ? $this->sanitize_decimal( $row['value'] ) : '',
+                    'value' => isset( $row['value'] ) && '' !== $row['value'] ? self::sanitize_decimal( $row['value'] ) : '',
                     'unit'  => in_array( ( $row['unit'] ?? '% DV' ), $allowed_units, true ) ? $row['unit'] : '% DV',
                 ];
             }
         }
 
-        update_post_meta( $post_id, '_wpcafe_nutrition_info', wp_json_encode( $sanitized ) );
+        update_post_meta( $product_id, '_wpcafe_nutrition_info', wp_json_encode( $sanitized ) );
 
         // Allergens.
-        $raw_allergens = isset( $_POST['wpcafe_allergens'] ) && is_array( $_POST['wpcafe_allergens'] )
-            ? wp_unslash( $_POST['wpcafe_allergens'] )
+        $raw_allergens = isset( $raw_post['wpcafe_allergens'] ) && is_array( $raw_post['wpcafe_allergens'] )
+            ? wp_unslash( $raw_post['wpcafe_allergens'] )
             : [];
 
         $allowed_slugs   = wpc_allergen_preset_slugs();
@@ -359,14 +387,14 @@ class Nutrition_Admin implements Hookable_Service_Contract {
             'custom'      => array_values( $custom ),
         ];
 
-        update_post_meta( $post_id, '_wpcafe_allergens', wp_json_encode( $allergen_blob ) );
+        update_post_meta( $product_id, '_wpcafe_allergens', wp_json_encode( $allergen_blob ) );
     }
 
     /**
      * Normalize ingredients to a clean array of trimmed strings.
      * Accepts array (repeater), comma-separated string (legacy), or anything else.
      */
-    private function sanitize_ingredients( $value ) {
+    private static function sanitize_ingredients( $value ) {
         if ( is_string( $value ) ) {
             $value = explode( ',', $value );
         }
@@ -386,11 +414,47 @@ class Nutrition_Admin implements Hookable_Service_Contract {
     /**
      * Sanitize a decimal-style number input — keep as string to preserve precision.
      */
-    private function sanitize_decimal( $value ) {
+    private static function sanitize_decimal( $value ) {
         if ( is_numeric( $value ) ) {
             return (string) (float) $value;
         }
         return '';
+    }
+
+    /**
+     * Nutrition admin asset descriptors (handle, url, version) for the CSS + JS
+     * that drive the panel (repeaters, allergen chip cycling). Shared so other
+     * contexts (WCFM vendor product manager) enqueue the exact same files
+     * instead of hardcoding wp-cafe paths.
+     *
+     * @return array{css:array,js:array,localize:array}
+     */
+    public static function asset_urls() {
+        $base_url = plugins_url( 'assets/admin/', WPCAFE_FILE );
+        $version  = defined( 'WPCAFE_VERSION' ) ? WPCAFE_VERSION : false;
+
+        return [
+            'css'      => [
+                'handle'  => 'wpcafe-nutrition-admin',
+                'src'     => $base_url . 'nutrition.css',
+                'version' => $version,
+            ],
+            'js'       => [
+                'handle'  => 'wpcafe-nutrition-admin',
+                'src'     => $base_url . 'nutrition.js',
+                'version' => $version,
+            ],
+            'localize' => [
+                'object' => 'wpcafeNutrition',
+                'data'   => [
+                    'i18n' => [
+                        'off'        => __( 'off', 'wp-cafe' ),
+                        'contains'   => __( 'Contains', 'wp-cafe' ),
+                        'mayContain' => __( 'May Contain', 'wp-cafe' ),
+                    ],
+                ],
+            ],
+        ];
     }
 
     /**
@@ -405,34 +469,13 @@ class Nutrition_Admin implements Hookable_Service_Contract {
             return;
         }
 
-        $base_url = plugins_url( 'assets/admin/', WPCAFE_FILE );
-        $version  = defined( 'WPCAFE_VERSION' ) ? WPCAFE_VERSION : false;
+        $assets = self::asset_urls();
 
-        wp_enqueue_style(
-            'wpcafe-nutrition-admin',
-            $base_url . 'nutrition.css',
-            [],
-            $version
-        );
+        wp_enqueue_style( $assets['css']['handle'], $assets['css']['src'], [], $assets['css']['version'] );
 
-        wp_enqueue_script(
-            'wpcafe-nutrition-admin',
-            $base_url . 'nutrition.js',
-            [], // Converted to vanilla JS — no jQuery dependency.
-            $version,
-            true
-        );
+        // Converted to vanilla JS — no jQuery dependency.
+        wp_enqueue_script( $assets['js']['handle'], $assets['js']['src'], [], $assets['js']['version'], true );
 
-        wp_localize_script(
-            'wpcafe-nutrition-admin',
-            'wpcafeNutrition',
-            [
-                'i18n' => [
-                    'off'        => __( 'off', 'wp-cafe' ),
-                    'contains'   => __( 'Contains', 'wp-cafe' ),
-                    'mayContain' => __( 'May Contain', 'wp-cafe' ),
-                ],
-            ]
-        );
+        wp_localize_script( $assets['js']['handle'], $assets['localize']['object'], $assets['localize']['data'] );
     }
 }

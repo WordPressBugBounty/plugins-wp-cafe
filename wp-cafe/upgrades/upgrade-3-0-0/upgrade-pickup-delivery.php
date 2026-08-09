@@ -65,6 +65,15 @@ class Upgrade_Pickup_Delivery {
         if ( $minimum_order_amount ) {
             wpc_update_option('pickup_minimum_order_amount', intval($minimum_order_amount) );
             wpc_update_option('delivery_minimum_order_amount', intval($minimum_order_amount) );
+
+            /*
+             * Drop the 2.x key now that both replacements hold the value.
+             * Settings::update() only merges, so leaving it behind would strand
+             * a copy that no admin field can ever change again. Deleted only
+             * after the copy succeeded, so a mid-migration failure still has
+             * the source to retry from.
+             */
+            \WpCafe\Settings::delete_keys( [ 'min_order_amount' ] );
         }
 
         if ( $prepare_time ) {

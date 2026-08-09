@@ -3,7 +3,7 @@ Contributors: arraytics, ehsanriyadh
 Tags: restaurant, reservation, booking, food menu, food delivery, table reservation, WooCommerce, food pickup, takeout, online reservations, restaurant management system, online food ordering
 Requires at least: 6.2
 Tested up to: 7.0
-Stable tag: 3.0.16
+Stable tag: 3.0.17
 Requires PHP: 7.4
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
@@ -419,6 +419,19 @@ Please report security bugs found in the source code of the WPCafe plugin throug
 Note: WooCommerce is required for online food ordering functionality. It is free and will be prompted during setup if not already installed.
 
 == Changelog ==
+
+= 3.0.17 ( August 09, 2026 ) =
+New: Reservation – Order food inside the reservation form, with deposit support.
+New: Integrations – FunnelKit Automations integration.
+New: Integrations – Uncanny Automator integration.
+New: Integrations – FlowMattic integration.
+New: Email – Reservation custom fields available as email tags.
+New: Receipt – Receipt Layout settings with conditional visibility.
+New: Page builders – Restaurant panel remount support for Divi and other builder previews.
+Fix: Reservation – Time slots now show for schedules that end at midnight.
+Fix: Reservation – Paying at the restaurant no longer sends the customer to checkout.
+Fix: Reservation – Picking food no longer forces online payment.
+Fix: Mini cart – Minimum order amount now follows the pickup and delivery settings.
 
 = 3.0.16 ( July 12, 2026 ) =
 New: Integrations – MailPoet integration for sending reservation and order data.

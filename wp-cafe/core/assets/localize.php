@@ -31,10 +31,37 @@ class Localize {
             'table_layout'        => wpc_is_module_enable('table_layout'),
             'has_woo_products'    => (wp_count_posts( 'product' )->publish ?? 0) > 0,
             'deposet'             => wpc_is_deposet_active(),
+            'aisentic'            => self::get_aisentic_state(),
         ];
 
         return apply_filters( 'wpcafe_admin_localize', $data );
-    } 
+    }
+
+    /**
+     * Aisentic connect state for the onboarding consent box and dashboard banner.
+     *
+     * Both surfaces show the email before the user opts in, so the value comes
+     * from the same resolver the connect request uses.
+     *
+     * @return array Aisentic identity plus active/registered flags.
+     */
+    private static function get_aisentic_state() {
+        $identity = wpc_aisentic_identity();
+
+        return [
+            'name'       => $identity['name'],
+            'email'      => $identity['email'],
+            'active'     => class_exists( 'Aisentic\Init' ),
+            'registered' => wpc_aisentic_is_registered(),
+            /*
+             * Aisentic builds before the registration handshake have no
+             * listener for our hook. Connecting would fail silently there, so
+             * the UI hides the offer instead of promising something dead.
+             */
+            'supports_registration' => class_exists( 'Aisentic\Api\Services\Registration_Service' ),
+            'terms_url'  => 'https://themewinter.com/terms-of-service/',
+        ];
+    }
 
     /**
      * Get frontend localize data

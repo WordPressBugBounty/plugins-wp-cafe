@@ -180,13 +180,29 @@ use WpCafe\Models\Reservation_Model;
         $slots = array();
         $date = $date->format( 'Y-m-d' );
 
+        // Guard against 0/empty intervals saved by older versions - they would loop forever.
+        $interval = max( 1, (int) $this->interval );
+
         foreach ( $time_ranges as $range ) {
-            $start = DateTime::createFromFormat( 'h:i A', $range['start'] );
-            $end   = DateTime::createFromFormat( 'h:i A', $range['end'] );
+            $start = $this->parse_time( $range['start'] ?? '' );
+            $end   = $this->parse_time( $range['end'] ?? '' );
+
+            if ( ! $start || ! $end ) {
+                continue;
+            }
+
+            /*
+             * A closing time at or before the opening time means the day runs past
+             * midnight - "8:00 AM to 12:00 AM" is open until midnight, not a zero
+             * length day. Without this every such schedule returned no slots.
+             */
+            if ( $end <= $start ) {
+                $end->modify( '+1 day' );
+            }
 
             while ( $start < $end ) {
                 $slot_start = clone $start;
-                $slot_end   = ( clone $start )->modify( '+' . $this->interval . ' minutes' );
+                $slot_end   = ( clone $start )->modify( '+' . $interval . ' minutes' );
 
                 if ( $slot_end > $end ) {
                     break;
@@ -204,6 +220,45 @@ use WpCafe\Models\Reservation_Model;
         }
 
         return $slots;
+    }
+
+    /**
+     * Turn a stored schedule time into a DateTime on a fixed reference day.
+     *
+     * Times are meant to be saved as "8:00 AM", but schedules migrated from
+     * WP Cafe 2.x and sites on a 24-hour locale also carry "20:00" or "8h00",
+     * so fall back before giving up.
+     *
+     * @param string $time Time string from the schedule.
+     * @return DateTime|null Null when the value cannot be read.
+     */
+    protected function parse_time( $time ) {
+        $time = trim( (string) $time );
+
+        if ( '' === $time ) {
+            return null;
+        }
+
+        foreach ( array( 'h:i A', 'g:i A', 'H:i', 'G:i' ) as $format ) {
+            $parsed = DateTime::createFromFormat( $format, $time );
+
+            if ( $parsed instanceof DateTime ) {
+                // Unspecified fields inherit the current time, so pin seconds to 0.
+                return $parsed->setTime( (int) $parsed->format( 'H' ), (int) $parsed->format( 'i' ), 0 );
+            }
+        }
+
+        $timestamp = strtotime( $time );
+
+        if ( false === $timestamp ) {
+            return null;
+        }
+
+        return ( new DateTime() )->setTimestamp( $timestamp )->setTime(
+            (int) wp_date( 'H', $timestamp ),
+            (int) wp_date( 'i', $timestamp ),
+            0
+        );
     }
 
     /**

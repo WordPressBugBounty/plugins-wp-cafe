@@ -72,6 +72,38 @@ class Settings {
     }
 
     /**
+     * Remove keys from the settings option entirely.
+     *
+     * update() only merges, so a key written by an old version stays forever
+     * once nothing sends it any more. This is the only way to retire one.
+     *
+     * @param  array $keys Setting keys to drop.
+     * @return bool  True when something was removed and the option was saved.
+     */
+    public static function delete_keys( array $keys ) {
+        $settings = self::get();
+
+        if ( ! is_array( $settings ) ) {
+            return false;
+        }
+
+        $removed = false;
+
+        foreach ( $keys as $key ) {
+            if ( array_key_exists( $key, $settings ) ) {
+                unset( $settings[ $key ] );
+                $removed = true;
+            }
+        }
+
+        if ( ! $removed ) {
+            return false;
+        }
+
+        return update_option( self::$option_name, $settings );
+    }
+
+    /**
      * Sanitize settings options by key schema.
      * Known keys get typed sanitization; unknown keys pass through unchanged
      * to avoid breaking pro plugin or third-party extensions.
@@ -121,8 +153,11 @@ class Settings {
             'reservation_confirmation_button_text'    => 'string',
             'reservation_cancellation_button_text'    => 'string',
             'fluentcrm_webhook_url'                   => 'string',
+            'funnelkit_webhook_url'                   => 'string',
+            'uncanny_automator_webhook_url'           => 'string',
             'mailmint_webhook_url'                    => 'string',
             'zoho_flow_webhook_url'                   => 'string',
+            'flowmattic_webhook_url'                  => 'string',
             'whatsapp_facebook_app_id'                => 'string',
             'whatsapp_facebook_app_secret'            => 'string',
             'whatsapp_token'                          => 'string',

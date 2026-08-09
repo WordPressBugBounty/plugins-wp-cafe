@@ -237,7 +237,7 @@ return [
         'notice' => '',
         'demo_link' => '',
         'settings_link' => 'admin.php?page=wpcafe#/receipt-layout',
-        'doc_link' => 'https://support.themewinter.com/docs/plugins/plugin-docs/wpcafe-version-3/how-to-use-time-based-products-in-wpcafe/',
+        'doc_link' => 'https://themewinter.com/docs/plugins/wp-cafe/how-to-use-recipt-layout-in-wpcafe-for-order-recipts-printing/',
         'icon' => '<svg width="26" height="26" viewBox="0 0 26 26" fill="none" xmlns="http://www.w3.org/2000/svg">
   <path d="M21.684 2.16602C20.4778 2.16602 19.5 5.07616 19.5 8.66602H21.684C22.7366 8.66602 23.2628 8.66602 23.5886 8.30261C23.9145 7.9392 23.8577 7.46062 23.7443 6.50348C23.4449 3.97673 22.6355 2.16602 21.684 2.16602Z" stroke="#525266" stroke-width="1.625"/>
   <path d="M19.5013 8.7248V20.199C19.5013 21.8366 19.5013 22.6554 19.0008 22.9777C18.183 23.5045 16.9187 22.3999 16.2828 21.9989C15.7574 21.6675 15.4948 21.5019 15.2032 21.4924C14.8881 21.482 14.6208 21.6409 14.0531 21.9989L11.983 23.3044C11.4245 23.6565 11.1453 23.8327 10.8346 23.8327C10.5239 23.8327 10.2447 23.6565 9.6863 23.3044L7.61619 21.9989C7.0908 21.6675 6.8281 21.5019 6.53654 21.4924C6.2215 21.482 5.95414 21.6409 5.38641 21.9989C4.75058 22.3999 3.48624 23.5045 2.66841 22.9777C2.16797 22.6554 2.16797 21.8366 2.16797 20.199V8.7248C2.16797 5.63295 2.16797 4.08704 3.11987 3.12653C4.07178 2.16602 5.60384 2.16602 8.66797 2.16602H21.668" stroke="#525266" stroke-width="1.625" stroke-linecap="round" stroke-linejoin="round"/>

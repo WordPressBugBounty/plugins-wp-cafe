@@ -49,7 +49,19 @@ class Reservation_Resource extends Resource {
             'food_items'        => Reservation_Item_Resource::collection( $this->data->get_items() ),
         ];
 
-        if ( ! empty( $reservation_data['food_items'] && class_exists('WooCommerce') && function_exists('wc_get_checkout_url') ) ) {
+        /*
+         * Send the customer to checkout only when they chose to pay online. A
+         * booking with food paid for at the restaurant must NOT be pushed to
+         * checkout — the food is recorded on the reservation and settled there,
+         * so the form shows its thank-you screen instead.
+         *
+         * (The && chain used to sit inside empty(), which happened to give the
+         * right answer but read as one test instead of three.)
+         */
+        if ( ! empty( $reservation_data['food_items'] )
+            && 'wc' === $payment_method
+            && class_exists( 'WooCommerce' )
+            && function_exists( 'wc_get_checkout_url' ) ) {
             $reservation_data['redirect_url'] = wc_get_checkout_url();
         }
 

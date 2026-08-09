@@ -43,6 +43,22 @@ class Checkout_Process implements Hookable_Service_Contract {
         add_action( 'woocommerce_before_checkout_form', [ $this, 'suppress_deposet_checkout_ui' ], 5 );
 
         /*
+         * The block checkout gets its deposit box from the Store API instead of
+         * the hooks above, and that route cannot be unhooked, so strip the data
+         * out of the response as well. See strip_deposet_store_api_data().
+         */
+        add_filter( 'rest_request_after_callbacks', [ $this, 'strip_deposet_store_api_data' ], 10, 3 );
+
+        /*
+         * The block checkout does not fetch its first cart over HTTP. WooCommerce
+         * builds that response while rendering the page and prints it into the
+         * markup, skipping the REST stack and the filter above — which is why the
+         * deposit box flashed up on load before the first real request replaced it.
+         * This is the same filter for that server-side path.
+         */
+        add_filter( 'woocommerce_hydration_request_after_callbacks', [ $this, 'strip_deposet_store_api_data' ], 10, 3 );
+
+        /*
          * Show the booking the customer made on the order-received and "my
          * account" order pages. At checkout the card comes from the session, but
          * that is cleared once the order exists, so here we rebuild it read-only
@@ -99,6 +115,11 @@ class Checkout_Process implements Hookable_Service_Contract {
      * path), it carries the booking itself, so we skip the fee to avoid charging
      * twice. The amount is booking-only — food is its own cart lines.
      *
+     * The booking is added at its full amount; when the customer pays a deposit we
+     * bring the whole order (booking + food) down to the deposit with a single
+     * "balance due" credit below, rather than discounting each line. That keeps the
+     * deposit a share of booking *and* food together.
+     *
      * @param \WC_Cart $cart The cart being calculated.
      * @return void
      */
@@ -120,10 +141,30 @@ class Checkout_Process implements Hookable_Service_Contract {
         }
 
         $reservation = new Reservation_Model( $session_data['reservation_id'] );
-        $amount      = $reservation->get_booking_charge();
+        $booking     = (float) $reservation->total_price;
 
-        if ( $amount > 0 ) {
-            $cart->add_fee( __( 'Reservation', 'wp-cafe' ), $amount, false );
+        if ( $booking > 0 ) {
+            $cart->add_fee( __( 'Reservation', 'wp-cafe' ), $booking, false );
+        }
+
+        /*
+         * Deposit booking: the food lines and the booking fee are all at full
+         * price, so credit back the balance to leave only the deposit to pay now.
+         *
+         * Work the split out from the cart as it stands right now, NOT from the
+         * remaining_amount saved on the reservation. That saved figure is from
+         * the moment the booking was made, and the customer can still change the
+         * cart afterwards from the mini-cart or cart page. Crediting back a stale
+         * balance leaves the wrong total — add food and they are overcharged,
+         * remove enough and the credit is bigger than the order.
+         */
+        if ( 'yes' === $reservation->is_partial_payment ) {
+            $order_total = $booking + (float) $cart->get_cart_contents_total();
+            $split       = wpc_reservation_deposit_split( $order_total );
+
+            if ( $split && $split['remaining'] > 0 ) {
+                $cart->add_fee( __( 'Balance due at the restaurant', 'wp-cafe' ), -$split['remaining'], false );
+            }
         }
     }
 
@@ -181,11 +222,32 @@ class Checkout_Process implements Hookable_Service_Contract {
              * Save the payment split on the order so staff can see what was paid
              * now and what is still owed. This is only a record for display — we
              * do not create a second order or chase the balance automatically.
+             *
+             * Work it out from the cart being checked out, the same way the
+             * balance credit does, and write it back to the reservation. The
+             * figures saved when the booking was made go stale as soon as the
+             * customer changes the cart, and this is the record staff read.
              */
             if ( $reservation->is_partial_payment === 'yes' ) {
-                $order->update_meta_data( '_wpc_reservation_total', (float) $reservation->total_price );
-                $order->update_meta_data( '_wpc_reservation_deposit', (float) $reservation->deposit_value );
-                $order->update_meta_data( '_wpc_reservation_remaining', (float) $reservation->remaining_amount );
+                $booking     = (float) $reservation->total_price;
+                $order_total = $booking + (float) WC()->cart->get_cart_contents_total();
+                $split       = wpc_reservation_deposit_split( $order_total );
+
+                $deposit   = $split ? $split['deposit'] : (float) $reservation->deposit_value;
+                $remaining = $split ? $split['remaining'] : (float) $reservation->remaining_amount;
+
+                if ( $split ) {
+                    $reservation->update( [
+                        'deposit_value'    => $deposit,
+                        'remaining_amount' => $remaining,
+                    ] );
+                }
+
+                // Total shown to the customer is the whole order the deposit was
+                // taken on: deposit + balance = booking + food.
+                $order->update_meta_data( '_wpc_reservation_total', $deposit + $remaining );
+                $order->update_meta_data( '_wpc_reservation_deposit', $deposit );
+                $order->update_meta_data( '_wpc_reservation_remaining', $remaining );
                 $order->save();
             }
         }
@@ -390,11 +452,14 @@ class Checkout_Process implements Hookable_Service_Contract {
             return;
         }
 
-        $total     = (float) $reservation->total_price;
         $remaining = (float) $reservation->remaining_amount;
+        $deposit   = (float) $reservation->deposit_value;
+        // Whole order the deposit was taken on (booking + food) = deposit + balance.
+        $total     = $deposit + $remaining;
 
         $rows = [
-            __( 'Reservation total', 'wp-cafe' )            => $total,
+            __( 'Reservation order total', 'wp-cafe' )       => $total,
+            __( 'Deposit paid today', 'wp-cafe' )            => $deposit,
             __( 'Balance due at the restaurant', 'wp-cafe' ) => $remaining,
         ];
 
@@ -433,12 +498,18 @@ class Checkout_Process implements Hookable_Service_Contract {
         }
 
         // The hooks where Deposet changes the total or prints its deposit UI.
+        // wp_enqueue_scripts is included so Deposet's classic- and block-checkout
+        // assets do not load for reservation carts; the block checkout otherwise
+        // renders its own Pay Deposit/Pay Full Amount selector using the cart
+        // subtotal only and ignores the reservation fee, giving wrong figures.
         $hooks = [
             'woocommerce_calculated_total',
             'woocommerce_review_order_before_payment',
             'woocommerce_review_order_after_order_total',
             'woocommerce_checkout_update_order_meta',
             'woocommerce_cart_calculate_fees',
+            'wp_enqueue_scripts',
+            'woocommerce_store_api_checkout_order_processed',
         ];
 
         global $wp_filter;
@@ -454,6 +525,106 @@ class Checkout_Process implements Hookable_Service_Contract {
                         unset( $wp_filter[ $hook ]->callbacks[ $priority ][ $id ] );
                     }
                 }
+            }
+        }
+    }
+
+    /**
+     * Remove Deposet's deposit data from the block cart/checkout response.
+     *
+     * The block checkout does not use the hooks stripped above. Deposet feeds it
+     * through the Store API instead, registered with
+     * woocommerce_store_api_register_endpoint_data(), which is not stored as a
+     * WordPress hook and so cannot be unhooked. Dropping its data from the
+     * response is the reliable way to hide the box: the block only draws the
+     * deposit choice when this data says it is available.
+     *
+     * Only reservation carts are touched, so a plain food order still gets
+     * Deposet's normal deposit choice.
+     *
+     * @param \WP_REST_Response|mixed $response Result of the request.
+     * @param array                   $handler  Route handler used for the request.
+     * @param \WP_REST_Request        $request  The request.
+     * @return \WP_REST_Response|mixed
+     */
+    public function strip_deposet_store_api_data( $response, $handler, $request ) {
+        if ( ! $response instanceof \WP_REST_Response ) {
+            return $response;
+        }
+
+        // Cart and checkout both carry the deposit data; match either.
+        if ( 0 !== strpos( (string) $request->get_route(), '/wc/store/' ) ) {
+            return $response;
+        }
+
+        if ( ! function_exists( 'WC' ) || ! WC()->session ) {
+            return $response;
+        }
+
+        $session_data = WC()->session->get( 'wpc_reservation_data' );
+        if ( empty( $session_data['reservation_id'] ) ) {
+            return $response;
+        }
+
+        $data = $response->get_data();
+        if ( ! is_array( $data ) && ! is_object( $data ) ) {
+            return $response;
+        }
+
+        $this->remove_deposet_extension( $data );
+        $response->set_data( $data );
+
+        return $response;
+    }
+
+    /**
+     * Drop Deposet's data from every `extensions` bag inside a Store API response.
+     *
+     * There is more than one place to look. The cart route carries `extensions` at
+     * the top, but the checkout route asked with `__experimental_calc_totals=true`
+     * also nests a whole cart response under `__experimentalCart`, with its own
+     * copy. Clearing only the top one left that copy to put the deposit box back
+     * as soon as the customer changed payment method.
+     *
+     * The nested key is named "experimental" by WooCommerce and can move, so walk
+     * the response rather than reaching for a fixed path. Depth is capped because
+     * this runs on every Store API call.
+     *
+     * @param array|object $node  Response data, edited in place.
+     * @param int          $depth Current recursion depth.
+     * @return void
+     */
+    private function remove_deposet_extension( &$node, int $depth = 0 ) {
+        if ( $depth > 6 ) {
+            return;
+        }
+
+        $keys = is_object( $node ) ? array_keys( get_object_vars( $node ) ) : ( is_array( $node ) ? array_keys( $node ) : [] );
+
+        foreach ( $keys as $key ) {
+            $value = is_object( $node ) ? $node->$key : $node[ $key ];
+
+            if ( 'extensions' === $key ) {
+                /*
+                 * The Store API hands `extensions` back as an object, not an array,
+                 * so it still encodes as {} when empty. Handle both shapes — reading
+                 * an object with array syntax is a fatal, not a warning.
+                 */
+                if ( is_object( $value ) ) {
+                    unset( $value->deposet );
+                } elseif ( is_array( $value ) ) {
+                    unset( $value['deposet'] );
+                }
+            } elseif ( is_array( $value ) || is_object( $value ) ) {
+                $this->remove_deposet_extension( $value, $depth + 1 );
+            } else {
+                continue;
+            }
+
+            if ( is_object( $node ) ) {
+                $node->$key = $value;
+            } else {
+                $node[ $key ] = $value;
             }
         }
     }

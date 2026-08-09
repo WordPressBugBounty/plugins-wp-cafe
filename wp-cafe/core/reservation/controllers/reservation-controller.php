@@ -133,6 +133,15 @@ class Reservation_Controller extends Base_Rest_Controller {
                 'permission_callback' => [$this, 'check_cart_has_items_permissions_check'],
             ]
         ] );
+
+        register_rest_route( $this->namespace,
+            '/' . $this->rest_base . '/cart-total', [
+            [
+                'methods'             => WP_REST_Server::READABLE,
+                'callback'            => [$this, 'get_reservation_cart_total'],
+                'permission_callback' => [$this, 'check_cart_has_items_permissions_check'],
+            ]
+        ] );
     }
 
     /**
@@ -228,7 +237,15 @@ class Reservation_Controller extends Base_Rest_Controller {
         // Price the reservation from trusted server settings, never the client.
         $this->set_server_calculated_total( $data );
 
-        $this->apply_partial_payment( $data );
+        // When the form shows a food menu, the deposit is worked out on the whole
+        // order (booking + food), not the booking alone. The food is still in the
+        // cart at this point (create_food_items_from_woocart runs just below), so
+        // read its subtotal now and fold it into the deposit split.
+        $food_subtotal = $this->food_menu_is_visible_in_reservation_form()
+            ? $this->get_reservation_food_cart_subtotal()
+            : 0.0;
+
+        $this->apply_partial_payment( $data, $food_subtotal );
 
         $reservation = Reservation_Model::create( $data );
 
@@ -242,6 +259,18 @@ class Reservation_Controller extends Base_Rest_Controller {
 
         if ( ! empty( $food_items ) ) {
             $reservation->update( [ 'food_order' => 'yes' ] );
+
+            /*
+             * Paying at the restaurant: the food is now recorded on the booking
+             * and never goes through checkout, so empty the cart. Leaving it
+             * would mean the same food is counted again on the customer's next
+             * booking (the whole cart counts as that booking's food) and could
+             * be ordered a second time. Online payment keeps the cart — checkout
+             * is about to charge it.
+             */
+            if ( 'wc' !== ( $data['payment_method'] ?? '' ) && function_exists( 'WC' ) && WC()->cart ) {
+                WC()->cart->empty_cart();
+            }
         }
         $this->set_reservation_data_in_woocommerce_session( $reservation );
 
@@ -266,35 +295,35 @@ class Reservation_Controller extends Base_Rest_Controller {
      * amount), and only when both the WP Cafe toggle and the Deposet plugin are
      * switched on.
      *
-     * total_price keeps the full amount. deposit_value and remaining_amount hold
-     * the split, and is_partial_payment ('yes'/'no') tells the checkout whether to
-     * charge only the deposit.
+     * total_price keeps the full booking amount. deposit_value and remaining_amount
+     * hold the split (worked out on booking + food when a food menu is used), and
+     * is_partial_payment ('yes'/'no') tells the checkout whether to charge only the
+     * deposit.
      *
-     * @param array $data Reservation data, changed in place.
+     * @param array $data          Reservation data, changed in place.
+     * @param float $food_subtotal Food already in the cart for this booking. The
+     *                             deposit is taken on booking + food together, so a
+     *                             booking with food asks for a deposit of the whole
+     *                             order, not just the table fee.
      * @return void
      */
-    private function apply_partial_payment( array &$data ): void {
+    private function apply_partial_payment( array &$data, float $food_subtotal = 0.0 ): void {
         $is_wc        = ( $data['payment_method'] ?? '' ) === 'wc';
         $toggle_on    = ! empty( wpc_get_option( 'reservation_partial_payment' ) );
         $wants_deposit = ( $data['payment_amount_type'] ?? 'deposit' ) === 'deposit';
 
         if ( $is_wc && $toggle_on && wpc_is_deposet_active() && $wants_deposit ) {
-            $total = (float) ( $data['total_price'] ?? 0 );
-            $calc  = \Deposet\Helpers\Utilities::calculate_checkout_deposit(
-                $total,
-                get_option( 'deposet_type', 'percentage' ),
-                (float) get_option( 'deposet_amount', '50' )
-            );
+            // The deposit is a share of everything the customer pays online: the
+            // booking amount plus any food added in the form. Checkout works this
+            // out again from the cart it is about to charge, in case the customer
+            // changes the cart after booking.
+            $total = (float) ( $data['total_price'] ?? 0 ) + $food_subtotal;
+            $split = wpc_reservation_deposit_split( $total );
 
-            /*
-             * Only treat it as a deposit when there is a real part-payment to take:
-             * the deposit is above zero and smaller than the full amount. A deposit
-             * equal to the total is just a full payment, so let it fall through.
-             */
-            if ( is_array( $calc ) && (float) $calc['deposit_value'] > 0 && (float) $calc['deposit_value'] < $total ) {
+            if ( $split ) {
                 $data['is_partial_payment'] = 'yes';
-                $data['deposit_value']      = (float) $calc['deposit_value'];
-                $data['remaining_amount']   = (float) $calc['remaining'];
+                $data['deposit_value']      = $split['deposit'];
+                $data['remaining_amount']   = $split['remaining'];
                 return;
             }
         }
@@ -970,6 +999,84 @@ class Reservation_Controller extends Base_Rest_Controller {
     }
 
     /**
+     * Return the WooCommerce cart items that count towards this reservation.
+     *
+     * When the reservation form shows a food menu, the whole cart is treated as
+     * food for the booking — we do not try to separate items the customer added
+     * while shopping from items they picked in the form. They check out in one
+     * go anyway, so splitting them only created cases to handle (merged lines,
+     * items added in another tab, carts built on an earlier visit).
+     *
+     * @return array Map of cart_item_key => WC cart item.
+     */
+    private function get_reservation_food_cart_items(): array {
+        // Bail before touching WC(): on sites without WooCommerce active the
+        // WC() function is undefined and calling it fatals the whole request.
+        if ( ! function_exists( 'WC' ) || ! class_exists( 'WooCommerce' ) ) {
+            return [];
+        }
+
+        if ( function_exists( 'wc_load_cart' ) && is_null( WC()->cart ) ) {
+            wc_load_cart();
+        }
+
+        if ( ! WC()->cart || WC()->cart->is_empty() ) {
+            return [];
+        }
+
+        return WC()->cart->get_cart();
+    }
+
+    /**
+     * Sum the reservation food currently in the cart.
+     *
+     * Uses the addon-inclusive line total so the figure matches what checkout
+     * actually charges (Optiontics adds its addon prices during calculate_totals,
+     * so we recalculate first, then read each line's `line_subtotal`). Falling
+     * back to base price * quantity only if a line has no computed subtotal.
+     *
+     * @return float Line total of the reservation food items.
+     */
+    private function get_reservation_food_cart_subtotal(): float {
+        // Make sure addon prices are baked into each line before reading it.
+        if ( WC()->cart ) {
+            WC()->cart->calculate_totals();
+        }
+
+        $subtotal = 0.0;
+
+        foreach ( $this->get_reservation_food_cart_items() as $cart_item ) {
+            if ( isset( $cart_item['line_subtotal'] ) ) {
+                $subtotal += (float) $cart_item['line_subtotal'];
+                continue;
+            }
+
+            $product = $cart_item['data'] ?? null;
+            if ( $product instanceof \WC_Product ) {
+                $subtotal += (float) $product->get_price() * (int) $cart_item['quantity'];
+            }
+        }
+
+        return $subtotal;
+    }
+
+    /**
+     * REST: live food total, used by the booking form to show a running
+     * "reservation + food" total and the deposit that follows from it.
+     *
+     * Reports the whole cart — see get_reservation_food_cart_items().
+     *
+     * @param \WP_REST_Request $request
+     * @return WP_HTTP_Response
+     */
+    public function get_reservation_cart_total( $request ) {
+        return $this->response( [
+            'food_subtotal' => $this->get_reservation_food_cart_subtotal(),
+            'food_count'    => count( $this->get_reservation_food_cart_items() ),
+        ] );
+    }
+
+    /**
      * Create food items from woocommerce cart items
      *
      * @param int $reservation_id
@@ -977,28 +1084,9 @@ class Reservation_Controller extends Base_Rest_Controller {
      * @return array Array of Reservation_Item_Model instances
      */
     public function create_food_items_from_woocart( $reservation_id ) {
-        // Bail before touching WC(): on sites without WooCommerce active the
-        // WC() function is undefined and calling it fatals the whole request.
-        if ( ! function_exists( 'WC' ) || ! class_exists( 'WooCommerce' ) ) {
-            return [];
-        }
-
-        if ( function_exists('wc_load_cart') && is_null( WC()->cart ) ) {
-            wc_load_cart();
-        }
-
-        if ( ! WC()->cart ) {
-            return [];
-        }
-
-        $cart = WC()->cart;
-        if ( $cart->is_empty() ) {
-            return [];
-        }
-
         $reservation_items = [];
 
-        foreach ( $cart->get_cart() as $cart_item ) {
+        foreach ( $this->get_reservation_food_cart_items() as $cart_item ) {
             $product = $cart_item['data'];
 
             if ( ! ( $product instanceof \WC_Product ) ) {
