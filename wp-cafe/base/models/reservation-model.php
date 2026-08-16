@@ -5,6 +5,23 @@ use WpCafe\Database\Post_Model;
 
 class Reservation_Model extends Post_Model {
     /**
+     * Moderation statuses a reservation is allowed to hold.
+     *
+     * The status becomes the post_status, so anything outside this list —
+     * including core statuses like `publish` or `trash` — could park a booking
+     * where the admin list never looks for it.
+     *
+     * @var string[]
+     */
+    public const ALLOWED_STATUSES = [
+        'pending',
+        'confirmed',
+        'cancelled',
+        'pending_payment',
+        'refunded',
+    ];
+
+    /**
      * Store fillable attributes
      *
      * @var array
@@ -45,6 +62,34 @@ class Reservation_Model extends Post_Model {
      */
     public function get_post_type() {
         return 'wpc_reservation';
+    }
+
+    /**
+     * Reduce a supplied status to one the plugin actually uses.
+     *
+     * Every path that can write a status should go through this, so a value
+     * from a request body can never reach post_status unchecked.
+     *
+     * @param mixed  $status   Raw status value.
+     * @param string $fallback Returned when the value is not allowed.
+     * @return string
+     */
+    public static function sanitize_status( $status, string $fallback = 'pending' ): string {
+        $status = is_string( $status ) ? strtolower( trim( $status ) ) : '';
+
+        return in_array( $status, self::ALLOWED_STATUSES, true ) ? $status : $fallback;
+    }
+
+    /**
+     * The status new bookings start in, taken from the Reservation settings.
+     *
+     * Runs through sanitize_status() as well, so a settings row edited by hand
+     * still cannot introduce an unknown status.
+     *
+     * @return string
+     */
+    public static function default_status(): string {
+        return self::sanitize_status( wpc_get_option( 'reservation_status', 'pending' ), 'pending' );
     }
 
     /**

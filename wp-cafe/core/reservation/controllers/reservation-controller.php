@@ -202,6 +202,9 @@ class Reservation_Controller extends Base_Rest_Controller {
      * @return WP_HTTP_Response|WP_Error
      */
     public function create_item($request) {
+        // Counted here, not in the permission callback — see rate_limit_exceeded().
+        $this->record_rate_limit_hit( 10 * MINUTE_IN_SECONDS, 'create' );
+
         $data = $this->prepare_item_for_database($request);
 
         if ( is_wp_error( $data ) ) {
@@ -230,9 +233,23 @@ class Reservation_Controller extends Base_Rest_Controller {
 
         $data['invoice'] = $this->generate_invoice_number();
 
-        if ( empty( $data['status'] ) ) {
-            $data['status'] = wpc_get_option( 'reservation_status', 'pending' );
-        }
+        /*
+         * The moderation status belongs to the site owner, not the caller. This
+         * route is open to logged-out visitors (it is the booking form), so only
+         * a user who can manage reservations may choose one; everyone else gets
+         * the configured default. Without this an anonymous POST could file
+         * itself as "confirmed" and skip the approval queue (CVE-2026-14550).
+         */
+        $data['status'] = $this->can_manage_reservations()
+            ? Reservation_Model::sanitize_status( $data['status'] ?? '', Reservation_Model::default_status() )
+            : Reservation_Model::default_status();
+
+        /*
+         * Payment linkage is written by the checkout hooks once money actually
+         * moves. Taking it from the request would let a booking point at someone
+         * else's WooCommerce order and report that order's payment method.
+         */
+        unset( $data['woo_order_id'], $data['payment_intent'] );
 
         // Price the reservation from trusted server settings, never the client.
         $this->set_server_calculated_total( $data );
@@ -449,13 +466,37 @@ class Reservation_Controller extends Base_Rest_Controller {
     }
 
     /**
-     * Permission check for creating a reservation
+     * Permission check for creating a reservation.
+     *
+     * The booking form is public, so this stays open to logged-out visitors —
+     * the nonce is CSRF protection only, and the guest `wp_rest` nonce is
+     * printed on every page carrying the form. What the caller may actually set
+     * is decided in create_item(); this callback only rejects forged and
+     * flooded requests.
+     *
+     * Deny paths must return WP_Error or false: WordPress treats any other
+     * return value as "granted".
      *
      * @param \WP_REST_Request $request
-     * @return bool
+     * @return true|\WP_Error
      */
-    public function create_item_permissions_check($request): bool {
-        return $this->verify_rest_nonce( $request );
+    public function create_item_permissions_check($request) {
+        /**
+         * Bookings allowed per IP before new attempts are refused.
+         *
+         * @param int $limit Number of bookings per 10 minutes.
+         */
+        $limit = (int) apply_filters( 'wpcafe_reservation_create_rate_limit', 10 );
+
+        if ( $this->rate_limit_exceeded( $limit, 'create' ) ) {
+            return new \WP_Error( 'rate_limited', __( 'Too many requests. Please try again later.', 'wp-cafe' ), [ 'status' => 429 ] );
+        }
+
+        if ( ! $this->verify_rest_nonce( $request ) ) {
+            return new \WP_Error( 'wpcafe_invalid_nonce', __( 'Invalid security token.', 'wp-cafe' ), [ 'status' => 403 ] );
+        }
+
+        return true;
     }
 
     /**
@@ -596,6 +637,21 @@ class Reservation_Controller extends Base_Rest_Controller {
 
         if ( is_wp_error( $data ) ) {
             return $this->error($data->get_error_message());
+        }
+
+        /*
+         * Same rule as create: a status only ever comes from our own list. An
+         * unknown value is refused rather than defaulted, so a bad request
+         * cannot quietly move a confirmed booking back to pending.
+         */
+        if ( isset( $data['status'] ) ) {
+            $clean_status = Reservation_Model::sanitize_status( $data['status'], '' );
+
+            if ( '' === $clean_status ) {
+                return $this->error( __( 'Invalid reservation status.', 'wp-cafe' ), 400 );
+            }
+
+            $data['status'] = $clean_status;
         }
 
         $old_status = $reservation->status;
@@ -1070,6 +1126,9 @@ class Reservation_Controller extends Base_Rest_Controller {
      * @return WP_HTTP_Response
      */
     public function get_reservation_cart_total( $request ) {
+        // Counted here, not in the permission callback — see rate_limit_exceeded().
+        $this->record_rate_limit_hit( 60, 'cart' );
+
         return $this->response( [
             'food_subtotal' => $this->get_reservation_food_cart_subtotal(),
             'food_count'    => count( $this->get_reservation_food_cart_items() ),
@@ -1119,6 +1178,9 @@ class Reservation_Controller extends Base_Rest_Controller {
      * @return WP_HTTP_Response
      */
     public function get_slots($request) {
+        // Counted here, not in the permission callback — see rate_limit_exceeded().
+        $this->record_rate_limit_hit( 60, 'slots' );
+
         $start_date     = $request->get_param('start_date');
         $end_date       = $request->get_param('end_date');
         $location_id    = $request->get_param('location_id') ?? null;
@@ -1282,24 +1344,97 @@ class Reservation_Controller extends Base_Rest_Controller {
     }
 
     /**
-     * Transient-based IP rate limiter for public endpoints.
-     * Returns true if the request is within the allowed limit, false otherwise.
-     *
-     * @param int $limit  Max requests allowed within $window seconds.
-     * @param int $window Time window in seconds.
-     * @return bool
+     * Object-cache group for the rate-limit counters.
      */
-    private function check_rate_limit( int $limit = 30, int $window = 60 ): bool {
-        $ip    = sanitize_text_field( wp_unslash( $_SERVER['REMOTE_ADDR'] ?? '' ) );
-        $key   = 'wpc_rate_' . md5( $ip );
-        $count = (int) get_transient( $key );
+    private const RATE_GROUP = 'wpcafe_rate';
 
-        if ( $count >= $limit ) {
-            return false;
+    /**
+     * Storage key holding this caller's request count.
+     *
+     * Each endpoint passes its own bucket so one route can't drain another's
+     * allowance. The booking form fires several read routes back-to-back while
+     * the guest fills it in (slots, capacity, food list, cart total); a shared
+     * counter would let that normal traffic trip a 429 on a legitimate user.
+     *
+     * @param string $bucket Counter name — the endpoint's own bucket.
+     * @return string
+     */
+    private function rate_limit_key( string $bucket = '' ): string {
+        $ip = sanitize_text_field( wp_unslash( $_SERVER['REMOTE_ADDR'] ?? '' ) );
+
+        return 'wpc_rate_' . ( '' !== $bucket ? $bucket . '_' : '' ) . md5( $ip );
+    }
+
+    /**
+     * Current request count for this caller's bucket.
+     *
+     * Reads from whichever store record_rate_limit_hit() writes to, so the two
+     * always agree: the persistent object cache when one is present, the options
+     * table (transient) otherwise.
+     *
+     * @param string $bucket Counter name, see rate_limit_key().
+     * @return int
+     */
+    private function rate_limit_count( string $bucket = '' ): int {
+        $key = $this->rate_limit_key( $bucket );
+
+        if ( wp_using_ext_object_cache() ) {
+            $count = wp_cache_get( $key, self::RATE_GROUP );
+            return false === $count ? 0 : (int) $count;
         }
 
-        set_transient( $key, $count + 1, $window );
-        return true;
+        return (int) get_transient( $key );
+    }
+
+    /**
+     * Has this caller used up its allowance?
+     *
+     * Read-only on purpose. WordPress runs a permission callback twice per
+     * request — once to authorize it, then again from rest_send_allow_header()
+     * to build the Allow header — so counting here would spend two of the
+     * caller's requests for every one they make. The route handler records the
+     * hit instead, once it is actually going to do the work.
+     *
+     * @param int    $limit  Max requests allowed within the window.
+     * @param string $bucket Counter name, see rate_limit_key().
+     * @return bool
+     */
+    private function rate_limit_exceeded( int $limit = 30, string $bucket = '' ): bool {
+        return $this->rate_limit_count( $bucket ) >= $limit;
+    }
+
+    /**
+     * Count one request against this caller's allowance.
+     *
+     * With a persistent object cache (Redis/Memcached) the increment is atomic,
+     * so two requests arriving together can't both read N and both write N+1 and
+     * lose a hit. Without one we fall back to a read-modify-write transient,
+     * which is not atomic — a concurrent burst can slip a few extra requests
+     * past the cap. That is an accepted limit of a DB-backed throttle: it stops
+     * naive floods, it is not the authorization boundary. Reads are harmless and
+     * every write route is still cap-gated on top of this.
+     *
+     * @param int    $window Time window in seconds.
+     * @param string $bucket Counter name, see rate_limit_key().
+     * @return int The count after this hit.
+     */
+    private function record_rate_limit_hit( int $window = 60, string $bucket = '' ): int {
+        $key = $this->rate_limit_key( $bucket );
+
+        if ( wp_using_ext_object_cache() ) {
+            // Seed the key without clobbering an existing count, then bump it
+            // atomically. wp_cache_incr() returns false only on a missing key,
+            // which the add() above rules out on the normal path.
+            wp_cache_add( $key, 0, self::RATE_GROUP, $window );
+            $count = wp_cache_incr( $key, 1, self::RATE_GROUP );
+            if ( false !== $count ) {
+                return (int) $count;
+            }
+        }
+
+        $count = (int) get_transient( $key ) + 1;
+        set_transient( $key, $count, $window );
+        return $count;
     }
 
     /**
@@ -1309,7 +1444,7 @@ class Reservation_Controller extends Base_Rest_Controller {
      * @return bool|\WP_Error
      */
     public function get_slots_permissions_check($request) {
-        if ( ! $this->check_rate_limit() ) {
+        if ( $this->rate_limit_exceeded( 60, 'slots' ) ) {
             return new \WP_Error( 'rate_limited', __( 'Too many requests. Please try again later.', 'wp-cafe' ), [ 'status' => 429 ] );
         }
         return true;
@@ -1322,6 +1457,9 @@ class Reservation_Controller extends Base_Rest_Controller {
      * @return WP_HTTP_Response
      */
     public function get_reservation_capacity($request) {
+        // Counted here, not in the permission callback — see rate_limit_exceeded().
+        $this->record_rate_limit_hit( 60, 'capacity' );
+
         $date       = $request->get_param('date');
         $start_time = $request->get_param('start_time');
         $end_time   = $request->get_param('end_time');
@@ -1367,7 +1505,7 @@ class Reservation_Controller extends Base_Rest_Controller {
      * @return bool|\WP_Error
      */
     public function get_reservation_capacity_permissions_check($request) {
-        if ( ! $this->check_rate_limit() ) {
+        if ( $this->rate_limit_exceeded( 60, 'capacity' ) ) {
             return new \WP_Error( 'rate_limited', __( 'Too many requests. Please try again later.', 'wp-cafe' ), [ 'status' => 429 ] );
         }
         return true;
@@ -1429,6 +1567,9 @@ class Reservation_Controller extends Base_Rest_Controller {
      * @return WP_HTTP_Response
      */
     public function cancel_reservation($request) {
+        // Counted here, not in the permission callback — see rate_limit_exceeded().
+        $this->record_rate_limit_hit( 60, 'cancel' );
+
         if ( ! $this->verify_rest_nonce( $request ) ) {
             return $this->error( __( 'Security check failed. Please try again.', 'wp-cafe' ), 403 );
         }
@@ -1479,7 +1620,8 @@ class Reservation_Controller extends Base_Rest_Controller {
      * @return bool|\WP_Error True when the caller owns the booking, WP_Error/false otherwise.
      */
     public function cancel_reservation_permissions_check($request) {
-        if ( ! $this->check_rate_limit() ) {
+        // Write action — tighter cap than the read lookups.
+        if ( $this->rate_limit_exceeded( 20, 'cancel' ) ) {
             return new \WP_Error( 'rate_limited', __( 'Too many requests. Please try again later.', 'wp-cafe' ), [ 'status' => 429 ] );
         }
         if ( ! $this->verify_rest_nonce( $request ) ) {
@@ -1498,6 +1640,9 @@ class Reservation_Controller extends Base_Rest_Controller {
      * @return WP_HTTP_Response
      */
     public function get_food_list($request) {
+        // Counted here, not in the permission callback — see rate_limit_exceeded().
+        $this->record_rate_limit_hit( 60, 'food' );
+
         $content = "";
 
         $branch_id = $request->get_param('branch_id');
@@ -1595,7 +1740,7 @@ class Reservation_Controller extends Base_Rest_Controller {
      * @return bool|\WP_Error
      */
     public function get_food_list_permissions_check() {
-        if ( ! $this->check_rate_limit() ) {
+        if ( $this->rate_limit_exceeded( 60, 'food' ) ) {
             return new \WP_Error( 'rate_limited', __( 'Too many requests. Please try again later.', 'wp-cafe' ), [ 'status' => 429 ] );
         }
         return true;
@@ -1620,6 +1765,9 @@ class Reservation_Controller extends Base_Rest_Controller {
      * @return WP_HTTP_Response
      */
     public function check_cart_has_items() {
+        // Counted here, not in the permission callback — see rate_limit_exceeded().
+        $this->record_rate_limit_hit( 60, 'cart' );
+
         // Check if WooCommerce is available
         if ( ! class_exists( 'WooCommerce' ) ) {
             return $this->response( [ 'has_items' => false ] );
@@ -1644,7 +1792,8 @@ class Reservation_Controller extends Base_Rest_Controller {
      * @return bool|\WP_Error
      */
     public function check_cart_has_items_permissions_check() {
-        if ( ! $this->check_rate_limit() ) {
+        // Shared by check_cart_has_items and get_reservation_cart_total.
+        if ( $this->rate_limit_exceeded( 60, 'cart' ) ) {
             return new \WP_Error( 'rate_limited', __( 'Too many requests. Please try again later.', 'wp-cafe' ), [ 'status' => 429 ] );
         }
         return true;

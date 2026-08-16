@@ -2,14 +2,14 @@
 # This file is distributed under the GPL-2.0+.
 msgid ""
 msgstr ""
-"Project-Id-Version: WPCafe - Restaurant Menu, Online Food Ordering & Table Booking System 3.0.17\n"
+"Project-Id-Version: WPCafe - Restaurant Menu, Online Food Ordering & Table Booking System 3.0.18\n"
 "Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/wp-cafe\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2026-08-03T12:16:15+00:00\n"
+"POT-Creation-Date: 2026-08-11T12:14:21+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.12.0\n"
 "X-Domain: wp-cafe\n"
@@ -94,7 +94,7 @@ msgid "Invalid property provided: %s"
 msgstr ""
 
 #. translators: %1$d: requested number of guests, %2$d: available capacity
-#: base/models/reservation-model.php:384
+#: base/models/reservation-model.php:429
 #, php-format
 msgid "Cannot create reservation. Requested %1$d guest(s) exceeds available capacity of %2$d for this time slot."
 msgstr ""
@@ -631,45 +631,45 @@ msgstr ""
 msgid "Download URL must use HTTPS from a trusted domain."
 msgstr ""
 
-#: core/food-order/controllers/food-order-controller.php:85
+#: core/food-order/controllers/food-order-controller.php:92
 msgid "You do not have permission to access orders."
 msgstr ""
 
-#: core/food-order/controllers/food-order-controller.php:89
-#: core/food-order/controllers/food-order-controller.php:114
-#: core/products/labels/controllers/product-label-controller.php:263
-#: core/products/labels/controllers/product-label-controller.php:287
+#: core/food-order/controllers/food-order-controller.php:98
+#: core/food-order/controllers/food-order-controller.php:129
+#: core/products/labels/controllers/product-label-controller.php:272
+#: core/products/labels/controllers/product-label-controller.php:303
 msgid "Invalid nonce."
 msgstr ""
 
-#: core/food-order/controllers/food-order-controller.php:93
-#: core/food-order/controllers/food-order-controller.php:118
+#: core/food-order/controllers/food-order-controller.php:102
+#: core/food-order/controllers/food-order-controller.php:133
 msgid "WooCommerce is not active."
 msgstr ""
 
-#: core/food-order/controllers/food-order-controller.php:110
+#: core/food-order/controllers/food-order-controller.php:123
 msgid "You do not have permission to manage orders."
 msgstr ""
 
-#: core/food-order/controllers/food-order-controller.php:214
-#: core/food-order/controllers/food-order-controller.php:244
-#: core/food-order/controllers/food-order-controller.php:263
+#: core/food-order/controllers/food-order-controller.php:229
+#: core/food-order/controllers/food-order-controller.php:259
+#: core/food-order/controllers/food-order-controller.php:278
 msgid "Order not found."
 msgstr ""
 
-#: core/food-order/controllers/food-order-controller.php:219
+#: core/food-order/controllers/food-order-controller.php:234
 msgid "Status is required."
 msgstr ""
 
-#: core/food-order/controllers/food-order-controller.php:225
+#: core/food-order/controllers/food-order-controller.php:240
 msgid "Invalid status."
 msgstr ""
 
-#: core/food-order/controllers/food-order-controller.php:271
+#: core/food-order/controllers/food-order-controller.php:286
 msgid "You do not have permission to view this order."
 msgstr ""
 
-#: core/food-order/controllers/food-order-controller.php:295
+#: core/food-order/controllers/food-order-controller.php:310
 #: templates/reservation/reservation-view.php:101
 #: assets/build/js/wc-checkout-blocks.js:1
 msgid "Guest"
@@ -718,7 +718,7 @@ msgstr ""
 #: assets/build/chunks/js/4589.79f07815.js:1
 #: assets/build/chunks/js/7607.81cc6925.js:1
 #: assets/build/chunks/js/8599.c0f5d89b.js:1
-#: assets/build/chunks/js/common-b1893266.d335116a.js:2
+#: assets/build/chunks/js/common-b1893266.1481c1d0.js:2
 #: assets/build/chunks/js/common-d1e7a7dc.a0f09380.js:1
 msgid "Delivery"
 msgstr ""
@@ -729,7 +729,7 @@ msgstr ""
 #: assets/build/chunks/js/4589.79f07815.js:1
 #: assets/build/chunks/js/7607.81cc6925.js:1
 #: assets/build/chunks/js/8599.c0f5d89b.js:1
-#: assets/build/chunks/js/common-b1893266.d335116a.js:2
+#: assets/build/chunks/js/common-b1893266.1481c1d0.js:2
 #: assets/build/chunks/js/common-d1e7a7dc.a0f09380.js:1
 msgid "Pickup"
 msgstr ""
@@ -1039,7 +1039,7 @@ msgstr ""
 #: core/modules/reservation/hooks.php:108
 #: core/modules/reservation/hooks.php:195
 #: core/modules/reservation/wpc-reservation-report.php:111
-#: assets/build/chunks/js/common-b1893266.d335116a.js:1
+#: assets/build/chunks/js/common-b1893266.1481c1d0.js:1
 #: assets/build/chunks/js/common-d1e7a7dc.a0f09380.js:1
 msgid "Confirmed"
 msgstr ""
@@ -1047,13 +1047,13 @@ msgstr ""
 #: core/modules/reservation/hooks.php:57
 #: core/modules/reservation/hooks.php:109
 #: core/modules/reservation/wpc-reservation-report.php:112
-#: assets/build/chunks/js/common-b1893266.d335116a.js:1
+#: assets/build/chunks/js/common-b1893266.1481c1d0.js:1
 #: assets/build/chunks/js/common-d1e7a7dc.a0f09380.js:1
 msgid "Cancelled"
 msgstr ""
 
 #: core/modules/reservation/hooks.php:196
-#: assets/build/chunks/js/common-b1893266.d335116a.js:1
+#: assets/build/chunks/js/common-b1893266.1481c1d0.js:1
 msgid "Refunded"
 msgstr ""
 
@@ -1070,18 +1070,18 @@ msgid "Total Guest: "
 msgstr ""
 
 #: core/modules/reservation/wpc-reservation-report.php:110
-#: assets/build/chunks/js/common-b1893266.d335116a.js:1
+#: assets/build/chunks/js/common-b1893266.1481c1d0.js:1
 #: assets/build/chunks/js/common-d1e7a7dc.a0f09380.js:1
 msgid "Pending"
 msgstr ""
 
 #: core/modules/reservation/wpc-reservation-report.php:113
-#: assets/build/chunks/js/common-b1893266.d335116a.js:1
+#: assets/build/chunks/js/common-b1893266.1481c1d0.js:1
 msgid "Completed"
 msgstr ""
 
 #: core/modules/reservation/wpc-reservation-report.php:114
-#: assets/build/chunks/js/common-b1893266.d335116a.js:1
+#: assets/build/chunks/js/common-b1893266.1481c1d0.js:1
 msgid "Processing"
 msgstr ""
 
@@ -1117,8 +1117,8 @@ msgid "Reservation ID is required"
 msgstr ""
 
 #: core/payments/controllers/payment-controller.php:81
-#: core/reservation/controllers/reservation-controller.php:592
-#: core/reservation/controllers/reservation-controller.php:674
+#: core/reservation/controllers/reservation-controller.php:633
+#: core/reservation/controllers/reservation-controller.php:730
 msgid "Reservation not found."
 msgstr ""
 
@@ -1130,8 +1130,8 @@ msgstr ""
 #: utils/extension-list.php:9
 #: assets/build/chunks/js/6210.00714e1d.js:1
 #: assets/build/chunks/js/7105.dbe4fbc4.js:1
-#: assets/build/chunks/js/common-b1893266.d335116a.js:1
-#: assets/build/chunks/js/common-b1893266.d335116a.js:2
+#: assets/build/chunks/js/common-b1893266.1481c1d0.js:1
+#: assets/build/chunks/js/common-b1893266.1481c1d0.js:2
 #: assets/build/chunks/js/common-f413f2d5.b3be4fc7.js:1
 msgid "Reservation"
 msgstr ""
@@ -1250,11 +1250,11 @@ msgstr ""
 msgid "Whether to hide labels not assigned to any products."
 msgstr ""
 
-#: core/products/labels/controllers/product-label-controller.php:259
+#: core/products/labels/controllers/product-label-controller.php:266
 msgid "You do not have permission to access product labels."
 msgstr ""
 
-#: core/products/labels/controllers/product-label-controller.php:283
+#: core/products/labels/controllers/product-label-controller.php:297
 msgid "You do not have permission to access this product label."
 msgstr ""
 
@@ -1687,103 +1687,112 @@ msgstr ""
 msgid "Allergens & Ingredients"
 msgstr ""
 
-#: core/reservation/controllers/reservation-controller.php:285
+#: core/reservation/controllers/reservation-controller.php:302
 msgid "Reservation created successfully."
 msgstr ""
 
-#: core/reservation/controllers/reservation-controller.php:525
+#: core/reservation/controllers/reservation-controller.php:492
+#: core/reservation/controllers/reservation-controller.php:1448
+#: core/reservation/controllers/reservation-controller.php:1509
+#: core/reservation/controllers/reservation-controller.php:1625
+#: core/reservation/controllers/reservation-controller.php:1744
+#: core/reservation/controllers/reservation-controller.php:1797
+msgid "Too many requests. Please try again later."
+msgstr ""
+
+#: core/reservation/controllers/reservation-controller.php:496
+msgid "Invalid security token."
+msgstr ""
+
+#: core/reservation/controllers/reservation-controller.php:566
 #: assets/build/chunks/js/3722.a88f5475.js:1
 #: assets/build/chunks/js/common-d1e7a7dc.a0f09380.js:1
 msgid "No reservations found"
 msgstr ""
 
-#: core/reservation/controllers/reservation-controller.php:557
-#: core/reservation/controllers/reservation-controller.php:1452
+#: core/reservation/controllers/reservation-controller.php:598
+#: core/reservation/controllers/reservation-controller.php:1593
 msgid "Reservation not found"
 msgstr ""
 
-#: core/reservation/controllers/reservation-controller.php:565
+#: core/reservation/controllers/reservation-controller.php:606
 msgid "You do not have permission to view this reservation."
 msgstr ""
 
-#: core/reservation/controllers/reservation-controller.php:625
+#: core/reservation/controllers/reservation-controller.php:651
+msgid "Invalid reservation status."
+msgstr ""
+
+#: core/reservation/controllers/reservation-controller.php:681
 msgid "Failed to update reservation."
 msgstr ""
 
-#: core/reservation/controllers/reservation-controller.php:645
+#: core/reservation/controllers/reservation-controller.php:701
 msgid "Reservation updated successfully."
 msgstr ""
 
-#: core/reservation/controllers/reservation-controller.php:667
-#: core/reservation/controllers/reservation-controller.php:707
+#: core/reservation/controllers/reservation-controller.php:723
+#: core/reservation/controllers/reservation-controller.php:763
 msgid "Invalid security token"
 msgstr ""
 
-#: core/reservation/controllers/reservation-controller.php:680
+#: core/reservation/controllers/reservation-controller.php:736
 msgid "Failed to delete reservation."
 msgstr ""
 
-#: core/reservation/controllers/reservation-controller.php:685
+#: core/reservation/controllers/reservation-controller.php:741
 msgid "Reservation deleted."
 msgstr ""
 
-#: core/reservation/controllers/reservation-controller.php:713
+#: core/reservation/controllers/reservation-controller.php:769
 msgid "Invalid or empty reservation IDs."
 msgstr ""
 
-#: core/reservation/controllers/reservation-controller.php:732
+#: core/reservation/controllers/reservation-controller.php:788
 msgid "Selected reservations deleted."
 msgstr ""
 
-#: core/reservation/controllers/reservation-controller.php:1129
+#: core/reservation/controllers/reservation-controller.php:1191
 msgid "Please start date"
 msgstr ""
 
-#: core/reservation/controllers/reservation-controller.php:1133
+#: core/reservation/controllers/reservation-controller.php:1195
 msgid "Please end date"
 msgstr ""
 
-#: core/reservation/controllers/reservation-controller.php:1137
+#: core/reservation/controllers/reservation-controller.php:1199
 msgid "Schedules did not set"
 msgstr ""
 
-#: core/reservation/controllers/reservation-controller.php:1313
-#: core/reservation/controllers/reservation-controller.php:1371
-#: core/reservation/controllers/reservation-controller.php:1483
-#: core/reservation/controllers/reservation-controller.php:1599
-#: core/reservation/controllers/reservation-controller.php:1648
-msgid "Too many requests. Please try again later."
-msgstr ""
-
-#: core/reservation/controllers/reservation-controller.php:1335
+#: core/reservation/controllers/reservation-controller.php:1473
 msgid "Please enter date"
 msgstr ""
 
-#: core/reservation/controllers/reservation-controller.php:1339
+#: core/reservation/controllers/reservation-controller.php:1477
 msgid "Please enter start time"
 msgstr ""
 
-#: core/reservation/controllers/reservation-controller.php:1343
+#: core/reservation/controllers/reservation-controller.php:1481
 msgid "Please enter end time"
 msgstr ""
 
-#: core/reservation/controllers/reservation-controller.php:1433
+#: core/reservation/controllers/reservation-controller.php:1574
 msgid "Security check failed. Please try again."
 msgstr ""
 
-#: core/reservation/controllers/reservation-controller.php:1442
+#: core/reservation/controllers/reservation-controller.php:1583
 msgid "Please enter invoice"
 msgstr ""
 
-#: core/reservation/controllers/reservation-controller.php:1446
+#: core/reservation/controllers/reservation-controller.php:1587
 msgid "Please enter email"
 msgstr ""
 
-#: core/reservation/controllers/reservation-controller.php:1458
+#: core/reservation/controllers/reservation-controller.php:1599
 msgid "Reservation already cancelled"
 msgstr ""
 
-#: core/reservation/controllers/reservation-controller.php:1472
+#: core/reservation/controllers/reservation-controller.php:1613
 msgid "Reservation cancelled successfully"
 msgstr ""
 
@@ -2078,7 +2087,7 @@ msgstr ""
 #: assets/build/chunks/js/4589.79f07815.js:1
 #: assets/build/chunks/js/6655.7651b1a5.js:1
 #: assets/build/chunks/js/7105.dbe4fbc4.js:1
-#: assets/build/chunks/js/common-b1893266.d335116a.js:1
+#: assets/build/chunks/js/common-b1893266.1481c1d0.js:1
 msgid "Location"
 msgstr ""
 
@@ -2201,13 +2210,13 @@ msgid "Booking date"
 msgstr ""
 
 #: templates/reservation/reservation-view.php:108
-#: assets/build/chunks/js/common-b1893266.d335116a.js:2
+#: assets/build/chunks/js/common-b1893266.1481c1d0.js:2
 #: assets/build/js/wc-checkout-blocks.js:1
 msgid "Start time"
 msgstr ""
 
 #: templates/reservation/reservation-view.php:115
-#: assets/build/chunks/js/common-b1893266.d335116a.js:2
+#: assets/build/chunks/js/common-b1893266.1481c1d0.js:2
 #: assets/build/js/wc-checkout-blocks.js:1
 msgid "End time"
 msgstr ""
@@ -2216,7 +2225,7 @@ msgstr ""
 #: assets/build/chunks/js/1826.fc5126df.js:1
 #: assets/build/chunks/js/8599.c0f5d89b.js:1
 #: assets/build/chunks/js/common-7ae94da2.6e1b181c.js:1
-#: assets/build/chunks/js/common-b1893266.d335116a.js:2
+#: assets/build/chunks/js/common-b1893266.1481c1d0.js:2
 #: assets/build/js/wc-checkout-blocks.js:1
 msgid "Message"
 msgstr ""
@@ -2928,8 +2937,8 @@ msgstr ""
 
 #: utils/extension-list.php:23
 #: assets/build/chunks/js/8599.c0f5d89b.js:1
-#: assets/build/chunks/js/common-b1893266.d335116a.js:1
-#: assets/build/chunks/js/common-b1893266.d335116a.js:2
+#: assets/build/chunks/js/common-b1893266.1481c1d0.js:1
+#: assets/build/chunks/js/common-b1893266.1481c1d0.js:2
 msgid "Food Ordering"
 msgstr ""
 
@@ -2966,7 +2975,7 @@ msgstr ""
 #: utils/extension-list.php:116
 #: assets/build/chunks/js/7607.81cc6925.js:1
 #: assets/build/chunks/js/8599.c0f5d89b.js:1
-#: assets/build/chunks/js/common-b1893266.d335116a.js:2
+#: assets/build/chunks/js/common-b1893266.1481c1d0.js:2
 #: assets/build/chunks/js/common-d1e7a7dc.a0f09380.js:1
 msgid "Tipping"
 msgstr ""
@@ -3028,7 +3037,7 @@ msgstr ""
 
 #: utils/extension-list.php:258
 #: assets/build/chunks/js/8599.c0f5d89b.js:1
-#: assets/build/chunks/js/common-b1893266.d335116a.js:2
+#: assets/build/chunks/js/common-b1893266.1481c1d0.js:2
 msgid "Mini Cart"
 msgstr ""
 
@@ -3081,9 +3090,9 @@ msgid "A powerful WooCommerce extension that allows customers to pay deposits on
 msgstr ""
 
 #: utils/extension-list.php:417
-#: utils/helpers.php:1227
+#: utils/helpers.php:1229
 #: assets/build/chunks/js/2655.a29d5d1e.js:1
-#: assets/build/chunks/js/common-b1893266.d335116a.js:1
+#: assets/build/chunks/js/common-b1893266.1481c1d0.js:1
 msgid "Optiontics"
 msgstr ""
 
@@ -3091,20 +3100,30 @@ msgstr ""
 msgid "Product add-ons / extras for food items — lets customers pick toppings, sizes and other paid options inside the WP Cafe order popup. Adds them to the WooCommerce cart as priced line-item data."
 msgstr ""
 
+#: utils/extension-list.php:439
+#: utils/helpers.php:1216
+#: assets/build/chunks/js/common-b1893266.1481c1d0.js:1
+msgid "Aisentic"
+msgstr ""
+
 #: utils/extension-list.php:440
+msgid "AI copilot for the WordPress dashboard. Adds a chatbot so visitors can search your site and staff can reach features by asking questions."
+msgstr ""
+
+#: utils/extension-list.php:460
 msgid "Webhook"
 msgstr ""
 
-#: utils/extension-list.php:441
+#: utils/extension-list.php:461
 msgid "Send reservation and order event data to custom webhook URLs via JSON payloads."
 msgstr ""
 
-#: utils/extension-list.php:455
+#: utils/extension-list.php:475
 #: assets/build/chunks/js/8599.c0f5d89b.js:1
 msgid "Notifications"
 msgstr ""
 
-#: utils/extension-list.php:456
+#: utils/extension-list.php:476
 msgid "Real-time in-app alerts and a notification feed for new orders and new reservations."
 msgstr ""
 
@@ -3172,18 +3191,13 @@ msgstr ""
 msgid "Popup builder for WordPress — grow your audience with beautiful, targeted popups without writing code."
 msgstr ""
 
-#: utils/helpers.php:1216
-#: assets/build/chunks/js/common-b1893266.d335116a.js:1
-msgid "Aisentic"
-msgstr ""
-
 #: utils/helpers.php:1217
-#: assets/build/chunks/js/common-b1893266.d335116a.js:1
+#: assets/build/chunks/js/common-b1893266.1481c1d0.js:1
 msgid "Add an AI chatbot so visitors can search your site and navigate features just by asking questions."
 msgstr ""
 
-#: utils/helpers.php:1228
-#: assets/build/chunks/js/common-b1893266.d335116a.js:1
+#: utils/helpers.php:1230
+#: assets/build/chunks/js/common-b1893266.1481c1d0.js:1
 msgid "Add extra options to food items-toppings, sizes, and paid add-ons, so customers can customize their orders."
 msgstr ""
 
@@ -4360,7 +4374,7 @@ msgid "Copied!"
 msgstr ""
 
 #: assets/build/chunks/js/936.79fbc883.js:1
-#: assets/build/chunks/js/common-b1893266.d335116a.js:2
+#: assets/build/chunks/js/common-b1893266.1481c1d0.js:2
 msgid "Generate Shortcode"
 msgstr ""
 
@@ -4385,7 +4399,7 @@ msgid " by adding food items, categories, and configuring display settings. Then
 msgstr ""
 
 #: assets/build/chunks/js/936.79fbc883.js:1
-#: assets/build/chunks/js/common-b1893266.d335116a.js:1
+#: assets/build/chunks/js/common-b1893266.1481c1d0.js:1
 msgid "Online Food Order"
 msgstr ""
 
@@ -4398,7 +4412,7 @@ msgid "Shortcodes for online food ordering"
 msgstr ""
 
 #: assets/build/chunks/js/936.79fbc883.js:1
-#: assets/build/chunks/js/common-b1893266.d335116a.js:1
+#: assets/build/chunks/js/common-b1893266.1481c1d0.js:1
 msgid "Restaurant Reservation"
 msgstr ""
 
@@ -4432,8 +4446,8 @@ msgstr ""
 
 #: assets/build/chunks/js/1786.73bc5a11.js:1
 #: assets/build/chunks/js/8599.c0f5d89b.js:1
-#: assets/build/chunks/js/common-b1893266.d335116a.js:1
-#: assets/build/chunks/js/common-b1893266.d335116a.js:2
+#: assets/build/chunks/js/common-b1893266.1481c1d0.js:1
+#: assets/build/chunks/js/common-b1893266.1481c1d0.js:2
 msgid "General"
 msgstr ""
 
@@ -4444,7 +4458,7 @@ msgstr ""
 
 #: assets/build/chunks/js/1786.73bc5a11.js:1
 #: assets/build/chunks/js/8518.1048f0f7.js:1
-#: assets/build/chunks/js/common-b1893266.d335116a.js:1
+#: assets/build/chunks/js/common-b1893266.1481c1d0.js:1
 msgid "Addons"
 msgstr ""
 
@@ -4522,7 +4536,7 @@ msgid "Connecting shares your name, email and site with Aisentic."
 msgstr ""
 
 #: assets/build/chunks/js/2655.a29d5d1e.js:1
-#: assets/build/chunks/js/common-b1893266.d335116a.js:2
+#: assets/build/chunks/js/common-b1893266.1481c1d0.js:2
 msgid "Terms"
 msgstr ""
 
@@ -4747,7 +4761,7 @@ msgid "No changelog entries found"
 msgstr ""
 
 #: assets/build/chunks/js/4589.79f07815.js:1
-#: assets/build/chunks/js/common-b1893266.d335116a.js:1
+#: assets/build/chunks/js/common-b1893266.1481c1d0.js:1
 msgid "Restaurant Name"
 msgstr ""
 
@@ -4760,7 +4774,7 @@ msgid "Your restaurant's name"
 msgstr ""
 
 #: assets/build/chunks/js/4589.79f07815.js:1
-#: assets/build/chunks/js/common-b1893266.d335116a.js:1
+#: assets/build/chunks/js/common-b1893266.1481c1d0.js:1
 msgid "Search or enter address (choose from suggestions if available)"
 msgstr ""
 
@@ -4849,7 +4863,7 @@ msgstr ""
 
 #: assets/build/chunks/js/5827.b303eb4f.js:1
 #: assets/build/chunks/js/8599.c0f5d89b.js:1
-#: assets/build/chunks/js/common-b1893266.d335116a.js:1
+#: assets/build/chunks/js/common-b1893266.1481c1d0.js:1
 msgid "Modules"
 msgstr ""
 
@@ -4973,7 +4987,7 @@ msgid "Reservation's - "
 msgstr ""
 
 #: assets/build/chunks/js/6655.7651b1a5.js:1
-#: assets/build/chunks/js/common-b1893266.d335116a.js:1
+#: assets/build/chunks/js/common-b1893266.1481c1d0.js:1
 msgid "Total Revenue"
 msgstr ""
 
@@ -5047,7 +5061,7 @@ msgid "No address"
 msgstr ""
 
 #: assets/build/chunks/js/7105.dbe4fbc4.js:1
-#: assets/build/chunks/js/common-b1893266.d335116a.js:1
+#: assets/build/chunks/js/common-b1893266.1481c1d0.js:1
 msgid "Restaurant Type"
 msgstr ""
 
@@ -5363,7 +5377,7 @@ msgid "No addons found."
 msgstr ""
 
 #: assets/build/chunks/js/8599.c0f5d89b.js:1
-#: assets/build/chunks/js/common-b1893266.d335116a.js:2
+#: assets/build/chunks/js/common-b1893266.1481c1d0.js:2
 #: assets/build/chunks/js/common-d1e7a7dc.a0f09380.js:1
 msgid "Food Menu"
 msgstr ""
@@ -5385,7 +5399,7 @@ msgid "Food Menu Settings"
 msgstr ""
 
 #: assets/build/chunks/js/8599.c0f5d89b.js:1
-#: assets/build/chunks/js/common-b1893266.d335116a.js:2
+#: assets/build/chunks/js/common-b1893266.1481c1d0.js:2
 msgid "Live Notifications"
 msgstr ""
 
@@ -5398,23 +5412,23 @@ msgid "Table Management"
 msgstr ""
 
 #: assets/build/chunks/js/8599.c0f5d89b.js:1
-#: assets/build/chunks/js/common-b1893266.d335116a.js:2
+#: assets/build/chunks/js/common-b1893266.1481c1d0.js:2
 msgid "Reservation Rules"
 msgstr ""
 
 #: assets/build/chunks/js/8599.c0f5d89b.js:1
-#: assets/build/chunks/js/common-b1893266.d335116a.js:2
+#: assets/build/chunks/js/common-b1893266.1481c1d0.js:2
 msgid "Customization"
 msgstr ""
 
 #: assets/build/chunks/js/8599.c0f5d89b.js:1
-#: assets/build/chunks/js/common-b1893266.d335116a.js:2
+#: assets/build/chunks/js/common-b1893266.1481c1d0.js:2
 #: assets/build/chunks/js/common-d1e7a7dc.a0f09380.js:1
 msgid "Payment Settings"
 msgstr ""
 
 #: assets/build/chunks/js/8599.c0f5d89b.js:1
-#: assets/build/chunks/js/common-b1893266.d335116a.js:2
+#: assets/build/chunks/js/common-b1893266.1481c1d0.js:2
 msgid "Schedule"
 msgstr ""
 
@@ -5424,7 +5438,7 @@ msgid "Integrations"
 msgstr ""
 
 #: assets/build/chunks/js/8599.c0f5d89b.js:1
-#: assets/build/chunks/js/common-b1893266.d335116a.js:2
+#: assets/build/chunks/js/common-b1893266.1481c1d0.js:2
 msgid "Version Control"
 msgstr ""
 
@@ -5441,7 +5455,7 @@ msgid "Overview"
 msgstr ""
 
 #: assets/build/chunks/js/8599.c0f5d89b.js:1
-#: assets/build/chunks/js/common-b1893266.d335116a.js:1
+#: assets/build/chunks/js/common-b1893266.1481c1d0.js:1
 #: assets/build/chunks/js/common-d1e7a7dc.a0f09380.js:1
 msgid "Reservations"
 msgstr ""
@@ -5859,7 +5873,7 @@ msgid "More pages"
 msgstr ""
 
 #: assets/build/chunks/js/common-7ae94da2.6e1b181c.js:1
-#: assets/build/chunks/js/common-b1893266.d335116a.js:1
+#: assets/build/chunks/js/common-b1893266.1481c1d0.js:1
 #: assets/build/chunks/js/common-d1e7a7dc.a0f09380.js:1
 msgid "Configure"
 msgstr ""
@@ -5884,7 +5898,7 @@ msgid "Mac:"
 msgstr ""
 
 #: assets/build/chunks/js/common-7ae94da2.6e1b181c.js:1
-#: assets/build/chunks/js/common-b1893266.d335116a.js:1
+#: assets/build/chunks/js/common-b1893266.1481c1d0.js:1
 msgid "Read More"
 msgstr ""
 
@@ -6243,681 +6257,681 @@ msgstr ""
 msgid "Filter"
 msgstr ""
 
-#: assets/build/chunks/js/common-b1893266.d335116a.js:1
+#: assets/build/chunks/js/common-b1893266.1481c1d0.js:1
 msgid "View All"
 msgstr ""
 
-#: assets/build/chunks/js/common-b1893266.d335116a.js:1
+#: assets/build/chunks/js/common-b1893266.1481c1d0.js:1
 msgid "Unknown"
 msgstr ""
 
-#: assets/build/chunks/js/common-b1893266.d335116a.js:1
+#: assets/build/chunks/js/common-b1893266.1481c1d0.js:1
 msgid "Delivered"
 msgstr ""
 
-#: assets/build/chunks/js/common-b1893266.d335116a.js:1
+#: assets/build/chunks/js/common-b1893266.1481c1d0.js:1
 msgid "On Hold"
 msgstr ""
 
-#: assets/build/chunks/js/common-b1893266.d335116a.js:1
+#: assets/build/chunks/js/common-b1893266.1481c1d0.js:1
 msgid "Failed"
 msgstr ""
 
-#: assets/build/chunks/js/common-b1893266.d335116a.js:1
+#: assets/build/chunks/js/common-b1893266.1481c1d0.js:1
 msgid "since last period"
 msgstr ""
 
-#: assets/build/chunks/js/common-b1893266.d335116a.js:1
+#: assets/build/chunks/js/common-b1893266.1481c1d0.js:1
 msgid "Total revenue generated from all orders including food orders and reservations during the selected time period."
 msgstr ""
 
-#: assets/build/chunks/js/common-b1893266.d335116a.js:1
+#: assets/build/chunks/js/common-b1893266.1481c1d0.js:1
 msgid "Total Customers"
 msgstr ""
 
-#: assets/build/chunks/js/common-b1893266.d335116a.js:1
+#: assets/build/chunks/js/common-b1893266.1481c1d0.js:1
 msgid "The total number of unique customers who placed food orders or made table reservations."
 msgstr ""
 
-#: assets/build/chunks/js/common-b1893266.d335116a.js:1
+#: assets/build/chunks/js/common-b1893266.1481c1d0.js:1
 msgid "Total Online Orders"
 msgstr ""
 
-#: assets/build/chunks/js/common-b1893266.d335116a.js:1
+#: assets/build/chunks/js/common-b1893266.1481c1d0.js:1
 msgid "The total number of food orders, including pickup, delivery, and food ordered during reservations."
 msgstr ""
 
-#: assets/build/chunks/js/common-b1893266.d335116a.js:1
+#: assets/build/chunks/js/common-b1893266.1481c1d0.js:1
 msgid "Total Reservations"
 msgstr ""
 
-#: assets/build/chunks/js/common-b1893266.d335116a.js:1
+#: assets/build/chunks/js/common-b1893266.1481c1d0.js:1
 msgid "The total count of table reservations, excluding pickup and delivery orders."
 msgstr ""
 
-#: assets/build/chunks/js/common-b1893266.d335116a.js:1
+#: assets/build/chunks/js/common-b1893266.1481c1d0.js:1
 msgid "Failed to fetch top sales"
 msgstr ""
 
-#: assets/build/chunks/js/common-b1893266.d335116a.js:1
+#: assets/build/chunks/js/common-b1893266.1481c1d0.js:1
 #: assets/build/chunks/js/common-f413f2d5.b3be4fc7.js:2
 #: assets/build/js/frontend.js:1
 #: assets/build/js/restaurant-management.js:1
 msgid "Mon"
 msgstr ""
 
-#: assets/build/chunks/js/common-b1893266.d335116a.js:1
+#: assets/build/chunks/js/common-b1893266.1481c1d0.js:1
 #: assets/build/chunks/js/common-f413f2d5.b3be4fc7.js:2
 #: assets/build/js/frontend.js:1
 #: assets/build/js/restaurant-management.js:1
 msgid "Tue"
 msgstr ""
 
-#: assets/build/chunks/js/common-b1893266.d335116a.js:1
+#: assets/build/chunks/js/common-b1893266.1481c1d0.js:1
 #: assets/build/chunks/js/common-f413f2d5.b3be4fc7.js:2
 #: assets/build/js/frontend.js:1
 #: assets/build/js/restaurant-management.js:1
 msgid "Wed"
 msgstr ""
 
-#: assets/build/chunks/js/common-b1893266.d335116a.js:1
+#: assets/build/chunks/js/common-b1893266.1481c1d0.js:1
 #: assets/build/chunks/js/common-f413f2d5.b3be4fc7.js:2
 #: assets/build/js/frontend.js:1
 #: assets/build/js/restaurant-management.js:1
 msgid "Thu"
 msgstr ""
 
-#: assets/build/chunks/js/common-b1893266.d335116a.js:1
+#: assets/build/chunks/js/common-b1893266.1481c1d0.js:1
 #: assets/build/chunks/js/common-f413f2d5.b3be4fc7.js:2
 #: assets/build/js/frontend.js:1
 #: assets/build/js/restaurant-management.js:1
 msgid "Fri"
 msgstr ""
 
-#: assets/build/chunks/js/common-b1893266.d335116a.js:1
+#: assets/build/chunks/js/common-b1893266.1481c1d0.js:1
 #: assets/build/chunks/js/common-f413f2d5.b3be4fc7.js:2
 #: assets/build/js/frontend.js:1
 #: assets/build/js/restaurant-management.js:1
 msgid "Sat"
 msgstr ""
 
-#: assets/build/chunks/js/common-b1893266.d335116a.js:1
+#: assets/build/chunks/js/common-b1893266.1481c1d0.js:1
 #: assets/build/chunks/js/common-f413f2d5.b3be4fc7.js:2
 #: assets/build/js/frontend.js:1
 #: assets/build/js/restaurant-management.js:1
 msgid "Sun"
 msgstr ""
 
-#: assets/build/chunks/js/common-b1893266.d335116a.js:1
+#: assets/build/chunks/js/common-b1893266.1481c1d0.js:1
 msgid "None"
 msgstr ""
 
-#: assets/build/chunks/js/common-b1893266.d335116a.js:1
+#: assets/build/chunks/js/common-b1893266.1481c1d0.js:1
 msgid "Install Now"
 msgstr ""
 
-#: assets/build/chunks/js/common-b1893266.d335116a.js:1
+#: assets/build/chunks/js/common-b1893266.1481c1d0.js:1
 msgid "Tutorial"
 msgstr ""
 
-#: assets/build/chunks/js/common-b1893266.d335116a.js:1
+#: assets/build/chunks/js/common-b1893266.1481c1d0.js:1
 msgid "Pro Required"
 msgstr ""
 
-#: assets/build/chunks/js/common-b1893266.d335116a.js:1
+#: assets/build/chunks/js/common-b1893266.1481c1d0.js:1
 msgid "All"
 msgstr ""
 
-#: assets/build/chunks/js/common-b1893266.d335116a.js:1
+#: assets/build/chunks/js/common-b1893266.1481c1d0.js:1
 msgid "Deactivate"
 msgstr ""
 
-#: assets/build/chunks/js/common-b1893266.d335116a.js:1
+#: assets/build/chunks/js/common-b1893266.1481c1d0.js:1
 msgid "Activate"
 msgstr ""
 
-#: assets/build/chunks/js/common-b1893266.d335116a.js:1
+#: assets/build/chunks/js/common-b1893266.1481c1d0.js:1
 msgid "Install"
 msgstr ""
 
-#: assets/build/chunks/js/common-b1893266.d335116a.js:1
+#: assets/build/chunks/js/common-b1893266.1481c1d0.js:1
 msgid "Upgrade"
 msgstr ""
 
-#: assets/build/chunks/js/common-b1893266.d335116a.js:1
+#: assets/build/chunks/js/common-b1893266.1481c1d0.js:1
 msgid "Set Up Your Restaurant"
 msgstr ""
 
-#: assets/build/chunks/js/common-b1893266.d335116a.js:1
+#: assets/build/chunks/js/common-b1893266.1481c1d0.js:1
 msgid "Let’s start with the basics. Fill in your restaurant info to get started."
 msgstr ""
 
-#: assets/build/chunks/js/common-b1893266.d335116a.js:1
+#: assets/build/chunks/js/common-b1893266.1481c1d0.js:1
 msgid "Select how your restaurant serves customers. Choose one or both options: 'Food Ordering' for online orders or 'Reservation' for table booking."
 msgstr ""
 
-#: assets/build/chunks/js/common-b1893266.d335116a.js:1
+#: assets/build/chunks/js/common-b1893266.1481c1d0.js:1
 msgid "Enter your restaurant's name as you'd like it to appear to customers (e.g., Café Aroma)."
 msgstr ""
 
-#: assets/build/chunks/js/common-b1893266.d335116a.js:1
+#: assets/build/chunks/js/common-b1893266.1481c1d0.js:1
 msgid "e.g. Café Aroma"
 msgstr ""
 
-#: assets/build/chunks/js/common-b1893266.d335116a.js:1
+#: assets/build/chunks/js/common-b1893266.1481c1d0.js:1
 msgid "Provide your restaurant’s physical location or city so customers can find and order from you."
 msgstr ""
 
-#: assets/build/chunks/js/common-b1893266.d335116a.js:1
+#: assets/build/chunks/js/common-b1893266.1481c1d0.js:1
 msgid "Email Address"
 msgstr ""
 
-#: assets/build/chunks/js/common-b1893266.d335116a.js:1
+#: assets/build/chunks/js/common-b1893266.1481c1d0.js:1
 msgid "youremail@email.com"
 msgstr ""
 
-#: assets/build/chunks/js/common-b1893266.d335116a.js:1
+#: assets/build/chunks/js/common-b1893266.1481c1d0.js:1
 msgid "Contact Number"
 msgstr ""
 
-#: assets/build/chunks/js/common-b1893266.d335116a.js:1
+#: assets/build/chunks/js/common-b1893266.1481c1d0.js:1
 msgid "123 456 7890"
 msgstr ""
 
-#: assets/build/chunks/js/common-b1893266.d335116a.js:1
+#: assets/build/chunks/js/common-b1893266.1481c1d0.js:1
 msgid "Yes, I want helpful updates (no spam, ever!)"
 msgstr ""
 
-#: assets/build/chunks/js/common-b1893266.d335116a.js:1
+#: assets/build/chunks/js/common-b1893266.1481c1d0.js:1
 msgid "Set Your Weekly Schedule"
 msgstr ""
 
-#: assets/build/chunks/js/common-b1893266.d335116a.js:1
+#: assets/build/chunks/js/common-b1893266.1481c1d0.js:1
 msgid "Tell us when your restaurant is open and when you take breaks."
 msgstr ""
 
-#: assets/build/chunks/js/common-b1893266.d335116a.js:1
+#: assets/build/chunks/js/common-b1893266.1481c1d0.js:1
 msgid "Set Up Online Food Ordering"
 msgstr ""
 
-#: assets/build/chunks/js/common-b1893266.d335116a.js:1
+#: assets/build/chunks/js/common-b1893266.1481c1d0.js:1
 msgid "Let customers order for pickup or delivery — and choose if you want to accept tips."
 msgstr ""
 
-#: assets/build/chunks/js/common-b1893266.d335116a.js:1
+#: assets/build/chunks/js/common-b1893266.1481c1d0.js:1
 msgid "Set Up Reservations"
 msgstr ""
 
-#: assets/build/chunks/js/common-b1893266.d335116a.js:1
+#: assets/build/chunks/js/common-b1893266.1481c1d0.js:1
 msgid "Let customers book tables online. Customize guest limits, time slots, and more."
 msgstr ""
 
-#: assets/build/chunks/js/common-b1893266.d335116a.js:1
+#: assets/build/chunks/js/common-b1893266.1481c1d0.js:1
 msgid "Connect with WooCommerce"
 msgstr ""
 
-#: assets/build/chunks/js/common-b1893266.d335116a.js:1
+#: assets/build/chunks/js/common-b1893266.1481c1d0.js:1
 msgid "Sync your food menu with WooCommerce to manage orders, payments, and categories easily."
 msgstr ""
 
-#: assets/build/chunks/js/common-b1893266.d335116a.js:1
+#: assets/build/chunks/js/common-b1893266.1481c1d0.js:1
 msgid "Take online orders for delivery or pickup"
 msgstr ""
 
-#: assets/build/chunks/js/common-b1893266.d335116a.js:1
+#: assets/build/chunks/js/common-b1893266.1481c1d0.js:1
 msgid "Let customers book a table online"
 msgstr ""
 
-#: assets/build/chunks/js/common-b1893266.d335116a.js:1
+#: assets/build/chunks/js/common-b1893266.1481c1d0.js:1
 msgid "🍽️ Next Steps to Get Started"
 msgstr ""
 
-#: assets/build/chunks/js/common-b1893266.d335116a.js:1
+#: assets/build/chunks/js/common-b1893266.1481c1d0.js:1
 msgid "Add Food Items (WooCommerce products shown as food menu)"
 msgstr ""
 
-#: assets/build/chunks/js/common-b1893266.d335116a.js:1
+#: assets/build/chunks/js/common-b1893266.1481c1d0.js:1
 msgid "Add Food Menu"
 msgstr ""
 
-#: assets/build/chunks/js/common-b1893266.d335116a.js:1
+#: assets/build/chunks/js/common-b1893266.1481c1d0.js:1
 msgid "Create Food product categories and labels (e.g., Pizza, Pasta)"
 msgstr ""
 
-#: assets/build/chunks/js/common-b1893266.d335116a.js:1
+#: assets/build/chunks/js/common-b1893266.1481c1d0.js:1
 msgid "Add Category"
 msgstr ""
 
-#: assets/build/chunks/js/common-b1893266.d335116a.js:1
+#: assets/build/chunks/js/common-b1893266.1481c1d0.js:1
 msgid "How to use shortcodes to display food menu on your site"
 msgstr ""
 
-#: assets/build/chunks/js/common-b1893266.d335116a.js:1
+#: assets/build/chunks/js/common-b1893266.1481c1d0.js:1
 msgid "Available Shortcodes"
 msgstr ""
 
-#: assets/build/chunks/js/common-b1893266.d335116a.js:1
+#: assets/build/chunks/js/common-b1893266.1481c1d0.js:1
 msgid "How to Configure Reservations in WP Cafe"
 msgstr ""
 
-#: assets/build/chunks/js/common-b1893266.d335116a.js:1
+#: assets/build/chunks/js/common-b1893266.1481c1d0.js:1
 msgid "How to Configure Reservations form for your restaurant"
 msgstr ""
 
-#: assets/build/chunks/js/common-b1893266.d335116a.js:1
+#: assets/build/chunks/js/common-b1893266.1481c1d0.js:1
 msgid "Select at least one restaurant type"
 msgstr ""
 
-#: assets/build/chunks/js/common-b1893266.d335116a.js:1
-#: assets/build/chunks/js/common-b1893266.d335116a.js:2
+#: assets/build/chunks/js/common-b1893266.1481c1d0.js:1
+#: assets/build/chunks/js/common-b1893266.1481c1d0.js:2
 #: assets/build/js/frontend.js:1
 msgid "Restaurant name is required"
 msgstr ""
 
-#: assets/build/chunks/js/common-b1893266.d335116a.js:1
+#: assets/build/chunks/js/common-b1893266.1481c1d0.js:1
 msgid "Restaurant location is required"
 msgstr ""
 
-#: assets/build/chunks/js/common-b1893266.d335116a.js:1
+#: assets/build/chunks/js/common-b1893266.1481c1d0.js:1
 msgid "Woocommerce"
 msgstr ""
 
-#: assets/build/chunks/js/common-b1893266.d335116a.js:1
+#: assets/build/chunks/js/common-b1893266.1481c1d0.js:1
 msgid "To use this plugin, You must need to install and activate WooCommerce."
 msgstr ""
 
-#: assets/build/chunks/js/common-b1893266.d335116a.js:1
+#: assets/build/chunks/js/common-b1893266.1481c1d0.js:1
 msgid "Recommended plugins"
 msgstr ""
 
-#: assets/build/chunks/js/common-b1893266.d335116a.js:1
+#: assets/build/chunks/js/common-b1893266.1481c1d0.js:1
 msgid "Connect my site and get 150K free AI tokens"
 msgstr ""
 
 #. translators: %s: email address the Aisentic account is created for.
-#: assets/build/chunks/js/common-b1893266.d335116a.js:2
+#: assets/build/chunks/js/common-b1893266.1481c1d0.js:2
 #, js-format
 msgid "Shares your name, email (%s) and site with Aisentic."
 msgstr ""
 
-#: assets/build/chunks/js/common-b1893266.d335116a.js:2
+#: assets/build/chunks/js/common-b1893266.1481c1d0.js:2
 #: assets/build/js/frontend.js:1
 msgid "Activated"
 msgstr ""
 
-#: assets/build/chunks/js/common-b1893266.d335116a.js:2
+#: assets/build/chunks/js/common-b1893266.1481c1d0.js:2
 msgid "Appearance & Localization Settings"
 msgstr ""
 
-#: assets/build/chunks/js/common-b1893266.d335116a.js:2
+#: assets/build/chunks/js/common-b1893266.1481c1d0.js:2
 msgid "Customize the colors and language preferences for your reservation forms, calendar, mini-cart, and other UI elements."
 msgstr ""
 
-#: assets/build/chunks/js/common-b1893266.d335116a.js:2
+#: assets/build/chunks/js/common-b1893266.1481c1d0.js:2
 msgid "Primary Color"
 msgstr ""
 
-#: assets/build/chunks/js/common-b1893266.d335116a.js:2
+#: assets/build/chunks/js/common-b1893266.1481c1d0.js:2
 msgid "Secondary Color"
 msgstr ""
 
-#: assets/build/chunks/js/common-b1893266.d335116a.js:2
+#: assets/build/chunks/js/common-b1893266.1481c1d0.js:2
 msgid "Calendar Language"
 msgstr ""
 
-#: assets/build/chunks/js/common-b1893266.d335116a.js:2
+#: assets/build/chunks/js/common-b1893266.1481c1d0.js:2
 msgid "Select the language for your calendar."
 msgstr ""
 
-#: assets/build/chunks/js/common-b1893266.d335116a.js:2
+#: assets/build/chunks/js/common-b1893266.1481c1d0.js:2
 msgid "Choose a language"
 msgstr ""
 
-#: assets/build/chunks/js/common-b1893266.d335116a.js:2
+#: assets/build/chunks/js/common-b1893266.1481c1d0.js:2
 msgid "Location Settings"
 msgstr ""
 
-#: assets/build/chunks/js/common-b1893266.d335116a.js:2
+#: assets/build/chunks/js/common-b1893266.1481c1d0.js:2
 msgid "Enable this for location-based services to enhance user experience during food ordering and reservations."
 msgstr ""
 
-#: assets/build/chunks/js/common-b1893266.d335116a.js:2
+#: assets/build/chunks/js/common-b1893266.1481c1d0.js:2
 msgid "Require Location"
 msgstr ""
 
-#: assets/build/chunks/js/common-b1893266.d335116a.js:2
+#: assets/build/chunks/js/common-b1893266.1481c1d0.js:2
 msgid "Enable this to require users to select a location before they can proceed with food ordering or reservations."
 msgstr ""
 
-#: assets/build/chunks/js/common-b1893266.d335116a.js:2
+#: assets/build/chunks/js/common-b1893266.1481c1d0.js:2
 msgid "Display location selector on"
 msgstr ""
 
-#: assets/build/chunks/js/common-b1893266.d335116a.js:2
+#: assets/build/chunks/js/common-b1893266.1481c1d0.js:2
 msgid "Automatically show the location selector popup when the location is not set."
 msgstr ""
 
-#: assets/build/chunks/js/common-b1893266.d335116a.js:2
+#: assets/build/chunks/js/common-b1893266.1481c1d0.js:2
 msgid "Select an option"
 msgstr ""
 
-#: assets/build/chunks/js/common-b1893266.d335116a.js:2
+#: assets/build/chunks/js/common-b1893266.1481c1d0.js:2
 msgid "Location Selector Pages"
 msgstr ""
 
-#: assets/build/chunks/js/common-b1893266.d335116a.js:2
+#: assets/build/chunks/js/common-b1893266.1481c1d0.js:2
 msgid "Select the pages where the location selector should appear."
 msgstr ""
 
-#: assets/build/chunks/js/common-b1893266.d335116a.js:2
+#: assets/build/chunks/js/common-b1893266.1481c1d0.js:2
 msgid "Floating Location Widget"
 msgstr ""
 
-#: assets/build/chunks/js/common-b1893266.d335116a.js:2
+#: assets/build/chunks/js/common-b1893266.1481c1d0.js:2
 msgid "Show a persistent floating badge with the selected location on the frontend. Visitors can click it to switch locations. Honors the same page rules as the location selector above."
 msgstr ""
 
-#: assets/build/chunks/js/common-b1893266.d335116a.js:2
+#: assets/build/chunks/js/common-b1893266.1481c1d0.js:2
 msgid "Version Control Settings"
 msgstr ""
 
-#: assets/build/chunks/js/common-b1893266.d335116a.js:2
+#: assets/build/chunks/js/common-b1893266.1481c1d0.js:2
 msgid "Manage and control different versions of your plugin or application, allowing you to rollback to previous versions if needed."
 msgstr ""
 
-#: assets/build/chunks/js/common-b1893266.d335116a.js:2
+#: assets/build/chunks/js/common-b1893266.1481c1d0.js:2
 msgid "Rollback Version"
 msgstr ""
 
-#: assets/build/chunks/js/common-b1893266.d335116a.js:2
+#: assets/build/chunks/js/common-b1893266.1481c1d0.js:2
 msgid "Select the version to which you want to rollback."
 msgstr ""
 
-#: assets/build/chunks/js/common-b1893266.d335116a.js:2
+#: assets/build/chunks/js/common-b1893266.1481c1d0.js:2
 msgid "Choose a version"
 msgstr ""
 
-#: assets/build/chunks/js/common-b1893266.d335116a.js:2
+#: assets/build/chunks/js/common-b1893266.1481c1d0.js:2
 msgid "Reinstall Version"
 msgstr ""
 
-#: assets/build/chunks/js/common-b1893266.d335116a.js:2
+#: assets/build/chunks/js/common-b1893266.1481c1d0.js:2
 msgid "Reinstall"
 msgstr ""
 
-#: assets/build/chunks/js/common-b1893266.d335116a.js:2
+#: assets/build/chunks/js/common-b1893266.1481c1d0.js:2
 msgid "Warning: Please backup your database before making the rollback."
 msgstr ""
 
-#: assets/build/chunks/js/common-b1893266.d335116a.js:2
+#: assets/build/chunks/js/common-b1893266.1481c1d0.js:2
 msgid "Set Your Weekly Global Schedule"
 msgstr ""
 
-#: assets/build/chunks/js/common-b1893266.d335116a.js:2
+#: assets/build/chunks/js/common-b1893266.1481c1d0.js:2
 msgid "Configure your restaurant's weekly operating hours, including multiple time slots in each day for flexibility."
 msgstr ""
 
-#: assets/build/chunks/js/common-b1893266.d335116a.js:2
+#: assets/build/chunks/js/common-b1893266.1481c1d0.js:2
 msgid "Holidays & Days Off"
 msgstr ""
 
-#: assets/build/chunks/js/common-b1893266.d335116a.js:2
+#: assets/build/chunks/js/common-b1893266.1481c1d0.js:2
 msgid "Add specific dates when your restaurant will be closed or unavailable for online orders or reservations."
 msgstr ""
 
-#: assets/build/chunks/js/common-b1893266.d335116a.js:2
+#: assets/build/chunks/js/common-b1893266.1481c1d0.js:2
 msgid "Add custom Holiday"
 msgstr ""
 
-#: assets/build/chunks/js/common-b1893266.d335116a.js:2
+#: assets/build/chunks/js/common-b1893266.1481c1d0.js:2
 msgid "Enable custom holiday schedule"
 msgstr ""
 
-#: assets/build/chunks/js/common-b1893266.d335116a.js:2
+#: assets/build/chunks/js/common-b1893266.1481c1d0.js:2
 msgid "Delete schedule"
 msgstr ""
 
-#: assets/build/chunks/js/common-b1893266.d335116a.js:2
+#: assets/build/chunks/js/common-b1893266.1481c1d0.js:2
 msgid "Set custom schedule"
 msgstr ""
 
-#: assets/build/chunks/js/common-b1893266.d335116a.js:2
+#: assets/build/chunks/js/common-b1893266.1481c1d0.js:2
 msgid "Add specific dates with custom time slots for your restaurant operations. These schedules will override the regular schedule."
 msgstr ""
 
-#: assets/build/chunks/js/common-b1893266.d335116a.js:2
+#: assets/build/chunks/js/common-b1893266.1481c1d0.js:2
 #: assets/build/chunks/js/common-d1e7a7dc.a0f09380.js:1
 msgid "Add new"
 msgstr ""
 
-#: assets/build/chunks/js/common-b1893266.d335116a.js:2
+#: assets/build/chunks/js/common-b1893266.1481c1d0.js:2
 msgid "Days With Custom Schedules"
 msgstr ""
 
-#: assets/build/chunks/js/common-b1893266.d335116a.js:2
+#: assets/build/chunks/js/common-b1893266.1481c1d0.js:2
 msgid "Set specific time slots for certain dates that differ from your regular schedule."
 msgstr ""
 
-#: assets/build/chunks/js/common-b1893266.d335116a.js:2
+#: assets/build/chunks/js/common-b1893266.1481c1d0.js:2
 msgid "Enable Online Food Order Module"
 msgstr ""
 
-#: assets/build/chunks/js/common-b1893266.d335116a.js:2
+#: assets/build/chunks/js/common-b1893266.1481c1d0.js:2
 msgid "This module allows customers to place food orders online. Enable it to start accepting online orders."
 msgstr ""
 
-#: assets/build/chunks/js/common-b1893266.d335116a.js:2
+#: assets/build/chunks/js/common-b1893266.1481c1d0.js:2
 msgid "Enable Online Reservation Module"
 msgstr ""
 
-#: assets/build/chunks/js/common-b1893266.d335116a.js:2
+#: assets/build/chunks/js/common-b1893266.1481c1d0.js:2
 msgid "Enable the reservation module to configure reservation rules and settings."
 msgstr ""
 
-#: assets/build/chunks/js/common-b1893266.d335116a.js:2
+#: assets/build/chunks/js/common-b1893266.1481c1d0.js:2
 msgid "Enable the reservation module to customize reservation form fields and appearance."
 msgstr ""
 
-#: assets/build/chunks/js/common-b1893266.d335116a.js:2
+#: assets/build/chunks/js/common-b1893266.1481c1d0.js:2
 msgid "This module allows customers to place reservations online. Enable it to start accepting online reservations."
 msgstr ""
 
-#: assets/build/chunks/js/common-b1893266.d335116a.js:2
+#: assets/build/chunks/js/common-b1893266.1481c1d0.js:2
 msgid "On all pages"
 msgstr ""
 
-#: assets/build/chunks/js/common-b1893266.d335116a.js:2
+#: assets/build/chunks/js/common-b1893266.1481c1d0.js:2
 msgid "On specific pages"
 msgstr ""
 
-#: assets/build/chunks/js/common-b1893266.d335116a.js:2
+#: assets/build/chunks/js/common-b1893266.1481c1d0.js:2
 msgid "Don't show"
 msgstr ""
 
-#: assets/build/chunks/js/common-b1893266.d335116a.js:2
+#: assets/build/chunks/js/common-b1893266.1481c1d0.js:2
 #: assets/build/js/frontend.js:1
 msgid "Value must be either enabled (1) or disabled (0)"
 msgstr ""
 
-#: assets/build/chunks/js/common-b1893266.d335116a.js:2
+#: assets/build/chunks/js/common-b1893266.1481c1d0.js:2
 #: assets/build/js/frontend.js:1
 msgid "Invalid color format. Use #RGB or #RRGGBB."
 msgstr ""
 
-#: assets/build/chunks/js/common-b1893266.d335116a.js:2
+#: assets/build/chunks/js/common-b1893266.1481c1d0.js:2
 #: assets/build/js/frontend.js:1
 msgid "Icon type must be either 'predefined' or 'custom'"
 msgstr ""
 
-#: assets/build/chunks/js/common-b1893266.d335116a.js:2
+#: assets/build/chunks/js/common-b1893266.1481c1d0.js:2
 #: assets/build/js/frontend.js:1
 msgid "Icon value must be a valid string"
 msgstr ""
 
-#: assets/build/chunks/js/common-b1893266.d335116a.js:2
+#: assets/build/chunks/js/common-b1893266.1481c1d0.js:2
 #: assets/build/js/frontend.js:1
 msgid "Icon must have type and value"
 msgstr ""
 
-#: assets/build/chunks/js/common-b1893266.d335116a.js:2
+#: assets/build/chunks/js/common-b1893266.1481c1d0.js:2
 #: assets/build/js/frontend.js:1
 msgid "Restaurant type must be either 'food_ordering' or 'reservation'"
 msgstr ""
 
-#: assets/build/chunks/js/common-b1893266.d335116a.js:2
+#: assets/build/chunks/js/common-b1893266.1481c1d0.js:2
 #: assets/build/js/frontend.js:1
 msgid "Restaurant type must be an array of valid options"
 msgstr ""
 
-#: assets/build/chunks/js/common-b1893266.d335116a.js:2
+#: assets/build/chunks/js/common-b1893266.1481c1d0.js:2
 #: assets/build/js/frontend.js:1
 msgid "Invalid email address"
 msgstr ""
 
-#: assets/build/chunks/js/common-b1893266.d335116a.js:2
+#: assets/build/chunks/js/common-b1893266.1481c1d0.js:2
 #: assets/build/js/frontend.js:1
 msgid "Contact number must be 6-15 digits with valid format"
 msgstr ""
 
-#: assets/build/chunks/js/common-b1893266.d335116a.js:2
+#: assets/build/chunks/js/common-b1893266.1481c1d0.js:2
 #: assets/build/js/frontend.js:1
 msgid "Reservation status must be 'pending', 'confirmed', or 'cancelled'"
 msgstr ""
 
-#: assets/build/chunks/js/common-b1893266.d335116a.js:2
+#: assets/build/chunks/js/common-b1893266.1481c1d0.js:2
 #: assets/build/js/frontend.js:1
 msgid "Block timeslot status must be 'pending', 'confirmed', or 'cancelled'"
 msgstr ""
 
-#: assets/build/chunks/js/common-b1893266.d335116a.js:2
+#: assets/build/chunks/js/common-b1893266.1481c1d0.js:2
 #: assets/build/js/frontend.js:1
 msgid "Block timeslot statuses must be an array of valid statuses"
 msgstr ""
 
-#: assets/build/chunks/js/common-b1893266.d335116a.js:2
+#: assets/build/chunks/js/common-b1893266.1481c1d0.js:2
 #: assets/build/js/frontend.js:1
 msgid "Reservation early booking time must be a valid number."
 msgstr ""
 
-#: assets/build/chunks/js/common-b1893266.d335116a.js:2
+#: assets/build/chunks/js/common-b1893266.1481c1d0.js:2
 #: assets/build/js/frontend.js:1
 msgid "Reservation early booking time must be a non-negative number."
 msgstr ""
 
-#: assets/build/chunks/js/common-b1893266.d335116a.js:2
+#: assets/build/chunks/js/common-b1893266.1481c1d0.js:2
 #: assets/build/js/frontend.js:1
 msgid "Reservation early booking unit must be 'days', 'weeks', or 'months'"
 msgstr ""
 
-#: assets/build/chunks/js/common-b1893266.d335116a.js:2
+#: assets/build/chunks/js/common-b1893266.1481c1d0.js:2
 #: assets/build/js/frontend.js:1
 msgid "Display location selector must be 'all_pages', 'specific_pages', or 'dont_show'"
 msgstr ""
 
-#: assets/build/chunks/js/common-b1893266.d335116a.js:2
+#: assets/build/chunks/js/common-b1893266.1481c1d0.js:2
 #: assets/build/js/frontend.js:1
 msgid "Mini cart style must be either 'style-1' or 'style-2'"
 msgstr ""
 
-#: assets/build/chunks/js/common-b1893266.d335116a.js:2
+#: assets/build/chunks/js/common-b1893266.1481c1d0.js:2
 #: assets/build/js/frontend.js:1
 msgid "Repeated sound minute must be a valid number"
 msgstr ""
 
-#: assets/build/chunks/js/common-b1893266.d335116a.js:2
+#: assets/build/chunks/js/common-b1893266.1481c1d0.js:2
 #: assets/build/js/frontend.js:1
 msgid "Repeated sound minute must be a non-negative number"
 msgstr ""
 
-#: assets/build/chunks/js/common-b1893266.d335116a.js:2
+#: assets/build/chunks/js/common-b1893266.1481c1d0.js:2
 #: assets/build/js/frontend.js:1
 msgid "Holiday date must be a valid string"
 msgstr ""
 
-#: assets/build/chunks/js/common-b1893266.d335116a.js:2
+#: assets/build/chunks/js/common-b1893266.1481c1d0.js:2
 #: assets/build/js/frontend.js:1
 msgid "Custom holidays must be an array of date strings"
 msgstr ""
 
-#: assets/build/chunks/js/common-b1893266.d335116a.js:2
+#: assets/build/chunks/js/common-b1893266.1481c1d0.js:2
 #: assets/build/js/frontend.js:1
 msgid "Duplicate holiday dates are not allowed. Please remove duplicate entries."
 msgstr ""
 
-#: assets/build/chunks/js/common-b1893266.d335116a.js:2
+#: assets/build/chunks/js/common-b1893266.1481c1d0.js:2
 #: assets/build/js/frontend.js:1
 msgid "Custom schedule date must be a valid string"
 msgstr ""
 
-#: assets/build/chunks/js/common-b1893266.d335116a.js:2
+#: assets/build/chunks/js/common-b1893266.1481c1d0.js:2
 #: assets/build/js/frontend.js:1
 msgid "Custom schedule start time must be a valid string"
 msgstr ""
 
-#: assets/build/chunks/js/common-b1893266.d335116a.js:2
+#: assets/build/chunks/js/common-b1893266.1481c1d0.js:2
 #: assets/build/js/frontend.js:1
 msgid "Custom schedule end time must be a valid string"
 msgstr ""
 
-#: assets/build/chunks/js/common-b1893266.d335116a.js:2
+#: assets/build/chunks/js/common-b1893266.1481c1d0.js:2
 #: assets/build/chunks/js/common-f413f2d5.b3be4fc7.js:2
 #: assets/build/js/frontend.js:1
 msgid "Invalid time range"
 msgstr ""
 
-#: assets/build/chunks/js/common-b1893266.d335116a.js:2
+#: assets/build/chunks/js/common-b1893266.1481c1d0.js:2
 #: assets/build/js/frontend.js:1
 msgid "Duplicate schedule dates are not allowed. Please remove duplicate entries."
 msgstr ""
 
-#: assets/build/chunks/js/common-b1893266.d335116a.js:2
+#: assets/build/chunks/js/common-b1893266.1481c1d0.js:2
 #: assets/build/js/frontend.js:1
 msgid "Minimum guest number must be at least 1"
 msgstr ""
 
-#: assets/build/chunks/js/common-b1893266.d335116a.js:2
+#: assets/build/chunks/js/common-b1893266.1481c1d0.js:2
 #: assets/build/js/frontend.js:1
 msgid "Maximum guest number must be greater than minimum guest number"
 msgstr ""
 
-#: assets/build/chunks/js/common-b1893266.d335116a.js:2
+#: assets/build/chunks/js/common-b1893266.1481c1d0.js:2
 #: assets/build/js/frontend.js:1
 msgid "Seat capacity must be greater than or equal to maximum guest number"
 msgstr ""
 
-#: assets/build/chunks/js/common-b1893266.d335116a.js:2
+#: assets/build/chunks/js/common-b1893266.1481c1d0.js:2
 msgid "Override Delivery Schedule"
 msgstr ""
 
-#: assets/build/chunks/js/common-b1893266.d335116a.js:2
+#: assets/build/chunks/js/common-b1893266.1481c1d0.js:2
 msgid "Override resturant schedule for delivery"
 msgstr ""
 
-#: assets/build/chunks/js/common-b1893266.d335116a.js:2
+#: assets/build/chunks/js/common-b1893266.1481c1d0.js:2
 msgid "Override Pickup Schedule"
 msgstr ""
 
-#: assets/build/chunks/js/common-b1893266.d335116a.js:2
+#: assets/build/chunks/js/common-b1893266.1481c1d0.js:2
 msgid "Override resturant schedule for pickup"
 msgstr ""
 
-#: assets/build/chunks/js/common-b1893266.d335116a.js:2
+#: assets/build/chunks/js/common-b1893266.1481c1d0.js:2
 msgid "Override Schedule for Reservation"
 msgstr ""
 
-#: assets/build/chunks/js/common-b1893266.d335116a.js:2
+#: assets/build/chunks/js/common-b1893266.1481c1d0.js:2
 msgid "If enabled then it will follow below schedule for reservation instead of global"
 msgstr ""
 
-#: assets/build/chunks/js/common-b1893266.d335116a.js:2
+#: assets/build/chunks/js/common-b1893266.1481c1d0.js:2
 msgid "Reservation Time Intervals"
 msgstr ""
 
-#: assets/build/chunks/js/common-b1893266.d335116a.js:2
+#: assets/build/chunks/js/common-b1893266.1481c1d0.js:2
 msgid "The interval between reservation slots. This is used to generate the slots for reservation booking."
 msgstr ""
 
-#: assets/build/chunks/js/common-b1893266.d335116a.js:2
+#: assets/build/chunks/js/common-b1893266.1481c1d0.js:2
 msgid "This affects reservation booking slots"
 msgstr ""
 

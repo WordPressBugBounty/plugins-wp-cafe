@@ -245,22 +245,31 @@ class Product_Label_Controller extends Base_Rest_Controller {
     /**
      * Permission check for list endpoint.
      *
+     * Deny paths return WP_Error: WordPress only refuses a request when the
+     * callback returns WP_Error, false or null, so the WP_HTTP_Response that
+     * Base_Rest_Controller::error() builds would read as "granted".
+     *
      * @param WP_REST_Request $request
-     * @return bool|\WP_HTTP_Response
+     * @return true|\WP_Error
      */
     public function get_items_permissions_check( $request ) {
         $can_read = current_user_can( 'manage_woocommerce' )
             || current_user_can( 'edit_products' )
             || current_user_can( 'manage_categories' );
 
-        $can_read = apply_filters( 'wpcafe_product_label_read_permission', $can_read, $request );
+        // Cast: a filter returning an object would otherwise read as "granted".
+        $can_read = (bool) apply_filters( 'wpcafe_product_label_read_permission', $can_read, $request );
 
         if ( ! $can_read ) {
-            return $this->error( __( 'You do not have permission to access product labels.', 'wp-cafe' ), 403 );
+            return new \WP_Error(
+                'wpcafe_forbidden',
+                __( 'You do not have permission to access product labels.', 'wp-cafe' ),
+                [ 'status' => rest_authorization_required_code() ]
+            );
         }
 
         if ( ! $this->verify_rest_nonce( $request ) ) {
-            return $this->error( __( 'Invalid nonce.', 'wp-cafe' ), 403 );
+            return new \WP_Error( 'wpcafe_invalid_nonce', __( 'Invalid nonce.', 'wp-cafe' ), [ 'status' => 403 ] );
         }
 
         return true;
@@ -269,22 +278,29 @@ class Product_Label_Controller extends Base_Rest_Controller {
     /**
      * Permission check for single endpoint.
      *
+     * See get_items_permissions_check() for why every deny path is a WP_Error.
+     *
      * @param WP_REST_Request $request
-     * @return bool|\WP_HTTP_Response
+     * @return true|\WP_Error
      */
     public function get_item_permissions_check( $request ) {
         $can_read = current_user_can( 'manage_woocommerce' )
             || current_user_can( 'edit_products' )
             || current_user_can( 'manage_categories' );
 
-        $can_read = apply_filters( 'wpcafe_product_label_item_permission', $can_read, $request );
+        // Cast: a filter returning an object would otherwise read as "granted".
+        $can_read = (bool) apply_filters( 'wpcafe_product_label_item_permission', $can_read, $request );
 
         if ( ! $can_read ) {
-            return $this->error( __( 'You do not have permission to access this product label.', 'wp-cafe' ), 403 );
+            return new \WP_Error(
+                'wpcafe_forbidden',
+                __( 'You do not have permission to access this product label.', 'wp-cafe' ),
+                [ 'status' => rest_authorization_required_code() ]
+            );
         }
 
         if ( ! $this->verify_rest_nonce( $request ) ) {
-            return $this->error( __( 'Invalid nonce.', 'wp-cafe' ), 403 );
+            return new \WP_Error( 'wpcafe_invalid_nonce', __( 'Invalid nonce.', 'wp-cafe' ), [ 'status' => 403 ] );
         }
 
         return true;

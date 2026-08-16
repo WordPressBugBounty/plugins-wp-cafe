@@ -430,6 +430,26 @@ return [
        </svg>
         ',
     ],
+    'aisentic' => [
+        'name' => 'aisentic',
+        'slug' => 'aisentic',
+        'type' => 'plugin',
+        'status' => 'install',
+        'is_pro' => false,
+        'title' => __('Aisentic', 'wp-cafe'),
+        'description' => __('AI copilot for the WordPress dashboard. Adds a chatbot so visitors can search your site and staff can reach features by asking questions.', 'wp-cafe'),
+        'notice' => '',
+        'demo_link' => '',
+        'settings_link' => 'admin.php?page=aisentic',
+        'doc_link' => 'https://support.themewinter.com/docs/plugins/docs/aisentic/',
+        // No download_url on purpose: Aisentic is hosted on wordpress.org, so the
+        // installer falls back to PluginManager and pulls the latest stable zip.
+        'icon' => '<svg width="40" height="40" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <rect width="40" height="40" rx="7.018" fill="#6443f9"/>
+        <path d="M20 4.21c.68 0 1.331.271 1.812.753a2.57 2.57 0 0 1 .241 3.348 2.55 2.55 0 0 1-1.321.921v3.791h7.323a4.4 4.4 0 0 1 3.107 1.291 4.4 4.4 0 0 1 1.287 3.115v.817h.617a2.195 2.195 0 0 1 2.197 2.203v5.14c0 .585-.231 1.145-.643 1.558a2.2 2.2 0 0 1-1.554.646h-.617v3.59a4.4 4.4 0 0 1-1.287 3.116 4.4 4.4 0 0 1-3.107 1.29h-16.11a4.4 4.4 0 0 1-3.107-1.29 4.4 4.4 0 0 1-1.287-3.116v-3.59h-.617a2.2 2.2 0 0 1-1.554-.646 2.2 2.2 0 0 1-.643-1.558v-5.14c0-.585.231-1.145.643-1.558a2.2 2.2 0 0 1 1.554-.645h.617v-.817c0-1.168.464-2.289 1.287-3.115a4.4 4.4 0 0 1 3.107-1.291h7.323V9.232a2.56 2.56 0 0 1-1.831-2.451c0-.682.27-1.336.751-1.818A2.56 2.56 0 0 1 20 4.211m-4.06 23.993a.73.73 0 0 0-.965.328.74.74 0 0 0 .297.978A10.35 10.35 0 0 0 20 30.65c1.646 0 3.282-.394 4.728-1.14a.735.735 0 0 0-.669-1.306 8.96 8.96 0 0 1-8.118 0m-.7-9.305a2.56 2.56 0 0 0-1.812.753 2.575 2.575 0 0 0 0 3.636 2.56 2.56 0 0 0 3.624 0 2.577 2.577 0 0 0 0-3.636 2.56 2.56 0 0 0-1.811-.753m9.52 0a2.56 2.56 0 0 0-2.368 1.587 2.58 2.58 0 0 0 .556 2.802 2.56 2.56 0 0 0 1.811.753 2.56 2.56 0 0 0 1.813-.753 2.577 2.577 0 0 0 0-3.636 2.56 2.56 0 0 0-1.813-.753" fill="#fff"/>
+        </svg>
+        ',
+    ],
     'webhooks' => [
         'name'          => 'webhooks',
         'slug'          => 'webhooks',

@@ -70,10 +70,15 @@ class Food_Order_Controller extends Base_Rest_Controller {
     }
 
     /**
-     * Permission check shared by all routes.
+     * Permission check shared by all read routes.
+     *
+     * Every deny path returns a WP_Error. WordPress only refuses a request when
+     * the callback returns WP_Error, false or null — anything else, including
+     * the WP_HTTP_Response that Base_Rest_Controller::error() builds, counts as
+     * "granted" and lets the request straight through.
      *
      * @param WP_REST_Request $request Request.
-     * @return bool|\WP_HTTP_Response
+     * @return true|\WP_Error
      */
     public function get_items_permissions_check( $request ) {
         $can_read = current_user_can( 'manage_woocommerce' )
@@ -82,15 +87,19 @@ class Food_Order_Controller extends Base_Rest_Controller {
             || current_user_can( 'wpcafe_manage_orders' );
 
         if ( ! $can_read ) {
-            return $this->error( __( 'You do not have permission to access orders.', 'wp-cafe' ), 403 );
+            return new \WP_Error(
+                'wpcafe_forbidden',
+                __( 'You do not have permission to access orders.', 'wp-cafe' ),
+                [ 'status' => rest_authorization_required_code() ]
+            );
         }
 
         if ( ! $this->verify_rest_nonce( $request ) ) {
-            return $this->error( __( 'Invalid nonce.', 'wp-cafe' ), 403 );
+            return new \WP_Error( 'wpcafe_invalid_nonce', __( 'Invalid nonce.', 'wp-cafe' ), [ 'status' => 403 ] );
         }
 
         if ( ! function_exists( 'wc_get_orders' ) ) {
-            return $this->error( __( 'WooCommerce is not active.', 'wp-cafe' ), 500 );
+            return new \WP_Error( 'wpcafe_woocommerce_inactive', __( 'WooCommerce is not active.', 'wp-cafe' ), [ 'status' => 500 ] );
         }
 
         return true;
@@ -99,23 +108,29 @@ class Food_Order_Controller extends Base_Rest_Controller {
     /**
      * Permission check for mutating order routes.
      *
+     * See get_items_permissions_check() for why every deny path is a WP_Error.
+     *
      * @param WP_REST_Request $request Request.
-     * @return bool|\WP_HTTP_Response
+     * @return true|\WP_Error
      */
     public function manage_items_permissions_check( $request ) {
         $can_manage = current_user_can( 'manage_woocommerce' )
             || current_user_can( 'wpcafe_manage_orders' );
 
         if ( ! $can_manage ) {
-            return $this->error( __( 'You do not have permission to manage orders.', 'wp-cafe' ), 403 );
+            return new \WP_Error(
+                'wpcafe_forbidden',
+                __( 'You do not have permission to manage orders.', 'wp-cafe' ),
+                [ 'status' => rest_authorization_required_code() ]
+            );
         }
 
         if ( ! $this->verify_rest_nonce( $request ) ) {
-            return $this->error( __( 'Invalid nonce.', 'wp-cafe' ), 403 );
+            return new \WP_Error( 'wpcafe_invalid_nonce', __( 'Invalid nonce.', 'wp-cafe' ), [ 'status' => 403 ] );
         }
 
         if ( ! function_exists( 'wc_get_orders' ) ) {
-            return $this->error( __( 'WooCommerce is not active.', 'wp-cafe' ), 500 );
+            return new \WP_Error( 'wpcafe_woocommerce_inactive', __( 'WooCommerce is not active.', 'wp-cafe' ), [ 'status' => 500 ] );
         }
 
         return true;
