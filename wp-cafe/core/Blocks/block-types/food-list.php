@@ -111,6 +111,7 @@ class FoodList extends AbstractBlock {
 			'style-1',
 			'style-2',
 			'style-3',
+			'style-4',
 		];
 
 		if ( in_array( $style, $allowed_file_names, true ) ) {
@@ -119,10 +120,14 @@ class FoodList extends AbstractBlock {
 			$template_file = $allowed_file_names[0];
 		}
 
+		wpc_enqueue_food_menu_style_assets( $template_file, 'list' );
+
+		$wpc_color_style = wpc_color_tokens();
+
 		ob_start();
 		?>
-		<div class="main_wrapper_<?php echo esc_html( $unique_id ); ?>">
-			<div class="list_template_<?php echo esc_html( $unique_id ); ?> wpc-nav-shortcode wpc-widget-wrapper"  data-id="<?php echo esc_attr( $unique_id ); ?>">
+		<div class="main_wrapper_<?php echo esc_attr( $unique_id ); ?>"<?php if ( '' !== $wpc_color_style ) : ?> style="<?php echo esc_attr( $wpc_color_style ); ?>"<?php endif; ?>>
+			<div class="list_template_<?php echo esc_attr( $unique_id ); ?> wpc-nav-shortcode wpc-widget-wrapper"  data-id="<?php echo esc_attr( $unique_id ); ?>">
 				<?php
 				$food_list_args = [
 					'post_type'     => 'product',

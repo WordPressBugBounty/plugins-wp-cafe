@@ -146,9 +146,9 @@ class Init {
             'support_url'      => 'https://themewinter.com/support/',
             'review_url'       => 'https://wordpress.org/support/plugin/wp-event-solution/reviews/#new-post',
             'allowed_screens'  => 'toplevel_page_wpcafe',
-            'stories_api_url'  => 'https://banner.themefunction.com/public/stories/',
-            'banners_api_url'  => 'https://banner.themefunction.com/public/jhanda',
-            'api_url'          => 'https://banner.themefunction.com',
+            'stories_api_url'  => 'https://banner.arraytics.com/public/stories/',
+            'banners_api_url'  => 'https://banner.arraytics.com/public/jhanda',
+            'api_url'          => 'https://banner.arraytics.com',
             // Dynamic filter string components
             'base_plugins'     => ['wp-cafe', 'wpcafe-free-only'],
             'pro_plugin_slug'  => 'wpcafe-pro',

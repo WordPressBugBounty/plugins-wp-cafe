@@ -271,10 +271,12 @@ class Mini_Cart {
      * @return void
      */
     public function handle_mini_cart_buttons_before() {
-        if ( class_exists( 'Wpcafe_Multivendor' ) ) {
+        if ( wpcafe_is_multivendor() ) {
             return;
         }
 
+        // Digital-only carts are hidden by Digital_Fulfillment_Gate on these
+        // same filters, so no early return here — a site can still override.
         $show_delivery = (bool) apply_filters( 'wpcafe_minicart_show_delivery', wpc_is_module_enable( 'delivery' ) );
         $show_pickup   = (bool) apply_filters( 'wpcafe_minicart_show_pickup', wpc_is_module_enable( 'pickup' ) );
         // Dine-in visibility is gated on both the dine-in module AND the

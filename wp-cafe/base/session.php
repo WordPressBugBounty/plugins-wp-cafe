@@ -14,6 +14,9 @@ class Session {
         if ( PHP_SAPI === 'cli' ) {
             return;
         }
+        if ( headers_sent() ) {
+            return;
+        }
         if ( session_status() === PHP_SESSION_NONE ) {
             session_start();
         }

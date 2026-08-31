@@ -52,6 +52,14 @@ class Frontend_Assets extends Base_Assets {
      */
     public function enqueue() {
 
+        // Sibling plugins (e.g. the WCFM multivendor addon) lazy-load their own
+        // wp-cafe-pro modules on pages wpcafe_should_load_frontend() doesn't
+        // recognize as ours, but those modules still call into our shared
+        // window.wpCafeI18nLoader for translations. That global only exists if
+        // this runs, so — unlike the rest of this method — it can't wait behind
+        // the page-type gate below.
+        $this->enqueue_i18n_loader();
+
         // BE1/FE1/FE2: only load the (historically sitewide) card/grid CSS, the
         // jQuery public bundle and the forced WC scripts where WP Cafe actually
         // renders. Registration stays unconditional in register_styles_scripts(),
@@ -144,8 +152,6 @@ class Frontend_Assets extends Base_Assets {
             'wpcafe-frontend-scripts',
             'wp-cafe' // text domain
         );
-
-        $this->enqueue_i18n_loader();
     }
 
     /**
@@ -259,6 +265,28 @@ class Frontend_Assets extends Base_Assets {
             // next to wpc-card-core wherever a food-menu list renders.
             'wpc-pagination' => [
                 'src' => wpcafe()->assets_url . '/css/wpc-pagination.css',
+            ],
+            // Newer card set (list style-4, tab style-6/7/8). Split per concern so
+            // a page only downloads the card shape it renders; all three are
+            // enqueued through wpc_food_menu_style_assets(). Depends on
+            // wpc-card-core for the shared add-to-cart / loader chrome.
+            'wpc-card-atoms' => [
+                'src'  => wpcafe()->assets_url . '/css/card-atoms.css',
+                'deps' => [ 'wpc-card-core' ],
+            ],
+            'wpc-card-row' => [
+                'src'  => wpcafe()->assets_url . '/css/card-row.css',
+                'deps' => [ 'wpc-card-atoms' ],
+            ],
+            'wpc-card-grid' => [
+                'src'  => wpcafe()->assets_url . '/css/card-grid.css',
+                'deps' => [ 'wpc-card-atoms' ],
+            ],
+            // Tab nav variants (pills-end / rail / pills-thumb). Kept out of
+            // food-menu-tab.css so styles 1-5 do not download rules they never use.
+            'wpc-tab-nav-v2' => [
+                'src'  => wpcafe()->assets_url . '/css/tab-nav-v2.css',
+                'deps' => [ 'wpc-food-menu-tab' ],
             ],
             'wpc-location-selector'    => [
                 'src' => wpcafe()->assets_url . '/css/location-selector.css',

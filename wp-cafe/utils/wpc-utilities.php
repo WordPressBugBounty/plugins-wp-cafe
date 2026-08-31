@@ -594,6 +594,29 @@ class Wpc_Utilities {
 	}
 
 	/**
+	 * Allowed tags for the newer card markup.
+	 *
+	 * Same list as wpc_kses_allowed_tags() plus the two tags WooCommerce prints
+	 * inside a sale price. They are not added to the shared list because that
+	 * would change how every existing style renders a sale price.
+	 *
+	 * @return array
+	 */
+	public static function wpc_kses_card_tags() {
+		$tags = self::wpc_kses_allowed_tags();
+
+		$tags['ins'] = [
+			'class' => [],
+			'style' => [],
+		];
+		$tags['bdi'] = [
+			'class' => [],
+		];
+
+		return $tags;
+	}
+
+	/**
 	 * Render product label badges for a product.
 	 *
 	 * Thin wrapper over the global wpc_product_labels() helper so that
@@ -641,6 +664,7 @@ class Wpc_Utilities {
 			'taxonomy'      => 'product_cat',
 			'wpc_location'  => null,
 			'paginate'      => false,
+			'suppress_filter' => false,
 		);
 
 		$parsed = wp_parse_args( $params, $defaults );
@@ -654,6 +678,15 @@ class Wpc_Utilities {
 		$search_value  = $parsed['search_value'];
 		$taxonomy      = $parsed['taxonomy'];
 		$wpc_location  = $parsed['wpc_location'];
+
+		// WPML/WCML: stored category/label term IDs come from widget/shortcode/
+		// block settings in the original language. Map them to the current
+		// language so the menu shows the right-language products on a translated
+		// page. Locations (wpcafe_location) are locked/shared, so their IDs are
+		// left untouched. No-op when WPML is inactive.
+		if ( is_array( $wpc_cat ) && count( $wpc_cat ) > 0 && class_exists( '\WpCafePro\Wpml\Wpc_Pro_Wpml' ) ) {
+			$wpc_cat = \WpCafePro\Wpml\Wpc_Pro_Wpml::term_ids( $wpc_cat, $taxonomy );
+		}
 
 		$args = [];
 		$args['post_type']      = $post_type;
@@ -718,9 +751,18 @@ class Wpc_Utilities {
 			unset( $args[ $from ] );
 		}
 
+		// WPML/WCML: product IDs supplied through the include/post__in path (e.g.
+		// by the timed-product filter) may be original-language IDs; map them to
+		// the current language. No-op when WPML is inactive.
+		if ( ! empty( $args['post__in'] ) && class_exists( '\WpCafePro\Wpml\Wpc_Pro_Wpml' ) ) {
+			$args['post__in'] = \WpCafePro\Wpml\Wpc_Pro_Wpml::product_ids( (array) $args['post__in'] );
+		}
+
 		$args['post_type']     = $args['post_type'] ?? 'product';
 		$args['fields']        = 'ids';
 		$args['no_found_rows'] = empty( $parsed['paginate'] );
+		// Let WCML scope the query to the current language.
+		$args['suppress_filters'] = false;
 
 		$query    = new \WP_Query( $args );
 		$ids      = $query->posts;
@@ -730,6 +772,9 @@ class Wpc_Utilities {
 			'products'     => $products,
 			'total_pages'  => ! empty( $parsed['paginate'] ) ? (int) $query->max_num_pages : 0,
 			'current_page' => ! empty( $parsed['paginate'] ) ? max( 1, (int) ( $parsed['page'] ?? 1 ) ) : 0,
+			// Matches count only when paginating; found_posts is not filled when
+			// no_found_rows short-circuits the count query.
+			'total_products' => ! empty( $parsed['paginate'] ) ? (int) $query->found_posts : count( $products ),
 		];
 	}
 
@@ -1049,7 +1094,17 @@ class Wpc_Utilities {
 	 *
 	 * @return array tab array
 	 */
-	public static function get_tab_array_from_category( $wpc_cat_arr ){
+	public static function get_tab_array_from_category( $wpc_cat_arr, $args = [] ){
+
+		$args = wp_parse_args(
+			$args,
+			[
+				// Both cost an extra lookup per category, so only the tab styles
+				// that actually print a count or a thumbnail ask for them.
+				'with_count' => false,
+				'with_thumb' => false,
+			]
+		);
 
 		$food_menu_tabs = [];
 
@@ -1059,6 +1114,15 @@ class Wpc_Utilities {
 				$wpc_cat    = get_term_by('id', $value, 'product_cat');
 				$cat_name   = ($wpc_cat && $wpc_cat->name ) ? $wpc_cat->name : "";
 				$tab_data   = array('post_cats'=>[$value, $wpc_cat->slug],'tab_title' => $cat_name);
+
+				if ( $args['with_count'] ) {
+					$tab_data['count'] = self::count_products_in_category( [ $value ] );
+				}
+
+				if ( $args['with_thumb'] ) {
+					$tab_data['thumb_id'] = (int) get_term_meta( $wpc_cat->term_id, 'thumbnail_id', true );
+				}
+
 				if ($wpc_get_menu_order == '') {
 					$food_menu_tabs[$key] = $tab_data;
 				} else {
@@ -1068,6 +1132,77 @@ class Wpc_Utilities {
 		}
 
 		return $food_menu_tabs;
+	}
+
+	/**
+	 * Count published products in one or more categories, honouring the
+	 * selected location so a rail count matches what the tab will list.
+	 *
+	 * Results are memoized per request because a tab nav asks for every
+	 * category up front.
+	 *
+	 * @param array    $cat_terms    Category term IDs.
+	 * @param int|null $wpc_location Location term ID, or null to read the session.
+	 *
+	 * @return int
+	 */
+	public static function count_products_in_category( $cat_terms, $wpc_location = null ) {
+		static $cache = [];
+
+		$cat_terms = array_values( array_filter( array_map( 'absint', (array) $cat_terms ) ) );
+
+		if ( empty( $cat_terms ) ) {
+			return 0;
+		}
+
+		if ( null === $wpc_location && function_exists( 'wpc_selected_location_id' ) ) {
+			$wpc_location = wpc_selected_location_id();
+		}
+
+		$cache_key = implode( ',', $cat_terms ) . '|' . (string) $wpc_location;
+
+		if ( isset( $cache[ $cache_key ] ) ) {
+			return $cache[ $cache_key ];
+		}
+
+		$args = [
+			'post_type'      => 'product',
+			'post_status'    => 'publish',
+			'posts_per_page' => 1,
+			'fields'         => 'ids',
+			'no_found_rows'  => false,
+			// phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_tax_query -- category counts need a taxonomy filter.
+			'tax_query'      => [
+				'relation' => 'AND',
+				[
+					'taxonomy'         => 'product_cat',
+					'terms'            => $cat_terms,
+					'field'            => 'id',
+					'include_children' => true,
+					'operator'         => 'IN',
+				],
+			],
+		];
+
+		if ( ! empty( $wpc_location ) ) {
+			$args['tax_query'][] = [
+				'taxonomy' => 'wpcafe_location',
+				'field'    => 'term_id',
+				'terms'    => $wpc_location,
+				'operator' => 'IN',
+			];
+		}
+
+		// Same filter the listing query runs through, so add-ons that hide
+		// products (timed menus, vendors) are reflected in the count.
+		// phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound -- wpc_ is the plugin's registered prefix.
+		$args = apply_filters( 'wpc_product_query_args', $args );
+
+		$query = new \WP_Query( $args );
+
+		$cache[ $cache_key ] = (int) $query->found_posts;
+
+		return $cache[ $cache_key ];
 	}
 
 	/**

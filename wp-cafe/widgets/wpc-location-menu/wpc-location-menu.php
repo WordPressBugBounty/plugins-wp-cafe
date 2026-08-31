@@ -205,7 +205,7 @@ class Wpc_Location_Menu extends Widget_Base
             ]
         );
 
-        if ( class_exists( 'Wpcafe_Multivendor' ) ) {
+        if ( wpcafe_is_multivendor() ) {
             $this->add_control(
                 'wpc_show_vendor',
                 [

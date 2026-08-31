@@ -168,6 +168,7 @@ class Food_Order_Controller extends Base_Rest_Controller {
         }
 
         if ( $location > 0 ) {
+            // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_query -- bounded, admin/staff-only order listing, not a public high-volume path.
             $args['meta_query'] = [
                 [
                     'key'     => 'wpc_location_id',

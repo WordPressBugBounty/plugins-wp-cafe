@@ -27,6 +27,10 @@ class Localize {
             'currency_list'       => wpc_get_currencies(),
             'wpcafePro'           => function_exists('wpcafe_pro'),
             'user_role'           => $current_user->roles,
+            // Prefill for the Aisentic consent dialog. The name rides along unshown,
+            // which is why the consent checkbox names it.
+            'current_user_email'  => $current_user->user_email,
+            'current_user_name'   => $current_user->display_name,
             'pages'               => wpc_get_pages(),
             'table_layout'        => wpc_is_module_enable('table_layout'),
             'has_woo_products'    => (wp_count_posts( 'product' )->publish ?? 0) > 0,
@@ -81,7 +85,7 @@ class Localize {
             'locale_name'         => strtolower( str_replace( '_', '-', get_locale() ) ),
             'table_layout'        => wpc_is_module_enable('table_layout'),
             'wpcafePro'           => function_exists('wpcafe_pro'),
-            'wpcafeMultivendor'   => class_exists('\Wpcafe_Multivendor'),
+            'wpcafeMultivendor'   => function_exists( 'wpcafe_is_multivendor' ) ? wpcafe_is_multivendor() : class_exists('\Wpcafe_Multivendor'),
             'deposet'             => wpc_is_deposet_active(),
         ];
 

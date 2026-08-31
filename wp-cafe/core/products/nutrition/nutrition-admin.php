@@ -294,7 +294,7 @@ class Nutrition_Admin implements Hookable_Service_Contract {
             return;
         }
 
-        $nonce = isset( $_POST[ self::NONCE_NAME ] ) ? wp_unslash( $_POST[ self::NONCE_NAME ] ) : '';
+        $nonce = isset( $_POST[ self::NONCE_NAME ] ) ? sanitize_text_field( wp_unslash( $_POST[ self::NONCE_NAME ] ) ) : '';
         if ( ! $nonce || ! wp_verify_nonce( $nonce, self::NONCE_ACTION ) ) {
             return;
         }

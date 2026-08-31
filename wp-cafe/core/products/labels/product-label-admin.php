@@ -112,9 +112,9 @@ class Product_Label_Admin implements Hookable_Service_Contract {
         }
 
         // Display option
-        echo $row_open;
+        echo wp_kses_post( $row_open );
         echo '<label for="wpcafe-label-display">' . esc_html__( 'Display option', 'wp-cafe' ) . '</label>';
-        echo $row_mid;
+        echo wp_kses_post( $row_mid );
         echo '<select id="wpcafe-label-display" name="wpcafe_label_display">';
         $display_labels = [
             'name'      => __( 'Name', 'wp-cafe' ),
@@ -126,37 +126,37 @@ class Product_Label_Admin implements Hookable_Service_Contract {
             echo '<option value="' . esc_attr( $value ) . '"' . selected( $values['display'], $value, false ) . '>' . esc_html( $label ) . '</option>';
         }
         echo '</select>';
-        echo $row_end;
+        echo wp_kses_post( $row_end );
 
         // Foreground color
-        echo $row_open;
+        echo wp_kses_post( $row_open );
         echo '<label for="wpcafe-label-fg">' . esc_html__( 'Foreground color', 'wp-cafe' ) . '</label>';
-        echo $row_mid;
+        echo wp_kses_post( $row_mid );
         echo '<input type="text" id="wpcafe-label-fg" class="wpcafe-label-color" name="wpcafe_label_fg" value="' . esc_attr( $values['fg'] ) . '" data-default-color="#FFFFFF" />';
-        echo $row_end;
+        echo wp_kses_post( $row_end );
 
         // Background color
-        echo $row_open;
+        echo wp_kses_post( $row_open );
         echo '<label for="wpcafe-label-bg">' . esc_html__( 'Background color', 'wp-cafe' ) . '</label>';
-        echo $row_mid;
+        echo wp_kses_post( $row_mid );
         echo '<input type="text" id="wpcafe-label-bg" class="wpcafe-label-color" name="wpcafe_label_bg" value="' . esc_attr( $values['bg'] ) . '" data-default-color="#1F2937" />';
-        echo $row_end;
+        echo wp_kses_post( $row_end );
 
         // Icon type tabs
-        echo $row_open;
+        echo wp_kses_post( $row_open );
         echo '<label>' . esc_html__( 'Icon source', 'wp-cafe' ) . '</label>';
-        echo $row_mid;
+        echo wp_kses_post( $row_mid );
         echo '<div class="wpcafe-label-icon-source">';
         foreach ( [ 'dashicons' => __( 'Dashicons', 'wp-cafe' ), 'svg' => __( 'Custom SVG', 'wp-cafe' ) ] as $val => $lbl ) {
             echo '<label style="margin-right:1em;"><input type="radio" name="wpcafe_label_icon_type" value="' . esc_attr( $val ) . '"' . checked( $values['icon_type'], $val, false ) . ' /> ' . esc_html( $lbl ) . '</label>';
         }
         echo '</div>';
-        echo $row_end;
+        echo wp_kses_post( $row_end );
 
         // Icon picker (Dashicons grid + SVG upload)
-        echo $row_open;
+        echo wp_kses_post( $row_open );
         echo '<label>' . esc_html__( 'Icon', 'wp-cafe' ) . '</label>';
-        echo $row_mid;
+        echo wp_kses_post( $row_mid );
 
         // Hidden field: stores the icon value (dashicon class OR attachment ID)
         echo '<input type="hidden" id="wpcafe-label-icon-value" name="wpcafe_label_icon_value" value="' . esc_attr( $values['icon_value'] ) . '" />';
@@ -179,15 +179,15 @@ class Product_Label_Admin implements Hookable_Service_Contract {
         echo '</div>';
         echo '</div>';
 
-        echo $row_end;
+        echo wp_kses_post( $row_end );
 
         // Preview
-        echo $row_open;
+        echo wp_kses_post( $row_open );
         echo '<label>' . esc_html__( 'Preview', 'wp-cafe' ) . '</label>';
-        echo $row_mid;
+        echo wp_kses_post( $row_mid );
         echo '<div class="wpcafe-label-preview-wrap"><span class="wpcafe-label-preview">' . esc_html__( 'Preview', 'wp-cafe' ) . '</span></div>';
         echo '<p class="description">' . esc_html__( 'Live preview of how the label will appear on product cards.', 'wp-cafe' ) . '</p>';
-        echo $row_end;
+        echo wp_kses_post( $row_end );
     }
 
     /**
@@ -202,7 +202,7 @@ class Product_Label_Admin implements Hookable_Service_Contract {
         }
 
         // Nonce check
-        $nonce = isset( $_POST[ self::NONCE_NAME ] ) ? wp_unslash( $_POST[ self::NONCE_NAME ] ) : '';
+        $nonce = isset( $_POST[ self::NONCE_NAME ] ) ? sanitize_text_field( wp_unslash( $_POST[ self::NONCE_NAME ] ) ) : '';
         if ( ! $nonce || ! wp_verify_nonce( $nonce, self::NONCE_ACTION ) ) {
             return;
         }
@@ -238,7 +238,7 @@ class Product_Label_Admin implements Hookable_Service_Contract {
         update_term_meta( $term_id, '_wpcafe_label_icon_type', $icon_type );
 
         // Icon value
-        $raw_icon_value = isset( $_POST['wpcafe_label_icon_value'] ) ? wp_unslash( $_POST['wpcafe_label_icon_value'] ) : '';
+        $raw_icon_value = isset( $_POST['wpcafe_label_icon_value'] ) ? sanitize_text_field( wp_unslash( $_POST['wpcafe_label_icon_value'] ) ) : '';
         if ( 'svg' === $icon_type ) {
             $icon_value = (string) absint( $raw_icon_value );
         } else {
@@ -301,7 +301,7 @@ class Product_Label_Admin implements Hookable_Service_Contract {
                 esc_attr( $meta['fg'] )
             );
 
-            echo '<span class="wpc-product-label wpc-product-label--' . esc_attr( $display ) . '" style="' . $style . '">';
+            echo '<span class="wpc-product-label wpc-product-label--' . esc_attr( $display ) . '" style="' . esc_attr( $style ) . '">';
             switch ( $display ) {
                 case 'icon':
                     echo wp_kses_post( $icon );
@@ -332,6 +332,7 @@ class Product_Label_Admin implements Hookable_Service_Contract {
         if ( 'edit-tags.php' !== $hook && 'term.php' !== $hook ) {
             return;
         }
+        // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- read-only asset-enqueue gate, not form processing.
         $taxonomy = isset( $_GET['taxonomy'] ) ? sanitize_key( wp_unslash( $_GET['taxonomy'] ) ) : '';
         if ( self::TAXONOMY !== $taxonomy ) {
             return;

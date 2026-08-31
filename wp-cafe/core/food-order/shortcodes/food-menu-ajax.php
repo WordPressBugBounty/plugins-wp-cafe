@@ -86,13 +86,14 @@ class Food_Menu_Ajax {
         $wpc_desc_limit     = $settings['wpc_desc_limit'];
         $wpc_price_show     = $settings['wpc_price_show'];
         $show_item_status   = $settings['show_item_status'];
+        $show_item_label    = $settings['show_item_label'];
         $wpc_show_vendor    = $settings['wpc_show_vendor'];
         $column_desktop     = $settings['wpc_menu_col'];
         $column_tablet      = $settings['wpc_menu_col_tablet'];
         $column_mobile      = $settings['wpc_menu_col_mobile'];
         $unique_id          = md5( md5( microtime() ) );
 
-        $allowed_styles = [ 'style-1', 'style-2', 'style-3' ];
+        $allowed_styles = [ 'style-1', 'style-2', 'style-3', 'style-4' ];
         $style          = in_array( $style, $allowed_styles, true ) ? $style : 'style-1';
 
         $show_pagination = $settings['show_pagination'];
@@ -118,6 +119,14 @@ class Food_Menu_Ajax {
         }
 
         $post_cats = $cat_id ? [ $cat_id ] : ( $settings['post_cats'] ?: [] );
+
+        // The "All Products" tab carries the 'all-products' marker instead of a
+        // category id. On the first (server) render a filter strips the category
+        // tax-query for it; that filter is not registered during AJAX, so drop
+        // the category filter here — an empty wpc_cat means "no category limit".
+        if ( in_array( 'all-products', $post_cats, true ) ) {
+            $post_cats = [];
+        }
 
         $args = [
             'post_type'     => 'product',
@@ -145,11 +154,20 @@ class Food_Menu_Ajax {
         $wpc_desc_limit     = $settings['wpc_desc_limit'];
         $wpc_price_show     = $settings['wpc_price_show'];
         $show_item_status   = $settings['show_item_status'];
+        $show_item_label    = $settings['show_item_label'];
         $wpc_show_vendor    = $settings['wpc_show_vendor'] ?? 'no';
+        $grid_columns       = $settings['grid_columns'];
+        $wpc_menu_count     = max( 1, (int) $settings['no_of_product'] );
         $unique_id          = md5( md5( microtime() ) );
 
+        // style-7 reprints its results counter with every page.
+        $wpc_result_total = $page_result['total_products'] ?? 0;
+        $wpc_current_page = $page;
+
+        // style-3/4/5 resolve to wpcafe-pro files; the free styles continue at 6.
         $is_pro_active  = function_exists( 'wpcafe_pro' ) || defined( 'WPCAFE_PRO_FILE' );
-        $allowed_styles = $is_pro_active ? [ 'style-1', 'style-2', 'style-3', 'style-4', 'style-5' ] : [ 'style-1', 'style-2' ];
+        $free_styles    = [ 'style-1', 'style-2', 'style-6', 'style-7', 'style-8' ];
+        $allowed_styles = $is_pro_active ? array_merge( $free_styles, [ 'style-3', 'style-4', 'style-5' ] ) : $free_styles;
         $style          = in_array( $style, $allowed_styles, true ) ? $style : 'style-1';
 
         $template = trailingslashit( wpcafe()->plugin_directory ) . "/widgets/wpc-food-menu-tab/style/{$style}.php";
@@ -247,6 +265,8 @@ class Food_Menu_Ajax {
             'wpc_price_show'       => $this->sanitize_price_show( $raw['wpc_price_show'] ?? 'yes' ),
             'wpc_cart_button_show' => wpc_sanitize_yes_no( $raw['wpc_cart_button_show'] ?? '', 'yes' ),
             'show_item_status'     => wpc_sanitize_yes_no( $raw['show_item_status'] ?? '', 'yes' ),
+            // Without this the labels disappear on the second page.
+            'show_item_label'      => wpc_sanitize_yes_no( $raw['show_item_label'] ?? '', 'no' ),
             'title_link_show'      => wpc_sanitize_yes_no( $raw['title_link_show'] ?? '', 'yes' ),
             'wpc_show_desc'        => wpc_sanitize_yes_no( $raw['wpc_show_desc'] ?? '', 'yes' ),
             'wpc_desc_limit'       => isset( $raw['wpc_desc_limit'] ) ? absint( $raw['wpc_desc_limit'] ) : 20,
@@ -262,9 +282,14 @@ class Food_Menu_Ajax {
     }
 
     private function sanitize_food_menu_tab_settings( $raw ) {
-        $post_cats = isset( $raw['post_cats'] ) && is_array( $raw['post_cats'] )
-            ? array_map( 'absint', $raw['post_cats'] )
-            : [];
+        // Keep the literal 'all-products' marker; absint() would zero it and the
+        // page-two query would then filter on category id 0 and return nothing.
+        $post_cats = [];
+        if ( isset( $raw['post_cats'] ) && is_array( $raw['post_cats'] ) ) {
+            foreach ( $raw['post_cats'] as $pc ) {
+                $post_cats[] = ( 'all-products' === $pc ) ? 'all-products' : absint( $pc );
+            }
+        }
 
         return [
             'style'             => $this->sanitize_style( $raw['style'] ?? 'style-1' ),
@@ -275,12 +300,14 @@ class Food_Menu_Ajax {
             'wpc_desc_limit'    => isset( $raw['wpc_desc_limit'] ) ? absint( $raw['wpc_desc_limit'] ) : 20,
             'title_link_show'   => wpc_sanitize_yes_no( $raw['title_link_show'] ?? '', 'yes' ),
             'show_item_status'  => wpc_sanitize_yes_no( $raw['show_item_status'] ?? '', 'yes' ),
+            'show_item_label'   => wpc_sanitize_yes_no( $raw['show_item_label'] ?? '', 'no' ),
             'no_of_product'     => isset( $raw['no_of_product'] ) ? max( 1, absint( $raw['no_of_product'] ) ) : 5,
             'wpc_menu_order'    => $this->sanitize_order( $raw['wpc_menu_order'] ?? 'DESC' ),
             'wpc_show_vendor'   => wpc_sanitize_yes_no( $raw['wpc_show_vendor'] ?? '', 'no' ),
             'show_pagination'   => wpc_sanitize_yes_no( $raw['show_pagination'] ?? '', 'yes' ),
             'cat_id'            => isset( $raw['cat_id'] ) ? absint( $raw['cat_id'] ) : 0,
             'post_cats'         => $post_cats,
+            'grid_columns'      => isset( $raw['grid_columns'] ) ? max( 1, min( 6, absint( $raw['grid_columns'] ) ) ) : 3,
         ];
     }
 

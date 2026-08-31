@@ -99,8 +99,8 @@ class Template_Functions {
 											?>
 									</h3>
 									<?php
-											if(class_exists('Wpcafe_Multivendor') && !empty( $wpc_show_vendor ) && $wpc_show_vendor == 'yes') {
-													apply_filters( 'wpcafe_multivendor_seller', $product->get_id());
+											if(wpcafe_is_multivendor() && !empty( $wpc_show_vendor ) && $wpc_show_vendor == 'yes') {
+													do_action( 'wpcafe_multivendor_seller', $product->get_id());
 											}
 									?>
 									<p>
@@ -197,8 +197,8 @@ class Template_Functions {
 
 													</h3>
 													<?php
-															if(class_exists('Wpcafe_Multivendor') && !empty( $wpc_show_vendor ) && $wpc_show_vendor == 'yes') {
-																	apply_filters( 'wpcafe_multivendor_seller', $product->get_id());
+															if(wpcafe_is_multivendor() && !empty( $wpc_show_vendor ) && $wpc_show_vendor == 'yes') {
+																	do_action( 'wpcafe_multivendor_seller', $product->get_id());
 															}
 													?>
 													<?php  if( $wpc_show_desc == 'yes' ){ ?>
@@ -337,8 +337,8 @@ class Template_Functions {
 
 											</h3>
 											<?php
-													if(class_exists('Wpcafe_Multivendor') && !empty( $wpc_show_vendor ) && $wpc_show_vendor == 'yes') {
-															apply_filters( 'wpcafe_multivendor_seller', $product->get_id());
+													if(wpcafe_is_multivendor() && !empty( $wpc_show_vendor ) && $wpc_show_vendor == 'yes') {
+															do_action( 'wpcafe_multivendor_seller', $product->get_id());
 													}
 											?>
 											<?php  if( $wpc_show_desc == 'yes' ){ ?>
@@ -419,12 +419,295 @@ class Template_Functions {
 	}
 
 	/**
-	 * Food tab list
+	 * Normalize the argument bag every newer card partial reads.
+	 * Callers only pass what they know about; everything else falls back to the
+	 * same defaults the legacy card templates use, so a style file can be as
+	 * short as product + permalink.
 	 *
-	 * @param [type] $food_menu_tabs
+	 * @param array $args Raw card arguments.
+	 *
+	 * @return array Normalized arguments.
+	 */
+	public static function card_args( $args ) {
+		$cafe_settings = wpc_get_option( 'cart_icon' );
+
+		return [
+			'product'            => $args['product'] ?? null,
+			'permalink'          => $args['permalink'] ?? '',
+			'class'              => $args['class'] ?? '',
+			'unique_id'          => $args['unique_id'] ?? '',
+			'show_thumbnail'     => $args['show_thumbnail'] ?? 'yes',
+			'wpc_price_show'     => $args['wpc_price_show'] ?? 'yes',
+			'wpc_cart_button'    => $args['wpc_cart_button'] ?? 'yes',
+			'show_item_status'   => $args['show_item_status'] ?? 'yes',
+			'show_item_label'    => $args['show_item_label'] ?? 'no',
+			'wpc_show_desc'      => $args['wpc_show_desc'] ?? 'yes',
+			'wpc_desc_limit'     => $args['wpc_desc_limit'] ?? 20,
+			'wpc_show_vendor'    => $args['wpc_show_vendor'] ?? 'no',
+			// The newer cards show a labelled button, so an empty value falls back
+			// to text instead of the icon-only button the legacy styles render.
+			'wpc_btn_text'       => ! empty( $args['wpc_btn_text'] ) ? $args['wpc_btn_text'] : __( 'Add to cart', 'wp-cafe' ),
+			'customize_btn'      => $args['customize_btn'] ?? '',
+			'cart_icon'          => $args['cart_icon'] ?? $cafe_settings,
+			'customization_icon' => $args['customization_icon'] ?? '',
+			'variant'            => $args['variant'] ?? '',
+		];
+	}
+
+	/**
+	 * Price node for the newer cards.
+	 *
+	 * Simple products reuse get_price_html() so a sale renders as
+	 * <del>old</del> <ins>new</ins> — that is what the strike-through price in
+	 * the designs is. Variable products keep the legacy min/max handling because
+	 * the wpc_price_show att ('yes'|'min'|'max') has no WooCommerce equivalent.
+	 *
+	 * The Pro discount module rewrites get_price_html(), so its strike-through
+	 * already reaches simple cards for free. Variable cards build their own range
+	 * and never call get_price_html(), so the module can't touch them — the range
+	 * is discounted here instead (see variable_discount_range()).
+	 *
+	 * @param WC_Product $product        Product object.
+	 * @param string     $wpc_price_show yes|no|min|max.
+	 *
+	 * @return string Price markup, or empty when prices are hidden.
+	 */
+	public static function card_price_html( $product, $wpc_price_show ) {
+		if ( ! is_object( $product ) || 'no' === $wpc_price_show ) {
+			return '';
+		}
+
+		if ( 'variable' !== $product->get_type() ) {
+			return (string) $product->get_price_html();
+		}
+
+		$variation_price = $product->get_variation_prices( true ); // true = tax-adjusted.
+		if ( ! is_array( $variation_price ) || empty( $variation_price['price'] ) ) {
+			return '';
+		}
+
+		$prices = $variation_price['price'];
+		$symbol = get_woocommerce_currency_symbol();
+
+		// Keys are variation ids ordered cheapest → priciest; grab them before
+		// array_shift/array_pop below consume the array.
+		$min_id = (int) array_key_first( $prices );
+		$max_id = (int) array_key_last( $prices );
+
+		// One wrapper so a stacked price column keeps "min - max" on one line.
+		$markup = '';
+
+		if ( 'yes' === $wpc_price_show || 'min' === $wpc_price_show ) {
+			$markup .= '<span class="min_price">' . esc_html( $symbol . array_shift( $prices ) ) . '</span>';
+		}
+		if ( 'yes' === $wpc_price_show ) {
+			$markup .= ' - ';
+		}
+		if ( 'yes' === $wpc_price_show || 'max' === $wpc_price_show ) {
+			$markup .= '<span class="max_price">' . esc_html( $symbol . array_pop( $prices ) ) . '</span>';
+		}
+
+		$plain = '<span class="wpc-price-range">' . $markup . '</span>';
+
+		// When the Pro discount module marks this product down, swap in the
+		// discounted range; free-only sites keep the plain range.
+		$discounted = self::variable_discount_range( $product, $min_id, $max_id, $wpc_price_show );
+
+		return '' !== $discounted ? $discounted : $plain;
+	}
+
+	/**
+	 * Strike-through range for a variable product when the Pro discount module
+	 * applies. Each end of the range is discounted with the module's own math so
+	 * the card matches the strike-through it already prints on simple products.
+	 * Returns '' when Pro is absent or no rule matches, so the caller keeps the
+	 * plain range.
+	 *
+	 * @param WC_Product $product        Variable product.
+	 * @param int        $min_id         Cheapest variation id.
+	 * @param int        $max_id         Priciest variation id.
+	 * @param string     $wpc_price_show yes|min|max.
+	 *
+	 * @return string Discounted-range markup, or '' to fall back to the plain range.
+	 */
+	private static function variable_discount_range( $product, $min_id, $max_id, $wpc_price_show ) {
+		if ( ! class_exists( '\WpCafePro\FoodOrder\Discount\Discount' ) ) {
+			return '';
+		}
+
+		$prices = $product->get_variation_prices( true );
+		if ( empty( $prices['price'] ) ) {
+			return '';
+		}
+
+		$min = (float) reset( $prices['price'] );
+		$max = (float) end( $prices['price'] );
+
+		// calculate_product_discount() reads the variation's own price, so each
+		// end is cut correctly for both percentage and fixed rules.
+		$cut_min = (float) \WpCafePro\FoodOrder\Discount\Discount::calculate_product_discount( $product->get_id(), $min_id );
+		$cut_max = (float) \WpCafePro\FoodOrder\Discount\Discount::calculate_product_discount( $product->get_id(), $max_id );
+
+		if ( $cut_min <= 0 && $cut_max <= 0 ) {
+			return '';
+		}
+
+		$original   = self::price_range_markup( $min, $max, $wpc_price_show );
+		$discounted = self::price_range_markup( max( 0, $min - $cut_min ), max( 0, $max - $cut_max ), $wpc_price_show );
+
+		// Reuse the module's own price classes so the look matches simple cards.
+		return '<div class="wpc-single-price-display">'
+			. '<span class="wpc-single-original-price" style="text-decoration: line-through;">' . $original . '</span>'
+			. '<span class="wpc-single-discounted-price">' . $discounted . '</span>'
+			. '</div>';
+	}
+
+	/**
+	 * Build a "min - max" range with wc_price(), honouring wpc_price_show.
+	 *
+	 * @param float  $min            Low price.
+	 * @param float  $max            High price.
+	 * @param string $wpc_price_show yes|min|max.
+	 *
+	 * @return string
+	 */
+	private static function price_range_markup( $min, $max, $wpc_price_show ) {
+		$markup = '';
+
+		// wc_price() returns markup, so filter it here rather than at the echo,
+		// where kses would have to trust the whole assembled string.
+		if ( 'yes' === $wpc_price_show || 'min' === $wpc_price_show ) {
+			$markup .= '<span class="min_price">' . wp_kses_post( wc_price( $min ) ) . '</span>';
+		}
+		if ( 'yes' === $wpc_price_show ) {
+			$markup .= ' - ';
+		}
+		if ( 'yes' === $wpc_price_show || 'max' === $wpc_price_show ) {
+			$markup .= '<span class="max_price">' . wp_kses_post( wc_price( $max ) ) . '</span>';
+		}
+
+		return '<span class="wpc-price-range">' . $markup . '</span>';
+	}
+
+	/**
+	 * Add-to-cart markup for the newer cards, with a text label.
+	 *
+	 * The customize/variation popup path returns an icon-only button and takes
+	 * no button-text argument, so the label is added here rather than changing
+	 * the shared filter signature every style depends on.
+	 *
+	 * @param array $wpc_card Normalized card arguments.
+	 *
+	 * @return string
+	 */
+	public static function card_cart_button( $wpc_card ) {
+		$markup = Wpc_Utilities::product_add_to_cart(
+			[
+				'product'            => $wpc_card['product'],
+				'cart_button'        => $wpc_card['wpc_cart_button'],
+				'wpc_btn_text'       => $wpc_card['wpc_btn_text'],
+				'customize_btn'      => $wpc_card['customize_btn'],
+				'widget_id'          => $wpc_card['unique_id'],
+				'cart_icon'          => $wpc_card['cart_icon'],
+				'customization_icon' => $wpc_card['customization_icon'],
+			]
+		);
+
+		$label = $wpc_card['wpc_btn_text'];
+
+		if ( '' === $markup || '' === $label || false !== strpos( $markup, 'add-cart-text' ) ) {
+			return $markup;
+		}
+
+		$position = strpos( $markup, '</a>' );
+		if ( false === $position ) {
+			return $markup;
+		}
+
+		return substr_replace(
+			$markup,
+			'<span class="add-cart-text">' . esc_html( $label ) . '</span>',
+			$position,
+			0
+		);
+	}
+
+	/**
+	 * Render the row card (food menu list style-4, tab style-7).
+	 *
+	 * @param array $args See card_args().
+	 *
 	 * @return void
 	 */
-	public static function render_food_menu_tab_nav( $food_menu_tabs ){
+	public static function wpc_food_menu_card_row( $args ) {
+		self::render_card_partial( 'card-row.php', $args );
+	}
+
+	/**
+	 * Render the grid card (food menu tab style-6 and style-8).
+	 *
+	 * @param array $args See card_args().
+	 *
+	 * @return void
+	 */
+	public static function wpc_food_menu_card_grid( $args ) {
+		self::render_card_partial( 'card-grid.php', $args );
+	}
+
+	/**
+	 * Include a card partial with normalized arguments.
+	 * File name comes from this class only — never from request data.
+	 *
+	 * @param string $file Partial file name inside widgets/card-style/.
+	 * @param array  $args Raw card arguments.
+	 *
+	 * @return void
+	 */
+	private static function render_card_partial( $file, $args ) {
+		$wpc_card = self::card_args( $args );
+
+		if ( ! is_object( $wpc_card['product'] ) ) {
+			return;
+		}
+
+		$path = trailingslashit( wpcafe()->plugin_directory ) . 'widgets/card-style/' . $file;
+
+		if ( file_exists( $path ) ) {
+			include $path;
+		}
+	}
+
+	/**
+	 * Food tab list
+	 *
+	 * The second parameter is optional so every existing caller keeps the
+	 * original underline nav markup unchanged. Newer tab styles pass a nav
+	 * variant; the tab anchor keeps its .wpc-tab-a / data-id / data-cat_id
+	 * contract in every variant, so the delegated click handler in
+	 * wpc-public.js works without changes.
+	 *
+	 * @param array $food_menu_tabs Tabs from Wpc_Utilities::get_tab_array_from_category().
+	 * @param array $args {
+	 *     @type string $nav default|pills-end|rail|pills-thumb.
+	 * }
+	 *
+	 * @return void
+	 */
+	public static function render_food_menu_tab_nav( $food_menu_tabs, $args = [] ){
+			$args = wp_parse_args(
+					$args,
+					[
+							'nav' => 'default',
+					]
+			);
+
+			$allowed_navs = [ 'default', 'pills-end', 'rail', 'pills-thumb' ];
+			$nav          = in_array( $args['nav'], $allowed_navs, true ) ? $args['nav'] : 'default';
+
+			if ( 'default' !== $nav ) {
+					self::render_food_menu_tab_nav_v2( $food_menu_tabs, $nav );
+					return;
+			}
 			?>
 			<ul class="wpc-nav">
 			<?php
@@ -444,6 +727,62 @@ class Template_Functions {
 			}
 			?>
 			</ul>
+			<?php
+	}
+
+	/**
+	 * Pill / rail nav used by tab styles 6, 7 and 8.
+	 *
+	 * @param array  $food_menu_tabs Tabs, optionally carrying 'count' and 'thumb_id'.
+	 * @param string $nav            Validated nav variant.
+	 *
+	 * @return void
+	 */
+	private static function render_food_menu_tab_nav_v2( $food_menu_tabs, $nav ) {
+			if ( ! is_array( $food_menu_tabs ) || empty( $food_menu_tabs ) ) {
+					return;
+			}
+
+			$nav_slug   = sanitize_html_class( $nav );
+			$first_key  = array_keys( $food_menu_tabs )[0];
+			?>
+			<div class="wpc-tab-nav-v2 wpc-tab-nav-v2--<?php echo esc_attr( $nav_slug ); ?>">
+					<ul class="wpc-nav wpc-nav--<?php echo esc_attr( $nav_slug ); ?>">
+							<?php foreach ( $food_menu_tabs as $tab_key => $value ) : ?>
+									<?php
+									$active_class = ( $tab_key === $first_key ) ? 'wpc-active' : '';
+									$cat_id       = isset( $value['post_cats'][0] ) ? intval( $value['post_cats'][0] ) : 0;
+									$thumb_id     = isset( $value['thumb_id'] ) ? (int) $value['thumb_id'] : 0;
+									$has_count    = isset( $value['count'] );
+									?>
+									<li>
+											<a href="#" class="wpc-tab-a <?php echo esc_attr( $active_class ); ?>"
+												data-id="tab_<?php echo intval( $tab_key ); ?>"
+												data-cat_id="<?php echo esc_attr( $cat_id ); ?>">
+
+													<?php if ( 'pills-thumb' === $nav ) : ?>
+															<span class="wpc-tab-thumb<?php echo $thumb_id ? '' : ' wpc-tab-thumb--placeholder'; ?>">
+																	<?php
+																	if ( $thumb_id ) {
+																			echo wp_kses(
+																					wp_get_attachment_image( $thumb_id, 'thumbnail', false, [ 'alt' => '', 'loading' => 'lazy' ] ),
+																					Wpc_Utilities::wpc_kses_allowed_tags()
+																			);
+																	}
+																	?>
+															</span>
+													<?php endif; ?>
+
+													<span class="wpc-tab-title"><?php echo esc_html( $value['tab_title'] ); ?></span>
+
+													<?php if ( $has_count ) : ?>
+															<span class="wpc-tab-count"><?php echo esc_html( zeroise( (int) $value['count'], 2 ) ); ?></span>
+													<?php endif; ?>
+											</a>
+									</li>
+							<?php endforeach; ?>
+					</ul>
+			</div>
 			<?php
 	}
 
@@ -488,6 +827,11 @@ class Template_Functions {
 			$total_pages      = isset( $args['total_pages'] ) ? (int) $args['total_pages'] : 0;
 			$show_pagination  = isset( $args['show_pagination'] ) ? $args['show_pagination'] : 'yes';
 			$product_data     = isset( $args['product_data'] ) && is_array( $args['product_data'] ) ? $args['product_data'] : array();
+			// Extras the style-6/7/8 cards read; harmless for the older styles.
+			$grid_columns     = $args['grid_columns']     ?? 3;
+			$wpc_menu_count   = $args['wpc_menu_count']   ?? count( $products );
+			$wpc_result_total = $args['total_products']   ?? 0;
+			$wpc_current_page = $current_page;
 			?>
 			<div class='wpc-tab <?php echo esc_attr($active_class); ?>' data-id='tab_<?php echo intval($content_key); ?>' data-cat_id='<?php echo  esc_attr($cat_id);?>'>
 					<div class="tab_template_<?php echo esc_attr( $cat_id.'_'.$unique_id );?>"></div>
@@ -513,7 +857,13 @@ class Template_Functions {
 									include $style_path;
 							$style_markup = ob_get_clean();
 
-							echo wp_kses( $style_markup, Wpc_Utilities::wpc_kses_allowed_tags() );
+							// The newer cards print WooCommerce sale markup (<ins>/<bdi>);
+							// the legacy list stays as-is so older styles render unchanged.
+							$kses_tags = in_array( $style, [ 'style-6', 'style-7', 'style-8' ], true )
+									? Wpc_Utilities::wpc_kses_card_tags()
+									: Wpc_Utilities::wpc_kses_allowed_tags();
+
+							echo wp_kses( $style_markup, $kses_tags );
 									?>
 								</div>
 								<?php

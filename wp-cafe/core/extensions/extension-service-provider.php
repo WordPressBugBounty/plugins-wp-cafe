@@ -1,6 +1,7 @@
 <?php
 namespace WpCafe\Extensions;
 
+use WpCafe\Extensions\Controllers\Aisentic_Setup_Controller;
 use WpCafe\Extensions\Controllers\Extension_Controller;
 use WpCafe\Extensions\Controllers\Plugin_Controller;
 use WpCafe\Extensions\Controllers\Integration_Controller;
@@ -21,6 +22,7 @@ class Extension_Service_Provider extends Base_Service_Provider {
         Extension_Controller::class,
         Plugin_Controller::class,
         Integration_Controller::class,
+        Aisentic_Setup_Controller::class,
     ];
 
     /**

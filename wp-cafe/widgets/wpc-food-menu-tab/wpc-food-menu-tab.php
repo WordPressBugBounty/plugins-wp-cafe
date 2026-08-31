@@ -60,13 +60,30 @@ class Wpc_Food_Menu_Tab extends Widget_Base {
                 'label'   => esc_html__( 'Menu tab Style', 'wp-cafe' ),
                 'type'    => Controls_Manager::SELECT,
                 'default' => 'style-1',
+                // Picker is numbered by position (Style 1-3) to match the free
+                // shortcode generator, but keeps the real slug as the value:
+                // Style 3 emits style-6, because a free style-3 would shadow the
+                // wpcafe-pro file of the same name. Styles 7/8 are pro-only, so
+                // they are not offered here.
                 'options' => [
                     'style-1' => esc_html__( 'Menu Style 1', 'wp-cafe' ),
                     'style-2' => esc_html__( 'Menu Style 2', 'wp-cafe' ),
+                    'style-6' => esc_html__( 'Menu Style 3', 'wp-cafe' ),
                 ],
             ]
         );
 
+        $this->add_control(
+            'grid_columns',
+            [
+                'label'     => esc_html__( 'Columns', 'wp-cafe' ),
+                'type'      => \Elementor\Controls_Manager::NUMBER,
+                'default'   => 3,
+                'min'       => 1,
+                'max'       => 6,
+                'condition' => [ 'food_tab_menu_style' => [ 'style-6' ] ],
+            ]
+        );
         $repeater = new \Elementor\Repeater();
 
 	    $repeater->add_control(
@@ -217,7 +234,7 @@ class Wpc_Food_Menu_Tab extends Widget_Base {
             ]
         );
 
-        if(class_exists('Wpcafe_Multivendor')) {
+        if(wpcafe_is_multivendor()) {
             $this->add_control(
                 'wpc_show_vendor',
                 [
@@ -837,7 +854,9 @@ class Wpc_Food_Menu_Tab extends Widget_Base {
      * @return array
      */
     public function get_style_depends() {
-        return [ 'wpc-card-core', 'wpc-popup', 'wpc-food-menu-tab', 'wpc-pagination' ];
+        // Union of every style's sheets: this runs before settings are reliable
+        // in the editor, and the new sheets are small.
+        return [ 'wpc-card-core', 'wpc-popup', 'wpc-food-menu-tab', 'wpc-pagination', 'wpc-card-row', 'wpc-card-grid', 'wpc-tab-nav-v2' ];
     }
 
     protected function render() {

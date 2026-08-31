@@ -191,12 +191,15 @@ class Email_Notification implements Hookable_Service_Contract {
 	public function log_whatsapp_error( $error_body, $to, $payload, $http_code ) {
 		$error_string = is_string( $error_body ) ? $error_body : wp_json_encode( $error_body );
 
-		error_log( sprintf(
-			'[wpcafe whatsapp] send failed (http=%d, to=%s): %s',
-			(int) $http_code,
-			$to,
-			$error_string
-		) );
+		if ( defined( 'WP_DEBUG' ) && WP_DEBUG ) {
+			// phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log -- intentional debug-only log, gated behind WP_DEBUG.
+			error_log( sprintf(
+				'[wpcafe whatsapp] send failed (http=%d, to=%s): %s',
+				(int) $http_code,
+				$to,
+				$error_string
+			) );
+		}
 
 		$recent = get_transient( 'wpcafe_whatsapp_recent_errors' );
 		if ( ! is_array( $recent ) ) {
@@ -224,6 +227,7 @@ class Email_Notification implements Hookable_Service_Contract {
 		if ( ! ( defined( 'WP_DEBUG' ) && WP_DEBUG ) ) {
 			return;
 		}
+		// phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log -- intentional debug-only log, gated behind WP_DEBUG (checked above).
 		error_log( sprintf(
 			'[wpcafe whatsapp] request type=%s to=%s payload=%s',
 			$message_type,
@@ -244,6 +248,7 @@ class Email_Notification implements Hookable_Service_Contract {
 		if ( ! ( defined( 'WP_DEBUG' ) && WP_DEBUG ) ) {
 			return;
 		}
+		// phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log -- intentional debug-only log, gated behind WP_DEBUG (checked above).
 		error_log( sprintf(
 			'[wpcafe whatsapp] sent ok (http=%d, to=%s) response=%s',
 			(int) $http_code,

@@ -1,4 +1,8 @@
 <?php
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+}
+
 return [
     'fluent-crm' => [
         'name' => 'fluent-crm',

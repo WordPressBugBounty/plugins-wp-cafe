@@ -75,8 +75,12 @@ class Food_Menu_List extends Base_Shortcode {
         $wpc_show_vendor     = $atts['wpc_show_vendor'];
         $show_pagination     = $atts['show_pagination'];
 
-        $allowed_file_names = [ 'style-1', 'style-2', 'style-3' ];
+        $allowed_file_names = [ 'style-1', 'style-2', 'style-3', 'style-4' ];
         $template_file = in_array( $style, $allowed_file_names, true ) ? $style : $allowed_file_names[0];
+
+        // Style-specific CSS must be enqueued here, on the host page: the
+        // pagination AJAX handler renders the same style but cannot enqueue.
+        wpc_enqueue_food_menu_style_assets( $template_file, 'list' );
 
         ob_start();
 

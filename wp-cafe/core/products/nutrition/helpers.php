@@ -178,9 +178,10 @@ if ( ! function_exists( 'wpc_render_nutrition_label' ) ) {
                 <p class="wpc-nutrition-label__serving">
                     <?php
                     $bits = [];
-                    if ( '' !== $serving_label ) $bits[] = esc_html( $serving_label );
-                    if ( '' !== $serving_size )  $bits[] = esc_html( $serving_size . ( 'pieces' === $serving_unit ? ' ' . __( 'pieces', 'wp-cafe' ) : ( 'fl_oz' === $serving_unit ? ' fl oz' : ' ' . $serving_unit ) ) );
-                    echo esc_html( 'fda' === $format ? __( 'Serving size: ', 'wp-cafe' ) : __( 'Per serving: ', 'wp-cafe' ) ) . implode( ' (', $bits ) . ( count( $bits ) > 1 ? ')' : '' );
+                    if ( '' !== $serving_label ) $bits[] = $serving_label;
+                    if ( '' !== $serving_size )  $bits[] = $serving_size . ( 'pieces' === $serving_unit ? ' ' . __( 'pieces', 'wp-cafe' ) : ( 'fl_oz' === $serving_unit ? ' fl oz' : ' ' . $serving_unit ) );
+                    $prefix = 'fda' === $format ? __( 'Serving size: ', 'wp-cafe' ) : __( 'Per serving: ', 'wp-cafe' );
+                    echo esc_html( $prefix . implode( ' (', $bits ) . ( count( $bits ) > 1 ? ')' : '' ) );
                     ?>
                 </p>
             <?php endif; ?>

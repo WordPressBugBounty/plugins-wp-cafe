@@ -26,11 +26,32 @@ $show_thumbnail   = ! empty( $settings['show_thumbnail'] ) ? sanitize_text_field
 $title_link_show  = ! empty( $settings['title_link_show'] ) ? sanitize_text_field( $settings['title_link_show'] ) : 'yes';
 $show_pagination  = isset( $settings['show_pagination'] ) ? sanitize_text_field( $settings['show_pagination'] ) : 'yes';
 $class            = ( 'yes' === $title_link_show ) ? '' : 'wpc-no-link';
+
+// Column count for the new CSS grid styles. Separate from $wpc_menu_col, which
+// the pro tab styles use as a 12-column span.
+$grid_columns     = $settings['grid_columns'] ?? 3;
+$nav_config       = is_array( $settings['nav_config'] ?? null ) ? $settings['nav_config'] : [ 'nav' => 'default' ];
+$is_rail_layout   = ( 'rail' === ( $nav_config['nav'] ?? 'default' ) );
+
+// Brand tokens on the wrapper: every card and pill below reads them, and a
+// per-instance color beats the global setting without extra selectors.
+$wpc_color_style = wpc_color_tokens();
 ?>
 
-<div class="wpc-food-tab-wrapper wpc-nav-shortcode main_wrapper_<?php echo esc_attr( $unique_id ); ?>" data-id="<?php echo esc_attr( $unique_id ); ?>">
+<div class="wpc-food-tab-wrapper wpc-nav-shortcode main_wrapper_<?php echo esc_attr( $unique_id ); ?>" data-id="<?php echo esc_attr( $unique_id ); ?>"<?php if ( '' !== $wpc_color_style ) : ?> style="<?php echo esc_attr( $wpc_color_style ); ?>"<?php endif; ?>>
 
-    <?php Template_Functions::render_food_menu_tab_nav( $food_menu_tabs ); ?>
+    <?php if ( $is_rail_layout ) : ?>
+        <div class="wpc-tab-layout--rail">
+    <?php endif; ?>
+
+    <?php
+    Template_Functions::render_food_menu_tab_nav(
+        $food_menu_tabs,
+        [
+            'nav' => $nav_config['nav'] ?? 'default',
+        ]
+    );
+    ?>
 
     <div class="wpc-tab-content wpc-widget-wrapper">
         <?php foreach ( $food_menu_tabs as $content_key => $value ) : ?>
@@ -63,6 +84,11 @@ $class            = ( 'yes' === $title_link_show ) ? '' : 'wpc-no-link';
                 $products    = $page_result['products'];
                 $total_pages = $page_result['total_pages'];
 
+                // Consumed by style-7's results counter, which re-renders with
+                // each AJAX page.
+                $wpc_result_total = $page_result['total_products'] ?? 0;
+                $wpc_current_page = $current_page;
+
                 $tab_product_data = array(
                     'style'             => $style,
                     'no_of_product'     => $wpc_menu_count,
@@ -73,11 +99,14 @@ $class            = ( 'yes' === $title_link_show ) ? '' : 'wpc-no-link';
                     'product_thumbnail' => $show_thumbnail,
                     'title_link_show'   => $title_link_show,
                     'show_item_status'  => $show_item_status,
+                    // Without this the labels disappear on the second page.
+                    'show_item_label'   => $settings['show_item_label'] ?? 'no',
                     'wpc_desc_limit'    => $wpc_desc_limit,
                     'wpc_show_vendor'   => $wpc_show_vendor ?? 'no',
                     'show_pagination'   => $show_pagination,
                     'cat_id'            => $cat_id,
                     'post_cats'         => $value['post_cats'],
+                    'grid_columns'      => $grid_columns,
                 );
 
                 $menu_tab_args = [
@@ -153,6 +182,10 @@ $class            = ( 'yes' === $title_link_show ) ? '' : 'wpc-no-link';
             <?php endif; ?>
         <?php endforeach; ?>
     </div><!-- .wpc-tab-content -->
+
+    <?php if ( $is_rail_layout ) : ?>
+        </div><!-- .wpc-tab-layout--rail -->
+    <?php endif; ?>
 
 </div><!-- .wpc-food-tab-wrapper -->
 

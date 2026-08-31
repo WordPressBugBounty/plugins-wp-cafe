@@ -80,7 +80,15 @@ class Top_Sales_Report {
                 if ( ! $product_id || $product_id === $generic_product_id_for_reservation ) {
                     continue;
                 }
-                
+
+                // WPML/WCML: a sale of a translated product is a sale of the
+                // original dish. Normalize to the original-language product ID so
+                // every language's sales of one product land in the same bucket
+                // instead of fragmenting into separate rows. No-op without WPML.
+                if ( class_exists( '\WpCafePro\Wpml\Wpc_Pro_Wpml' ) ) {
+                    $product_id = \WpCafePro\Wpml\Wpc_Pro_Wpml::original_product_id( $product_id );
+                }
+
                 $quantity = $item->get_quantity();
                 // @phpcs:ignore WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase
                 $revenue = $item->get_total();

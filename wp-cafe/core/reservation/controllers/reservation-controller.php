@@ -1152,10 +1152,18 @@ class Reservation_Controller extends Base_Rest_Controller {
                 continue;
             }
 
+            // WPML/WCML: store the original-language product ID so reservation
+            // records and reports stay consistent no matter which language the
+            // customer ordered in. No-op when WPML is inactive.
+            $reservation_product_id = $cart_item['product_id'];
+            if ( class_exists( '\WpCafePro\Wpml\Wpc_Pro_Wpml' ) ) {
+                $reservation_product_id = \WpCafePro\Wpml\Wpc_Pro_Wpml::original_product_id( $reservation_product_id );
+            }
+
             // Create reservation item data
             $item = [
                 'reservation_id' => $reservation_id,
-                'product_id'     => $cart_item['product_id'],
+                'product_id'     => $reservation_product_id,
                 'product_name'   => $product->get_name(),
                 'quantity'       => $cart_item['quantity'],
                 'price'          => $product->get_price(),

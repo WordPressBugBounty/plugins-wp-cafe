@@ -44,13 +44,17 @@ if ( ! defined( 'ABSPATH' ) ) exit;
     $page_result    = Wpc_Utilities::product_query_with_pagination( $food_list_args );
     $products       = $page_result['products'];
     $total_pages    = $page_result['total_pages'];
-    $allowed_styles = ['style-1', 'style-2', 'style-3'];
+    $allowed_styles = ['style-1', 'style-2', 'style-3', 'style-4'];
     $style          = in_array( $style, $allowed_styles, true ) ? $style : 'style-1';
 
     $wpc_menu_settings = $settings;
     unset( $wpc_menu_settings['_page'] );
+
+    // Brand tokens live on the wrapper so every card below inherits them and a
+    // per-instance color (builder control / shortcode att) beats the setting.
+    $wpc_color_style = wpc_color_tokens();
     ?>
-    <div class="wpc-nav-shortcode main_wrapper_<?php echo esc_attr($unique_id .' '. $no_desc_class)?>" data-id="<?php echo esc_attr($unique_id)?>">
+    <div class="wpc-nav-shortcode main_wrapper_<?php echo esc_attr($unique_id .' '. $no_desc_class)?>" data-id="<?php echo esc_attr($unique_id)?>"<?php if ( '' !== $wpc_color_style ) : ?> style="<?php echo esc_attr( $wpc_color_style ); ?>"<?php endif; ?>>
         <div class="wpc-paginated-products" data-shortcode="food_menu_list" data-current="<?php echo esc_attr( $current_page ); ?>" data-product_data="<?php echo esc_attr( wp_json_encode( $wpc_menu_settings ) ); ?>">
             <div class="wpc-paginated-products-body list_template_<?php echo esc_attr($unique_id) ?> wpc-nav-shortcode wpc-widget-wrapper">
                 <?php include wpcafe()->plugin_directory . "/widgets/wpc-menus-list/style/{$style}.php"; ?>

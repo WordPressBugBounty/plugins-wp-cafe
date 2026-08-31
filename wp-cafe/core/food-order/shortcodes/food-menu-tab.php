@@ -55,6 +55,10 @@ class Food_Menu_Tab extends Base_Shortcode {
                 'wpc_cart_button'     => 'yes',
                 'wpc_price_show'      => 'yes',
                 'show_pagination'     => 'yes',
+                // Deliberately not wpc_menu_col: that att is a 12-column span the
+                // pro tab styles print into wpc-col-lg-*. This one is a plain
+                // column count for the new CSS grid.
+                'grid_columns'        => '3',
             ],
             $atts
         );
@@ -72,6 +76,15 @@ class Food_Menu_Tab extends Base_Shortcode {
         $wpc_cart_button     = $atts['wpc_cart_button'];
         $wpc_price_show      = $atts['wpc_price_show'];
         $show_pagination     = $atts['show_pagination'];
+        $grid_columns        = $atts['grid_columns'];
+
+        // Nav variant + the per-category extras it needs. Counts and thumbnails
+        // cost one lookup per category, so only the styles that print them ask.
+        $nav_config = self::nav_config_for_style( $style );
+
+        // Style CSS must load here, on the host page: the pagination AJAX
+        // handler renders the same style file but cannot enqueue.
+        wpc_enqueue_food_menu_style_assets( $style, 'tab' );
 
         ob_start();
         $wpc_cat_arr  = explode(',', $wpc_food_categories);
@@ -92,7 +105,13 @@ class Food_Menu_Tab extends Base_Shortcode {
         }
 
         // Get tabs for provided or all categories
-        $food_menu_tabs = Wpc_Utilities::get_tab_array_from_category($wpc_cat_arr);
+        $food_menu_tabs = Wpc_Utilities::get_tab_array_from_category(
+            $wpc_cat_arr,
+            [
+                'with_count' => $nav_config['with_count'],
+                'with_thumb' => $nav_config['with_thumb'],
+            ]
+        );
 
         if ( ! $has_categories && ! empty( $food_menu_tabs ) ) {
             $food_menu_tabs = $this->add_all_products_tab($food_menu_tabs);
@@ -116,11 +135,17 @@ class Food_Menu_Tab extends Base_Shortcode {
             $settings["wpc_cart_button"]        = $wpc_cart_button;
             $settings["wpc_price_show"]        = $wpc_price_show;
             $settings["show_pagination"]        = $show_pagination;
+            $settings["grid_columns"]           = $grid_columns;
+            $settings["nav_config"]             = $nav_config;
             // render template
             $template = wpcafe()->template_directory . "/shortcodes/food-tab.php";
 
+            // style-3/4/5 belong to wpcafe-pro; the free styles continue at 6.
             $is_pro_active = function_exists('wpcafe_pro') || defined('WPCAFE_PRO_FILE');
-            $allowed_styles = $is_pro_active ? ['style-1', 'style-2', 'style-3', 'style-4', 'style-5'] : ['style-1', 'style-2'];
+            $free_styles   = ['style-1', 'style-2', 'style-6', 'style-7', 'style-8'];
+            $allowed_styles = $is_pro_active
+                ? array_merge( $free_styles, ['style-3', 'style-4', 'style-5'] )
+                : $free_styles;
             $style_file_exists = file_exists( wpcafe()->plugin_directory . "/widgets/wpc-food-menu-tab/style/{$style}.php" );
 
             if ( ! $style_file_exists && $is_pro_active && function_exists('wpcafe_pro') ) {
@@ -134,6 +159,26 @@ class Food_Menu_Tab extends Base_Shortcode {
         }
         
         return ob_get_clean();
+    }
+
+    /**
+     * Nav variant a tab style renders, plus the per-category data it needs.
+     *
+     * Kept in one place because the shortcode, the tab template and the
+     * Elementor view all have to agree on it.
+     *
+     * @param string $style Style slug.
+     *
+     * @return array{nav: string, with_count: bool, with_thumb: bool}
+     */
+    public static function nav_config_for_style( $style ) {
+        $map = [
+            'style-6' => [ 'nav' => 'pills-end',   'with_count' => false, 'with_thumb' => false ],
+            'style-7' => [ 'nav' => 'rail',        'with_count' => true,  'with_thumb' => false ],
+            'style-8' => [ 'nav' => 'pills-thumb', 'with_count' => true,  'with_thumb' => true ],
+        ];
+
+        return $map[ $style ] ?? [ 'nav' => 'default', 'with_count' => false, 'with_thumb' => false ];
     }
 
     /**

@@ -44,6 +44,7 @@ class Onboard_Setup implements Hookable_Service_Contract {
             return;
         }
 
+        // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- read-only redirect gate, not form processing.
         $page = isset( $_GET['page'] ) ? sanitize_text_field( wp_unslash( $_GET['page'] ) ) : '';
         if ( 'wpcafe' === $page ) {
             return;

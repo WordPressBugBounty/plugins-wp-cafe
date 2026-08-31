@@ -4,6 +4,8 @@ namespace WpCafe\Core\Blocks\BlockTypes;
 defined( 'ABSPATH' ) || exit;
 
 use WpCafe\Utils\Wpc_Utilities;
+use WpCafe\Core\Shortcodes\Template_Functions;
+use WpCafe\FoodOrder\Shortcodes\Food_Menu_Tab;
 
 /**
  * Food Tab Block
@@ -74,6 +76,11 @@ class FoodTab extends AbstractBlock {
 			'wpc_show_vendor'       => [
 				'type'    => 'string',
 				'default' => 'yes',
+			],
+			// Style-6/7/8 extras.
+			'grid_columns'          => [
+				'type'    => 'integer',
+				'default' => 3,
 			],
 		];
 	}
@@ -146,9 +153,14 @@ class FoodTab extends AbstractBlock {
 		$show_thumbnail = $attributes['show_thumbnail'] ?? 'yes';
 		$title_link_show= $attributes['title_link_show'] ?? 'yes';
 
+		$grid_columns     = $attributes['grid_columns'] ?? 3;
+
 		$allowed_file_names = [
 			'style-1',
 			'style-2',
+			'style-6',
+			'style-7',
+			'style-8',
 		];
 
 		if ( in_array( $style, $allowed_file_names, true ) ) {
@@ -157,27 +169,43 @@ class FoodTab extends AbstractBlock {
 			$template_file = $allowed_file_names[0];
 		}
 
+		$nav_config     = Food_Menu_Tab::nav_config_for_style( $template_file );
+		$is_rail_layout = ( 'rail' === $nav_config['nav'] );
+
+		// Counts and thumbnails cost one lookup per category, so only fetch them
+		// for the nav variants that print them.
+		if ( $nav_config['with_count'] || $nav_config['with_thumb'] ) {
+			foreach ( $food_menu_tabs as $tab_key => $tab ) {
+				$term_id = isset( $tab['post_cats'][0] ) ? (int) $tab['post_cats'][0] : 0;
+
+				if ( $nav_config['with_count'] ) {
+					$food_menu_tabs[ $tab_key ]['count'] = Wpc_Utilities::count_products_in_category( [ $term_id ] );
+				}
+				if ( $nav_config['with_thumb'] ) {
+					$food_menu_tabs[ $tab_key ]['thumb_id'] = (int) get_term_meta( $term_id, 'thumbnail_id', true );
+				}
+			}
+		}
+
+		wpc_enqueue_food_menu_style_assets( $template_file, 'tab' );
+
+		$wpc_color_style = wpc_color_tokens();
+
 		ob_start();
 		?>
-		<div class="wpc-food-tab-wrapper wpc-nav-shortcode main_wrapper_<?php echo esc_html( $unique_id ); ?>" data-id="<?php echo esc_attr( $unique_id ); ?>">
-			<ul class="wpc-nav">
-				<?php
-				if ( is_array( $food_menu_tabs ) && count( $food_menu_tabs ) > 0 ) {
-					foreach ( $food_menu_tabs as $tab_key => $value ) {
-						$active_class = ( ( $tab_key === array_keys( $food_menu_tabs )[0] ) ? 'wpc-active' : ' ' );
-						$cat_id       = isset( $value['post_cats'][0] ) ? intval( $value['post_cats'][0] ) : 0;
-						?>
-						<li>
-							<a href='#' class='wpc-tab-a <?php echo esc_attr( $active_class ); ?>' data-id='tab_<?php echo intval( $tab_key ); ?>'
-							   data-cat_id='<?php echo esc_attr( $cat_id ); ?>'>
-								<span><?php echo esc_html( $value['tab_title'] ); ?></span>
-							</a>
-						</li>
-						<?php
-					}
-				}
-				?>
-			</ul>
+		<div class="wpc-food-tab-wrapper wpc-nav-shortcode main_wrapper_<?php echo esc_attr( $unique_id ); ?>" data-id="<?php echo esc_attr( $unique_id ); ?>"<?php if ( '' !== $wpc_color_style ) : ?> style="<?php echo esc_attr( $wpc_color_style ); ?>"<?php endif; ?>>
+			<?php if ( $is_rail_layout ) : ?>
+				<div class="wpc-tab-layout--rail">
+			<?php endif; ?>
+
+			<?php
+			Template_Functions::render_food_menu_tab_nav(
+				$food_menu_tabs,
+				[
+					'nav' => $nav_config['nav'],
+				]
+			);
+			?>
 			<div class="wpc-tab-content wpc-widget-wrapper">
 				<?php
 				foreach ( $food_menu_tabs as $content_key => $value ) {
@@ -212,6 +240,9 @@ class FoodTab extends AbstractBlock {
 				}
 				?>
 			</div>
+			<?php if ( $is_rail_layout ) : ?>
+				</div><!-- .wpc-tab-layout--rail -->
+			<?php endif; ?>
 		</div>
 		<?php
 

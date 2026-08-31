@@ -158,6 +158,7 @@ class Product_Popup_Service implements Hookable_Service_Contract {
 		// phpcs:disable WordPress.Security.NonceVerification.Missing -- verified above.
 		$product_id   = isset( $_POST['product_id'] ) ? absint( wp_unslash( $_POST['product_id'] ) ) : 0;
 		$variation_id = isset( $_POST['variation_id'] ) ? absint( wp_unslash( $_POST['variation_id'] ) ) : 0;
+		// phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- wc_stock_amount() coerces this to a safe numeric quantity.
 		$quantity     = empty( $_POST['quantity'] ) ? 1 : wc_stock_amount( wp_unslash( $_POST['quantity'] ) );
 
 		if ( $product_id <= 0 && $variation_id <= 0 ) {
@@ -178,6 +179,7 @@ class Product_Popup_Service implements Hookable_Service_Contract {
 		foreach ( array_keys( $_POST ) as $key ) {
 			$key = (string) $key;
 			if ( 0 === strpos( $key, 'attribute_' ) ) {
+				// phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotValidated -- $key is enumerated from array_keys( $_POST ), so it is always defined.
 				$variation[ sanitize_title( wp_unslash( $key ) ) ] = sanitize_text_field( wp_unslash( $_POST[ $key ] ) );
 			}
 		}
@@ -224,12 +226,18 @@ class Product_Popup_Service implements Hookable_Service_Contract {
 			?>
 			<div id="product-<?php echo esc_attr( (string) $product_id ); ?>" <?php post_class( 'product wpc-row' ); ?>>
 				<div class="wpc-col-lg-6 variation_product_image">
-					<?php do_action( 'variation/product_thumbnails' ); ?>
+					<?php
+					// phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound -- shared cross-plugin hook, consumed by wpcafe-pro's product-popup-ajax.php and hooks.php; renaming breaks that integration.
+					do_action( 'variation/product_thumbnails' );
+					?>
 				</div>
 				<div class="wpc-col-lg-6">
 					<div class="wpc-single-content summary entry-summary">
 						<h2 class="product_title entry-title"><?php the_title(); ?></h2>
-						<?php do_action( 'variation/popup_content' ); ?>
+						<?php
+						// phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound -- shared cross-plugin hook, consumed by wpcafe-pro's product-popup-ajax.php and hooks.php; renaming breaks that integration.
+						do_action( 'variation/popup_content' );
+						?>
 					</div>
 				</div>
 			</div>

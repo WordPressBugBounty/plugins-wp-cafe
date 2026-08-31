@@ -44,10 +44,20 @@ if ( ! defined( 'ABSPATH' ) ) exit;
     $products    = $page_result['products'];
     $total_pages = $page_result['total_pages'];
 
+    // Style comes from a widget select, but validate anyway — this value ends up
+    // in an include() path.
+    $allowed_styles = [ 'style-1', 'style-2', 'style-3', 'style-4' ];
+    $style          = in_array( $style, $allowed_styles, true ) ? $style : 'style-1';
+
+    wpc_enqueue_food_menu_style_assets( $style, 'list' );
+
     $wpc_menu_settings = $settings;
     unset( $wpc_menu_settings['_page'] );
+
+    // Brand tokens on the wrapper so every card inherits them.
+    $wpc_color_style = wpc_color_tokens();
     ?>
-    <div class="wpc-nav-shortcode main_wrapper_<?php echo esc_attr($unique_id .' '. $no_desc_class)?>" data-id="<?php echo esc_attr($unique_id)?>">
+    <div class="wpc-nav-shortcode main_wrapper_<?php echo esc_attr($unique_id .' '. $no_desc_class)?>" data-id="<?php echo esc_attr($unique_id)?>"<?php if ( '' !== $wpc_color_style ) : ?> style="<?php echo esc_attr( $wpc_color_style ); ?>"<?php endif; ?>>
         <div class="wpc-paginated-products" data-shortcode="food_menu_list" data-current="<?php echo esc_attr( $current_page ); ?>" data-product_data="<?php echo esc_attr( wp_json_encode( $wpc_menu_settings ) ); ?>">
             <div class="wpc-paginated-products-body list_template_<?php echo esc_attr($unique_id) ?> wpc-nav-shortcode wpc-widget-wrapper">
                 <?php include wpcafe()->plugin_directory . "/widgets/wpc-menus-list/style/{$style}.php"; ?>

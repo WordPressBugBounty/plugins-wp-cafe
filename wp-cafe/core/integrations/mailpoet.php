@@ -132,6 +132,7 @@ class Mail_Poet implements Hookable_Service_Contract, Switchable_Service_Contrac
             }
         } catch ( \Throwable $e ) {
             if ( defined( 'WP_DEBUG' ) && WP_DEBUG ) {
+                // phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log -- intentional debug-only log, gated behind WP_DEBUG.
                 error_log( 'WP Cafe MailPoet: ' . $e->getMessage() );
             }
         }

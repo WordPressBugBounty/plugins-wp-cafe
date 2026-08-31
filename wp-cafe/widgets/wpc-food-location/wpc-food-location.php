@@ -168,7 +168,7 @@ class Wpc_Food_Location extends Widget_Base {
                 'default'      => 'yes',
             ]
         );
-        if ( class_exists( 'Wpcafe_Multivendor' ) ) {
+        if ( wpcafe_is_multivendor() ) {
             $this->add_control(
                 'wpc_show_vendor',
                 [

@@ -64,6 +64,7 @@ class Wpc_Menus_List extends Widget_Base {
                     'style-1' => esc_html__( 'Menu Style 1', 'wp-cafe' ),
                     'style-2' => esc_html__( 'Menu Style 2', 'wp-cafe' ),
                     'style-3' => esc_html__( 'Menu Style 3', 'wp-cafe' ),
+                    'style-4' => esc_html__( 'Menu Style 4', 'wp-cafe' ),
                 ],
             ]
         );
@@ -206,7 +207,7 @@ class Wpc_Menus_List extends Widget_Base {
                 ],
             ]
         );
-        if(class_exists('Wpcafe_Multivendor')) {
+        if(wpcafe_is_multivendor()) {
             $this->add_control(
                 'wpc_show_vendor',
                 [
@@ -929,7 +930,10 @@ class Wpc_Menus_List extends Widget_Base {
      * @return array
      */
     public function get_style_depends() {
-        return [ 'wpc-card-core', 'wpc-popup', 'wpc-pagination' ];
+        // Returns the union rather than branching on the selected style: this
+        // runs before settings are reliable in the editor, and the style-4
+        // sheets are small.
+        return [ 'wpc-card-core', 'wpc-popup', 'wpc-pagination', 'wpc-card-row' ];
     }
 
     protected function render() {
