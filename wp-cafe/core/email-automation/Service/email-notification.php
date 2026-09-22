@@ -361,12 +361,24 @@ class Email_Notification implements Hookable_Service_Contract {
 		// Build powered-by HTML if enabled
 		$powered_by_html = '';
 		if ( $show_powered_by ) {
-			$powered_by_html = '<p class="wpc-powered-by">Powered by ' . esc_html( $plugin_name ) . '</p>';
+			/* translators: %s: plugin name. */
+			$powered_by_html = '<p class="wpc-powered-by">' . sprintf( esc_html__( 'Powered by %s', 'wp-cafe' ), esc_html( $plugin_name ) ) . '</p>';
 		}
+
+		// Footer text lives here, not in the HTML file, so it can be translated.
+		$copyright = '&copy; ' . sprintf(
+			/* translators: 1: current year, 2: restaurant name. */
+			esc_html__( '%1$s %2$s. All rights reserved.', 'wp-cafe' ),
+			esc_html( wp_date( 'Y' ) ),
+			esc_html( $restaurant_name )
+		);
 
 		// Prepare variables for replacement
 		$variables = array(
 			'{{MESSAGE}}'                     => wp_kses_post( $message ),
+			'{{EMAIL_TITLE}}'                 => esc_html( $restaurant_name ? $restaurant_name : get_bloginfo( 'name' ) ),
+			'{{COPYRIGHT}}'                   => $copyright,
+			'{{CONTACT_LABEL}}'               => esc_html__( 'Contact Info:', 'wp-cafe' ),
 			'{%reservation_branch_name%}'     => esc_html( $restaurant_name ),
 			'{%reservation_branch_address%}'  => esc_html( $restaurant_address ),
 			'{%restaurant_phone%}'    => esc_html( $restaurant_phone ),

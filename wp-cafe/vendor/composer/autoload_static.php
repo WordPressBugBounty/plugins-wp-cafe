@@ -4,7 +4,7 @@
 
 namespace Composer\Autoload;
 
-class ComposerStaticInitbdc3519fc299ae9554f63327562135f0
+class ComposerStaticInit302cef4a9e621ce24eab5244bbcfd265
 {
     public static $files = array (
         '65bd208c04f25e98cf12b5c37b014f1e' => __DIR__ . '/..' . '/themewinter/email-notification-sdk/src/Utils/global-helpers.php',
@@ -153,9 +153,6 @@ class ComposerStaticInitbdc3519fc299ae9554f63327562135f0
         'WpCafe\\FoodOrder\\Controllers\\Qrcode_Controller' => __DIR__ . '/../..' . '/core/food-order/qrcode/controllers/qrcode-controller.php',
         'WpCafe\\FoodOrder\\Digital\\Digital_Fulfillment_Gate' => __DIR__ . '/../..' . '/core/food-order/digital/digital-fulfillment-gate.php',
         'WpCafe\\FoodOrder\\Food_Order_Service_Provider' => __DIR__ . '/../..' . '/core/food-order/food-order-service-provider.php',
-        'WpCafe\\FoodOrder\\LiveOrder\\Assets_Manager' => __DIR__ . '/../..' . '/core/food-order/liver-order/assets-manager.php',
-        'WpCafe\\FoodOrder\\LiveOrder\\Liver_Order_Service' => __DIR__ . '/../..' . '/core/food-order/liver-order/live-order-service.php',
-        'WpCafe\\FoodOrder\\LiveOrder\\Notifier' => __DIR__ . '/../..' . '/core/food-order/liver-order/notifier.php',
         'WpCafe\\FoodOrder\\Mini_Cart\\Mini_Cart' => __DIR__ . '/../..' . '/core/food-order/mini-cart/mini-cart.php',
         'WpCafe\\FoodOrder\\Mini_Cart\\Mini_Cart_Service' => __DIR__ . '/../..' . '/core/food-order/mini-cart/mini-cart-service.php',
         'WpCafe\\FoodOrder\\Qrcode\\Qr_Fulfillment_Gate' => __DIR__ . '/../..' . '/core/food-order/qrcode/qr-fulfillment-gate.php',
@@ -188,6 +185,9 @@ class ComposerStaticInitbdc3519fc299ae9554f63327562135f0
         'WpCafe\\Integrations\\Uncanny_Automator' => __DIR__ . '/../..' . '/core/integrations/uncanny-automator.php',
         'WpCafe\\Integrations\\Zapier' => __DIR__ . '/../..' . '/core/integrations/zapier.php',
         'WpCafe\\Integrations\\Zoho_Flow' => __DIR__ . '/../..' . '/core/integrations/zoho-flow.php',
+        'WpCafe\\LiveAlert\\Assets_Manager' => __DIR__ . '/../..' . '/core/live-alert/assets-manager.php',
+        'WpCafe\\LiveAlert\\Live_Alert_Service_Provider' => __DIR__ . '/../..' . '/core/live-alert/live-alert-service-provider.php',
+        'WpCafe\\LiveAlert\\Notifier' => __DIR__ . '/../..' . '/core/live-alert/notifier.php',
         'WpCafe\\Location\\Controllers\\Location_Controller' => __DIR__ . '/../..' . '/core/location/controllers/location-controller.php',
         'WpCafe\\Location\\Location_Selector' => __DIR__ . '/../..' . '/core/location/location-selector.php',
         'WpCafe\\Location\\Location_Service_Provider' => __DIR__ . '/../..' . '/core/location/location-service-provider.php',
@@ -233,6 +233,7 @@ class ComposerStaticInitbdc3519fc299ae9554f63327562135f0
         'WpCafe\\Reservation\\Email\\Triggers\\Reservation_Pending_Trigger' => __DIR__ . '/../..' . '/core/reservation/email/triggers/reservation-pending-trigger.php',
         'WpCafe\\Reservation\\Email\\Triggers\\Reservation_Updated_Trigger' => __DIR__ . '/../..' . '/core/reservation/email/triggers/reservation-updated-trigger.php',
         'WpCafe\\Reservation\\Reservation_Hooks' => __DIR__ . '/../..' . '/core/reservation/reservation-hooks.php',
+        'WpCafe\\Reservation\\Reservation_Placed' => __DIR__ . '/../..' . '/core/reservation/reservation-placed.php',
         'WpCafe\\Reservation\\Reservation_Service_Provider' => __DIR__ . '/../..' . '/core/reservation/reservation-service-provider.php',
         'WpCafe\\Reservation\\Shortcodes\\Reservation_Form' => __DIR__ . '/../..' . '/core/reservation/shortcodes/reservation-form.php',
         'WpCafe\\Reservation\\Shortcodes\\Shortcode_Manager' => __DIR__ . '/../..' . '/core/reservation/shortcodes/reservation-shortcode-manager.php',
@@ -295,9 +296,9 @@ class ComposerStaticInitbdc3519fc299ae9554f63327562135f0
     public static function getInitializer(ClassLoader $loader)
     {
         return \Closure::bind(function () use ($loader) {
-            $loader->prefixLengthsPsr4 = ComposerStaticInitbdc3519fc299ae9554f63327562135f0::$prefixLengthsPsr4;
-            $loader->prefixDirsPsr4 = ComposerStaticInitbdc3519fc299ae9554f63327562135f0::$prefixDirsPsr4;
-            $loader->classMap = ComposerStaticInitbdc3519fc299ae9554f63327562135f0::$classMap;
+            $loader->prefixLengthsPsr4 = ComposerStaticInit302cef4a9e621ce24eab5244bbcfd265::$prefixLengthsPsr4;
+            $loader->prefixDirsPsr4 = ComposerStaticInit302cef4a9e621ce24eab5244bbcfd265::$prefixDirsPsr4;
+            $loader->classMap = ComposerStaticInit302cef4a9e621ce24eab5244bbcfd265::$classMap;
 
         }, null, ClassLoader::class);
     }

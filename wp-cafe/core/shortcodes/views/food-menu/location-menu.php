@@ -25,7 +25,14 @@ if ( is_object( WC()->cart ) && WC()->cart->cart_contents_count == 0 ) {
 				data-current="<?php echo esc_attr( $location_current_page ); ?>"
 				data-product_data="<?php echo esc_attr( wp_json_encode( $product_data ) ); ?>">
 				<div class="wpc-paginated-products-body">
-					<?php include wpcafe()->plugin_directory . "/widgets/wpc-menus-list/style/{$style}.php"; ?>
+					<?php
+					// Style comes from a widget select, but validate anyway — this value ends up
+					// in an include() path.
+					$allowed_styles = [ 'style-1', 'style-2', 'style-3', 'style-4' ];
+					$style          = in_array( $style, $allowed_styles, true ) ? $style : 'style-1';
+
+					include wpcafe()->plugin_directory . "/widgets/wpc-menus-list/style/{$style}.php";
+					?>
 				</div>
 				<?php
 				if ( 'yes' === $location_show_pagination ) {

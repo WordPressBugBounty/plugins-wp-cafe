@@ -3,7 +3,7 @@
         'name' => 'themewinter/wp-cafe',
         'pretty_version' => 'dev-develop',
         'version' => 'dev-develop',
-        'reference' => 'bb2b808717bc30fa7622b825300143b3826544d6',
+        'reference' => 'ddd39fadde66ac781b38b9c696a722dcd3911b7f',
         'type' => 'project',
         'install_path' => __DIR__ . '/../../',
         'aliases' => array(),
@@ -35,7 +35,7 @@
         'themewinter/email-notification-sdk' => array(
             'pretty_version' => 'dev-main',
             'version' => 'dev-main',
-            'reference' => '5f34554ed734ded8badc9bacd615a6648f16bd32',
+            'reference' => '1103d74359ba13316118d12dd1c49d47b3881987',
             'type' => 'library',
             'install_path' => __DIR__ . '/../themewinter/email-notification-sdk',
             'aliases' => array(
@@ -57,7 +57,7 @@
         'themewinter/wp-cafe' => array(
             'pretty_version' => 'dev-develop',
             'version' => 'dev-develop',
-            'reference' => 'bb2b808717bc30fa7622b825300143b3826544d6',
+            'reference' => 'ddd39fadde66ac781b38b9c696a722dcd3911b7f',
             'type' => 'project',
             'install_path' => __DIR__ . '/../../',
             'aliases' => array(),

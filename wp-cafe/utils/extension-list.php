@@ -68,6 +68,26 @@ return [
 </svg>
 ',
     ],
+    'reservation_waitlist' => [
+        'name' => 'reservation_waitlist',
+        'slug' => 'reservation_waitlist',
+        'type' => 'module',
+        'parent' => 'reservation',
+        'status' => $reservation_waitlist_status,
+        'is_pro' => true,
+        'title' => __('Reservation Waitlist', 'wp-cafe'),
+        'description' => __('Lets guests join a waiting list when a slot is full, then automatically offers the freed seat to the next matching guest when a booking is cancelled.', 'wp-cafe'),
+        'notice' => '',
+        'demo_link' => '',
+        'settings_link' => 'admin.php?page=wpcafe#/waitlist-settings',
+        'doc_link' => 'https://themewinter.com/docs/plugins/plugin-docs/reservation/how-to-set-up-and-use-waitlist-for-reservation-in-wpcafe/',
+        'icon' => '<svg width="26" height="26" viewBox="0 0 26 26" fill="none" xmlns="http://www.w3.org/2000/svg">
+<path d="M13 7.58398V13.0007L16.25 15.1673" stroke="#525266" stroke-width="1.625" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M2.16797 13.0007C2.16797 7.01761 7.01823 2.16736 13.0013 2.16736C18.9844 2.16736 23.8346 7.01761 23.8346 13.0007C23.8346 18.9838 18.9844 23.834 13.0013 23.834" stroke="#525266" stroke-width="1.625" stroke-linecap="round"/>
+<path d="M2.70703 16.25H8.66536M2.16797 19.5H6.5013M3.25 22.75H5.41667" stroke="#525266" stroke-width="1.625" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>
+',
+    ],
     'delivery' => [
         'name' => 'delivery',
         'slug' => 'delivery',
@@ -404,7 +424,7 @@ return [
         'type' => 'plugin',
         'status' => 'install',
         'is_pro' => false,
-        'deps'   => ['wc-frontend-manager'],
+        'deps'   => ['wc-frontend-manager', 'wc-multivendor-marketplace'],
         'title' => __('WPCafe Addon for WCFM Marketplace', 'wp-cafe'),
         'description' => __('Brings WPCafe food-ordering capabilities to a WCFM Marketplace multivendor store. Lets each vendor run their own restaurant menu, food ordering and receipt printing from their own WCFM dashboard.', 'wp-cafe'),
         'notice' => '',
@@ -528,7 +548,7 @@ return [
         'notice'        => '',
         'demo_link'     => '',
         'settings_link' => 'admin.php?page=wpcafe#/settings?tab=notifications',
-        'doc_link'      => '',
+        'doc_link'      => 'https://themewinter.com/docs/wp-cafe/live-order/',
         'icon'          => '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-bell-icon lucide-bell"><path d="M10.268 21a2 2 0 0 0 3.464 0"/><path d="M3.262 15.326A1 1 0 0 0 4 17h16a1 1 0 0 0 .74-1.673C19.41 13.956 18 12.499 18 8A6 6 0 0 0 6 8c0 4.499-1.411 5.956-2.738 7.326"/></svg>',
     ],
 

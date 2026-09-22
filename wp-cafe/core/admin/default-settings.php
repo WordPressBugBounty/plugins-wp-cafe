@@ -41,6 +41,11 @@ class Default_Settings implements Hookable_Service_Contract {
             'display_location_selector' => wpc_get_option('display_location_selector', 'dont_show'),
         ];
 
+        // Notification toggles count as on until saved; the switches need that as a real boolean.
+        foreach ( [ 'enable_order_notification', 'enable_reservation_notification' ] as $key ) {
+            $default[ $key ] = wpc_is_option_on( $key );
+        }
+
         return array_merge( $settings, $default );
     }
 }

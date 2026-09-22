@@ -311,15 +311,20 @@ class Reservation_Model extends Post_Model {
     /**
      * Convert time to timestamp
      *
-     * Handles both DateTime objects and string timestamps.
+     * Handles DateTime objects, time strings and ready-made Unix timestamps.
      *
-     * @param string $date The date to use for timestamp conversion.
-     * @param string|DateTime $time The time to convert (DateTime object or string).
-     * @return int The Unix timestamp.
+     * @param string                       $date The date to use for timestamp conversion.
+     * @param int|string|DateTimeInterface $time A DateTime, a time string, or a Unix timestamp.
+     * @return int|false The Unix timestamp, or false when the time cannot be parsed.
      */
     private static function convert_time_to_timestamp( $date, $time ) {
         if ( is_object( $time ) && method_exists( $time, 'format' ) ) {
             return strtotime( $date . ' ' . $time->format('h:i A') );
+        }
+        // Already a Unix timestamp (the create path and the waitlist pass these), and
+        // strtotime( "$date 1789070400" ) is false. 10+ digits only, so "0930" still parses as a time.
+        if ( is_int( $time ) || ( is_string( $time ) && ctype_digit( $time ) && strlen( $time ) >= 10 ) ) {
+            return (int) $time;
         }
         return strtotime( $date . ' ' . $time );
     }
@@ -419,6 +424,13 @@ class Reservation_Model extends Post_Model {
      */
     public static function validate_guest_capacity( $total_guest, $date, $start_time, $end_time, $branch_id = '' ) {
         $total_guest = intval( $total_guest );
+
+        // An unreadable time must not count as an empty slot: false became midnight, found no bookings and let any request book past capacity.
+        if ( empty( $start_time ) || empty( $end_time )
+            || false === self::convert_time_to_timestamp( $date, $start_time )
+            || false === self::convert_time_to_timestamp( $date, $end_time ) ) {
+            return new \WP_Error( 'invalid_reservation_time', __( 'Cannot create reservation. The reservation time is not valid.', 'wp-cafe' ) );
+        }
 
         $total_capacity  = wpc_get_reservation_capacity( $branch_id );
         $booked_capacity = self::get_total_guest_by_date_time( $date, $start_time, $end_time, $branch_id );

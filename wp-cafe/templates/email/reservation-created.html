@@ -3,7 +3,7 @@
     <head>
         <meta charset="UTF-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        <title>Reservation Confirmation</title>
+        <title>{{EMAIL_TITLE}}</title>
         <style>
             /* Reset styles for email clients */
             body,
@@ -141,10 +141,7 @@
 
                         <!-- Footer -->
                         <div class="footer">
-                            <p>
-                                &copy; 2026 {%reservation_branch_name%}. All
-                                rights reserved.
-                            </p>
+                            <p>{{COPYRIGHT}}</p>
                             <!-- Added Contact Information -->
                             <p
                                 style="
@@ -153,7 +150,7 @@
                                     color: #666666;
                                 "
                             >
-                                Contact Info:
+                                {{CONTACT_LABEL}}
                                 <a
                                     href="tel:{%restaurant_phone%}"
                                     style="color: #ff6b35"

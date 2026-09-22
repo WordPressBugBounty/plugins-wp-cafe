@@ -13,6 +13,7 @@ use WpCafe\Contracts\Switchable_Provider_Contract;
 use WpCafe\Extensions\Extension_Service_Provider;
 use WpCafe\Feedback\Feedback_Service_Provider;
 use WpCafe\FoodOrder\Food_Order_Service_Provider;
+use WpCafe\LiveAlert\Live_Alert_Service_Provider;
 use WpCafe\Location\Location_Service_Provider;
 use WpCafe\Products\Products_Service_Provider;
 use WpCafe\Products\Labels\Product_Label_Service_Provider;
@@ -55,6 +56,7 @@ class Global_Service_Provider implements Provider_Contract {
         'extension'     => Extension_Service_Provider::class,
         'feedback-form' => Feedback_Service_Provider::class,
         'food-order'    => Food_Order_Service_Provider::class,
+        'live-alert'    => Live_Alert_Service_Provider::class,
         'location'      => Location_Service_Provider::class,
         'products'      => Products_Service_Provider::class,
         'product-labels' => Product_Label_Service_Provider::class,

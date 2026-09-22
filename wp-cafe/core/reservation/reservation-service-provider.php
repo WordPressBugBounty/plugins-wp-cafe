@@ -22,6 +22,7 @@ class Reservation_Service_Provider extends Base_Service_Provider implements Swit
     protected $services = [
         Reservation_Controller::class,
         Reservation_Hooks::class,
+        Reservation_Placed::class,
         Reservation_Email_Handler::class,
         Shortcode_Manager::class,
     ];

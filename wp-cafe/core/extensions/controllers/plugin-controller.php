@@ -74,12 +74,23 @@ class Plugin_Controller extends Base_Rest_Controller {
         $plugin = wpcafe_extension()->find( $name );
         $deps = ! empty( $plugin['deps'] ) ? $plugin['deps'] : [];
 
-        if ( $deps ) {
-            foreach ( $deps as $dep ) {
-                if ( ! PluginManager::is_installed( $dep ) ) {
+        // A dep the addon needs (e.g. WCFM for the WCFM addon) is installed
+        // and activated automatically instead of blocking the user with an
+        // error they have no context for.
+        $installed_deps = [];
+
+        foreach ( $deps as $dep ) {
+            if ( ! PluginManager::is_installed( $dep ) ) {
+                if ( ! PluginManager::install_plugin( $dep ) ) {
                     /* translators: %s: plugin name */
-                    return $this->error( sprintf( __( 'Dependency plugin %s is not installed', 'wp-cafe' ), $dep ) );
+                    return $this->error( sprintf( __( 'Could not automatically install the required plugin %s. Please install it manually.', 'wp-cafe' ), $dep ) );
                 }
+
+                $installed_deps[] = PluginManager::get_plugin_name_by_slug( $dep ) ?: $dep;
+            }
+
+            if ( ! PluginManager::is_activated( $dep ) ) {
+                PluginManager::activate_plugin( $dep );
             }
         }
 
@@ -133,6 +144,14 @@ class Plugin_Controller extends Base_Rest_Controller {
         $response = [
             'message' => __( 'Successfully updated', 'wp-cafe' ),
         ];
+
+        if ( $installed_deps ) {
+            $response['message'] = sprintf(
+                /* translators: %s: comma separated list of required plugin names that were auto-installed */
+                __( '%s was not installed. We installed and activated it for you. Successfully updated.', 'wp-cafe' ),
+                implode( ', ', $installed_deps )
+            );
+        }
 
         /*
          * Registration only runs when the caller sent explicit consent, which

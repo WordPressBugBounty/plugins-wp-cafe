@@ -7,6 +7,8 @@
 
 if ( ! defined( 'ABSPATH' ) ) exit;
 
+// phpcs:disable WordPress.NamingConventions.PrefixAllGlobals -- public API since 3.0.11, used by the WCFM addon; renaming breaks it.
+
 if ( ! function_exists( 'wpc_nutrition_field_keys' ) ) {
     /**
      * Numeric nutrition fields stored in the meta blob.

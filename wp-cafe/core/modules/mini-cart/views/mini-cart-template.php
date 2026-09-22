@@ -145,7 +145,13 @@ $cart_link 		= !empty($settings['wpc_mini_empty_cart_link']) ? $settings['wpc_mi
 										<input id="minicart-coupon" class="input-text wpc-minicart-coupon-field" type="text" name="coupon_code"/>
 										<button type="submit" id="minicart-apply-button" class="wpc-cupon-btn button" name="apply_coupon" value="<?php esc_attr_e( 'Apply coupon', 'wp-cafe' ); ?>"><?php echo esc_html__( 'Apply', 'wp-cafe' ); ?></button>
 										<?php do_action( 'woocommerce_cart_coupon' ); ?>
-										<?php do_action( 'woocommerce_cart_actions' ); ?>
+										<?php
+										/*
+										 * `woocommerce_cart_actions` is not fired here on purpose. It is a cart-page
+										 * hook, so themes hang their checkout button on it (Pizzaro does) and it
+										 * landed inside this coupon form. Our own button prints further down.
+										 */
+										?>
 									</form>
 								</div>
 						<?php } ?>

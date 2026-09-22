@@ -844,6 +844,15 @@ class Template_Functions {
 								<div class="wpc-paginated-products-body">
 									<?php
 									$is_pro_active = function_exists('wpcafe_pro') || defined('WPCAFE_PRO_FILE');
+
+									// Elementor hands this over raw from the widget settings and it ends up in
+									// an include() path. style-3/4/5 belong to wpcafe-pro; free styles continue at 6.
+									$free_styles    = ['style-1', 'style-2', 'style-6', 'style-7', 'style-8'];
+									$allowed_styles = $is_pro_active
+										? array_merge( $free_styles, ['style-3', 'style-4', 'style-5'] )
+										: $free_styles;
+									$style          = in_array( $style, $allowed_styles, true ) ? $style : 'style-1';
+
 									$style_path = wpcafe()->plugin_directory . "/widgets/wpc-food-menu-tab/style/{$style}.php";
 
 									if ( !file_exists( $style_path ) && $is_pro_active && function_exists('wpcafe_pro') ) {

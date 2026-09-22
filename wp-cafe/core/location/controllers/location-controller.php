@@ -24,6 +24,13 @@ class Location_Controller extends Base_Rest_Controller {
     protected $namespace = 'wpcafe/v2';
 
     /**
+     * Location fields that hold a weekly schedule.
+     *
+     * @var string[]
+     */
+    private const SCHEDULE_KEYS = [ 'restaurant_schedule', 'pickup_schedule', 'delivery_schedule', 'reservation_schedule' ];
+
+    /**
      * Route base
      *
      * @var string
@@ -194,6 +201,14 @@ class Location_Controller extends Base_Rest_Controller {
             return $this->error( $data->get_error_message() );
         }
 
+        // Model::update() replaces a schedule whole, so merge per day: a payload
+        // with only Mon must not wipe the other six stored days.
+        foreach ( self::SCHEDULE_KEYS as $key ) {
+            if ( isset( $data[ $key ] ) ) {
+                $data[ $key ] = array_replace( is_array( $location->$key ) ? $location->$key : [], $data[ $key ] );
+            }
+        }
+
         $location->update( $data );
 
         return $this->response($location);
@@ -299,6 +314,70 @@ class Location_Controller extends Base_Rest_Controller {
             return $validate;
         }
 
+        foreach ( self::SCHEDULE_KEYS as $key ) {
+            if ( ! isset( $data[ $key ] ) ) {
+                continue;
+            }
+
+            // Reject a bad schedule instead of cleaning it. Cleaning would turn
+            // "x" into no hours at all, or "open" into "off", and still say success.
+            if ( ! $this->is_valid_schedule( $data[ $key ] ) ) {
+                return new WP_Error(
+                    'wpcafe_invalid_schedule',
+                    __( 'Schedule must be an object keyed by day (Mon to Sun), and each day needs a status of "on" or "off".', 'wp-cafe' )
+                );
+            }
+
+            $data[ $key ] = \WpCafe\Settings::sanitize_schedule( $data[ $key ] );
+        }
+
+        foreach ( $data as $key => $value ) {
+            if ( in_array( $key, self::SCHEDULE_KEYS, true ) ) {
+                continue;
+            }
+
+            if ( 'location_image' === $key ) {
+                $data[ $key ] = esc_url_raw( (string) $value );
+                continue;
+            }
+
+            /*
+             * Clean strings but keep each value's type. The form sends switches
+             * as "0"/"1" and visual_table_layout as a JSON string, so casting to
+             * bool or int would break it. Same rule the global settings save uses.
+             */
+            $data[ $key ] = map_deep(
+                $value,
+                function ( $item ) {
+                    return is_string( $item ) ? sanitize_text_field( $item ) : $item;
+                }
+            );
+        }
+
         return $data;
+    }
+
+    /**
+     * Check a schedule's shape before it is cleaned and saved.
+     *
+     * @param mixed $schedule Raw schedule from the request body.
+     * @return bool True when every entry is a known day with an on/off status.
+     */
+    private function is_valid_schedule( $schedule ): bool {
+        if ( ! is_array( $schedule ) ) {
+            return false;
+        }
+
+        foreach ( $schedule as $day => $config ) {
+            if (
+                ! in_array( $day, [ 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun' ], true )
+                || ! is_array( $config )
+                || ! in_array( $config['status'] ?? null, [ 'on', 'off' ], true )
+            ) {
+                return false;
+            }
+        }
+
+        return true;
     }
 }

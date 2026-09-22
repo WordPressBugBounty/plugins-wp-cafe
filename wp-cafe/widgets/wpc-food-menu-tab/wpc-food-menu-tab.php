@@ -447,7 +447,7 @@ class Wpc_Food_Menu_Tab extends Widget_Base {
                 'label'     => esc_html__( 'Cart Button Color', 'wp-cafe' ),
                 'type'      => Controls_Manager::COLOR,
                 'selectors' => [
-                    '{{WRAPPER}} .wpc-food-menu-item .wpc-add-to-cart a' => 'color: {{VALUE}};',
+                    '{{WRAPPER}} .wpc-food-menu-item .wpc-add-to-cart a, {{WRAPPER}} .wpc-card .wpc-add-to-cart a' => 'color: {{VALUE}};',
                 ],
             ]
         );
@@ -457,7 +457,7 @@ class Wpc_Food_Menu_Tab extends Widget_Base {
                 'label'     => esc_html__( 'Cart Button BG Color', 'wp-cafe' ),
                 'type'      => Controls_Manager::COLOR,
                 'selectors' => [
-                    '{{WRAPPER}} .wpc-food-menu-item .wpc-add-to-cart a' => 'background-color: {{VALUE}};',
+                    '{{WRAPPER}} .wpc-food-menu-item .wpc-add-to-cart a, {{WRAPPER}} .wpc-card .wpc-add-to-cart a' => 'background-color: {{VALUE}};',
                 ],
             ]
         );
@@ -466,7 +466,7 @@ class Wpc_Food_Menu_Tab extends Widget_Base {
             [
                 'name'     => 'wpc_cart_button_typo',
                 'label'    => esc_html__( 'Typography', 'wp-cafe' ),
-                'selector' => '{{WRAPPER}} .wpc-food-menu-item .wpc-add-to-cart a i',
+                'selector' => '{{WRAPPER}} .wpc-food-menu-item .wpc-add-to-cart a i, {{WRAPPER}} .wpc-card .wpc-add-to-cart a i',
             ]
         );
         $this->add_responsive_control(
@@ -490,7 +490,7 @@ class Wpc_Food_Menu_Tab extends Widget_Base {
                     'size' => 35,
                 ],
                 'selectors'  => [
-                    '{{WRAPPER}} .wpc-food-menu-item .wpc-add-to-cart a' => 'width: {{SIZE}}{{UNIT}};',
+                    '{{WRAPPER}} .wpc-food-menu-item .wpc-add-to-cart a, {{WRAPPER}} .wpc-card .wpc-add-to-cart a' => 'width: {{SIZE}}{{UNIT}};',
                 ],
             ]
         );
@@ -516,7 +516,7 @@ class Wpc_Food_Menu_Tab extends Widget_Base {
                     'size' => 35,
                 ],
                 'selectors'  => [
-                    '{{WRAPPER}} .wpc-food-menu-item .wpc-add-to-cart a' => 'height: {{SIZE}}{{UNIT}};',
+                    '{{WRAPPER}} .wpc-food-menu-item .wpc-add-to-cart a, {{WRAPPER}} .wpc-card .wpc-add-to-cart a' => 'height: {{SIZE}}{{UNIT}};',
                 ],
             ]
         );
@@ -528,7 +528,7 @@ class Wpc_Food_Menu_Tab extends Widget_Base {
                 'type'       => Controls_Manager::DIMENSIONS,
                 'size_units' => ['px', '%', 'em'],
                 'selectors'  => [
-                    '{{WRAPPER}} .wpc-food-menu-item .wpc-add-to-cart a' => 'padding: {{TOP}}{{UNIT}} {{RIGHT}}{{UNIT}} {{BOTTOM}}{{UNIT}} {{LEFT}}{{UNIT}};',
+                    '{{WRAPPER}} .wpc-food-menu-item .wpc-add-to-cart a, {{WRAPPER}} .wpc-card .wpc-add-to-cart a' => 'padding: {{TOP}}{{UNIT}} {{RIGHT}}{{UNIT}} {{BOTTOM}}{{UNIT}} {{LEFT}}{{UNIT}};',
                 ],
             ]
         );
@@ -569,7 +569,7 @@ class Wpc_Food_Menu_Tab extends Widget_Base {
                 ],
                 'default'   => 'center',
                 'selectors' => [
-                    '{{WRAPPER}}  .wpc-nav' => 'text-align: {{VALUE}};',
+                    '{{WRAPPER}}  .wpc-nav, {{WRAPPER}} .wpc-tab-nav-v2 .wpc-nav' => 'text-align: {{VALUE}};',
                 ],
             ]
         );
@@ -581,7 +581,7 @@ class Wpc_Food_Menu_Tab extends Widget_Base {
             [
                 'name'     => 'wpc_nav_typography',
                 'label'    => esc_html__( 'Nav Title Typography', 'wp-cafe' ),
-                'selector' => '{{WRAPPER}} .wpc-nav li a',
+                'selector' => '{{WRAPPER}} .wpc-nav li a, {{WRAPPER}} .wpc-tab-nav-v2 .wpc-nav li a',
             ]
         );
 
@@ -604,7 +604,7 @@ class Wpc_Food_Menu_Tab extends Widget_Base {
                 'label'     => esc_html__( 'Nav Title Color', 'wp-cafe' ),
                 'type'      => Controls_Manager::COLOR,
                 'selectors' => [
-                    '{{WRAPPER}} .wpc-nav li a' => 'color: {{VALUE}};',
+                    '{{WRAPPER}} .wpc-nav li a, {{WRAPPER}} .wpc-tab-nav-v2 .wpc-nav li a' => 'color: {{VALUE}};',
                 ],
             ]
         );
@@ -614,7 +614,7 @@ class Wpc_Food_Menu_Tab extends Widget_Base {
             [
                 'name'     => 'nav_border',
                 'label'    => esc_html__( 'Border', 'wp-cafe' ),
-                'selector' => '{{WRAPPER}} .wpc-nav li a',
+                'selector' => '{{WRAPPER}} .wpc-nav li a, {{WRAPPER}} .wpc-tab-nav-v2 .wpc-nav li a',
             ]
         );
 
@@ -635,8 +635,8 @@ class Wpc_Food_Menu_Tab extends Widget_Base {
                 'label'     => esc_html__( 'Nav active color', 'wp-cafe' ),
                 'type'      => Controls_Manager::COLOR,
                 'selectors' => [
-                    '{{WRAPPER}} .wpc-nav li a.wpc-active' => 'color: {{VALUE}};',
-                    '{{WRAPPER}} .wpc-nav li a:after'      => 'border-color: {{VALUE}} transparent transparent transparent;',
+                    '{{WRAPPER}} .wpc-nav li a.wpc-active, {{WRAPPER}} .wpc-tab-nav-v2 .wpc-nav li a.wpc-active' => 'color: {{VALUE}};',
+                    '{{WRAPPER}} .wpc-nav li a:after, {{WRAPPER}} .wpc-tab-nav-v2 .wpc-nav li a:after'      => 'border-color: {{VALUE}} transparent transparent transparent;',
                 ],
             ]
         );
@@ -647,7 +647,7 @@ class Wpc_Food_Menu_Tab extends Widget_Base {
                 'label'     => esc_html__( 'Nav Angle Active color', 'wp-cafe' ),
                 'type'      => Controls_Manager::COLOR,
                 'selectors' => [
-                    '{{WRAPPER}} .wpc-nav li a:after' => 'border-color: {{VALUE}}  transparent transparent transparent;',
+                    '{{WRAPPER}} .wpc-nav li a:after, {{WRAPPER}} .wpc-tab-nav-v2 .wpc-nav li a:after' => 'border-color: {{VALUE}}  transparent transparent transparent;',
                 ],
             ]
         );
@@ -656,7 +656,7 @@ class Wpc_Food_Menu_Tab extends Widget_Base {
             [
                 'name'     => 'nav_border_active',
                 'label'    => esc_html__( 'Border active', 'wp-cafe' ),
-                'selector' => '{{WRAPPER}} .wpc-nav li a.wpc-active',
+                'selector' => '{{WRAPPER}} .wpc-nav li a.wpc-active, {{WRAPPER}} .wpc-tab-nav-v2 .wpc-nav li a.wpc-active',
             ]
         );
         $this->end_controls_tab();
@@ -785,7 +785,7 @@ class Wpc_Food_Menu_Tab extends Widget_Base {
                 'label'     => esc_html__( 'Description Color', 'wp-cafe' ),
                 'type'      => Controls_Manager::COLOR,
                 'selectors' => [
-                    '{{WRAPPER}} .wpc-food-inner-content p' => 'color: {{VALUE}};',
+                    '{{WRAPPER}} .wpc-food-inner-content p, {{WRAPPER}} .wpc-card .wpc-card__desc' => 'color: {{VALUE}};',
                 ],
             ]
         );
@@ -796,7 +796,7 @@ class Wpc_Food_Menu_Tab extends Widget_Base {
             [
                 'name'     => 'wpc_menu_desc',
                 'label'    => esc_html__( 'Description Typography', 'wp-cafe' ),
-                'selector' => '{{WRAPPER}} .wpc-food-inner-content p',
+                'selector' => '{{WRAPPER}} .wpc-food-inner-content p, {{WRAPPER}} .wpc-card .wpc-card__desc',
             ]
         );
 
@@ -807,7 +807,7 @@ class Wpc_Food_Menu_Tab extends Widget_Base {
                 'type'       => Controls_Manager::DIMENSIONS,
                 'size_units' => ['px', '%', 'em'],
                 'selectors'  => [
-                    '{{WRAPPER}} .wpc-food-inner-content p' => 'margin: {{TOP}}{{UNIT}} {{RIGHT}}{{UNIT}} {{BOTTOM}}{{UNIT}} {{LEFT}}{{UNIT}};',
+                    '{{WRAPPER}} .wpc-food-inner-content p, {{WRAPPER}} .wpc-card .wpc-card__desc' => 'margin: {{TOP}}{{UNIT}} {{RIGHT}}{{UNIT}} {{BOTTOM}}{{UNIT}} {{LEFT}}{{UNIT}};',
                 ],
             ]
         );
@@ -828,7 +828,7 @@ class Wpc_Food_Menu_Tab extends Widget_Base {
                 'type'       => Controls_Manager::DIMENSIONS,
                 'size_units' => ['px', '%', 'em'],
                 'selectors'  => [
-                    '{{WRAPPER}} .wpc-food-menu-item' => 'margin: {{TOP}}{{UNIT}} {{RIGHT}}{{UNIT}} {{BOTTOM}}{{UNIT}} {{LEFT}}{{UNIT}};',
+                    '{{WRAPPER}} .wpc-food-menu-item, {{WRAPPER}} .wpc-card' => 'margin: {{TOP}}{{UNIT}} {{RIGHT}}{{UNIT}} {{BOTTOM}}{{UNIT}} {{LEFT}}{{UNIT}};',
                 ],
             ]
         );
@@ -839,7 +839,7 @@ class Wpc_Food_Menu_Tab extends Widget_Base {
                 'type'       => Controls_Manager::DIMENSIONS,
                 'size_units' => ['px', '%', 'em'],
                 'selectors'  => [
-                    '{{WRAPPER}} .wpc-food-menu-item' => 'padding: {{TOP}}{{UNIT}} {{RIGHT}}{{UNIT}} {{BOTTOM}}{{UNIT}} {{LEFT}}{{UNIT}};',
+                    '{{WRAPPER}} .wpc-food-menu-item, {{WRAPPER}} .wpc-card' => 'padding: {{TOP}}{{UNIT}} {{RIGHT}}{{UNIT}} {{BOTTOM}}{{UNIT}} {{LEFT}}{{UNIT}};',
                 ],
             ]
         );

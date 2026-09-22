@@ -1,6 +1,8 @@
 <?php
 namespace WpCafe;
 
+defined( 'ABSPATH' ) || exit;
+
 /**
  * Settings class
  */
@@ -55,6 +57,29 @@ class Settings {
         'reservation_booking_amount',
     ];
 
+    /**
+     * Allowed values for the presence-widget enum fields.
+     *
+     * Kept in the class so the option can never hold a corner or a display
+     * mode the templates have no CSS or branch for.
+     */
+    private const PRESENCE_POSITIONS  = [ 'bottom-right', 'bottom-left', 'top-right', 'top-left' ];
+    private const PRESENCE_DISPLAY    = [ 'all_pages', 'specific_pages', 'dont_show' ];
+    private const PRESENCE_SOURCES    = [ 'upload', 'url' ];
+    private const PRESENCE_LINK_TYPES = [ 'page', 'url' ];
+    private const PRESENCE_TRIGGERS   = [ 'load', 'delay', 'scroll' ];
+
+    /**
+     * Ceilings on what one presence save may store.
+     *
+     * This option is autoloaded on every request, so nothing reaching the
+     * sanitizer may grow it without bound. The contact card's UI still has no
+     * row limit: its list scrolls, and 50 rows is far past any real menu.
+     */
+    private const PRESENCE_TEXT_MAX  = 200;
+    private const PRESENCE_MAX_ROWS  = 50;
+    private const PRESENCE_MAX_PAGES = 200;
+
     public static function update( $options = [] ) {
         $settings = self::get();
 
@@ -65,6 +90,14 @@ class Settings {
             if ( in_array( $name, self::POSITIVE_INT_KEYS, true ) && $value === 0 ) {
                 continue;
             }
+
+            // The presence sanitizer returns only the widgets and fields the
+            // payload named, so the previous value has to be folded back in
+            // here, where it is already loaded.
+            if ( 'presence_widgets' === $name ) {
+                $value = self::merge_presence_widgets( $settings[ $name ] ?? [], $value );
+            }
+
             $settings[$name] = $value;
         }
 
@@ -195,6 +228,7 @@ class Settings {
             'enable_local_payment'                     => 'bool',
             'enable_woocommerce_payments'              => 'bool',
             'enable_order_notification'                => 'bool',
+            'enable_reservation_notification'          => 'bool',
             'enable_order_tip'                         => 'bool',
             'mini_cart_show_per_item_tax'              => 'bool',
             'qr_show_pickup_delivery'                  => 'bool',
@@ -208,6 +242,7 @@ class Settings {
             'restaurant_type'                          => 'string_array',
             'custom_holidays'                          => 'string_array',
             'mailpoet_list_ids'                        => 'string_array',
+            'order_limit_statuses'                     => 'string_array',
 
             // Schedules
             'restaurant_schedule'                      => 'schedule',
@@ -219,6 +254,7 @@ class Settings {
             'reservation_advanced'                     => 'reservation_advanced',
             'restaurant_location'                      => 'restaurant_location',
             'mini_cart_icon'                           => 'mini_cart_icon',
+            'presence_widgets'                         => 'presence_widgets',
         ];
     }
 
@@ -274,6 +310,9 @@ class Settings {
                     'value' => sanitize_text_field( $value['value'] ?? '' ),
                 ] : $value;
 
+            case 'presence_widgets':
+                return self::sanitize_presence_widgets( $value );
+
             default: // 'passthrough' — unknown keys: sanitize defensively
                 if ( is_string( $value ) ) return sanitize_text_field( $value );
                 if ( is_array( $value ) )  return self::sanitize_value_recursive( $value );
@@ -283,13 +322,341 @@ class Settings {
     }
 
     /**
-     * Sanitize a schedule array (restaurant_schedule, pickup_schedule, delivery_schedule).
-     * Whitelists day keys and status values; sanitizes time slot strings.
+     * Sanitize the nested presence_widgets structure.
+     *
+     * Input only. The merge with what is already saved happens in update(),
+     * where the previous settings are loaded anyway, so running this twice in
+     * one request gives the same answer both times.
+     *
+     * @param  mixed $value Raw value from the REST payload.
+     * @return array        Only the widgets the payload actually named.
+     */
+    private static function sanitize_presence_widgets( $value ): array {
+        if ( ! is_array( $value ) ) {
+            return [];
+        }
+
+        $clean = [];
+
+        foreach ( [ 'video', 'contact' ] as $widget ) {
+            if ( is_array( $value[ $widget ] ?? null ) ) {
+                $clean[ $widget ] = self::presence_widget( $widget, $value[ $widget ] );
+            }
+        }
+
+        return $clean;
+    }
+
+    /**
+     * Sanitize one widget, keeping only the keys the payload named.
+     *
+     * array_intersect_key is what makes a partial write safe: send one field
+     * and the rest of the widget is left for update() to fill from what is
+     * already saved, instead of resetting to a hard-coded default.
+     *
+     * @param  string $widget 'video' or 'contact'.
+     * @param  array  $raw    That widget's raw payload.
+     * @return array
+     */
+    private static function presence_widget( string $widget, array $raw ): array {
+        $clean = 'video' === $widget
+            ? self::presence_video( $raw )
+            : self::presence_contact( $raw );
+
+        $clean = array_intersect_key( $clean, $raw );
+
+        // A page list only means anything for "specific pages". Keeping it
+        // otherwise leaves IDs behind that nothing reads.
+        if ( isset( $clean['display'] ) && 'specific_pages' !== $clean['display'] ) {
+            $clean['display_pages'] = [];
+        }
+
+        return $clean;
+    }
+
+    /**
+     * Fold a sanitized presence payload into what is already saved.
+     *
+     * Each widget has its own settings tab, so a payload naming one widget
+     * must not touch the other, and a payload naming one field must not reset
+     * the rest. Defaults only fill a key the site has never saved, so a first
+     * partial write still stores a complete config.
+     *
+     * @param  mixed $stored   Previously saved presence_widgets value.
+     * @param  array $incoming Sanitized payload.
+     * @return array
+     */
+    private static function merge_presence_widgets( $stored, array $incoming ): array {
+        $stored = is_array( $stored ) ? $stored : [];
+
+        // A payload that named no widget is not an instruction to erase both.
+        if ( ! $incoming ) {
+            return $stored;
+        }
+
+        $merged = $stored;
+
+        foreach ( $incoming as $widget => $config ) {
+            $merged[ $widget ] = array_merge(
+                self::presence_defaults( $widget ),
+                is_array( $stored[ $widget ] ?? null ) ? $stored[ $widget ] : [],
+                $config
+            );
+        }
+
+        return $merged;
+    }
+
+    /**
+     * Default config for one presence widget.
+     *
+     * Only fills a key the site has never saved. Keep in step with
+     * Presence_Settings::defaults() in wpcafe-pro.
+     *
+     * @param  string $widget 'video' or 'contact'.
+     * @return array          Empty for an unknown widget name.
+     */
+    private static function presence_defaults( string $widget ): array {
+        $defaults = [
+            'video'   => [
+                'enabled'         => false,
+                'source_type'     => 'upload',
+                'video_id'        => 0,
+                'video_url'       => '',
+                'show_controls'   => true,
+                'start_muted'     => true,
+                'allow_unmute'    => true,
+                'autoplay'        => false,
+                'start_minimized' => true,
+                'position'        => 'bottom-right',
+                'offset_x'        => 24,
+                'offset_y'        => 190,
+                'display'         => 'all_pages',
+                'display_pages'   => [],
+                'cta_label'       => '',
+                'cta_link_type'   => 'page',
+                'cta_page_id'     => 0,
+                'cta_url'         => '',
+                'trigger'         => 'load',
+                'trigger_delay'   => 3,
+                'trigger_scroll'  => 20,
+            ],
+            'contact' => [
+                'enabled'        => false,
+                'title'          => '',
+                'subtitle'       => '',
+                'items'          => [],
+                'primary'        => [ 'label' => '', 'url' => '' ],
+                'secondary'      => [ 'label' => '', 'url' => '' ],
+                'position'       => 'bottom-left',
+                'offset_x'       => 24,
+                'offset_y'       => 24,
+                'display'        => 'all_pages',
+                'display_pages'  => [],
+                'trigger'        => 'load',
+                'trigger_delay'  => 3,
+                'trigger_scroll' => 20,
+                'remember_close' => true,
+            ],
+        ];
+
+        return $defaults[ $widget ] ?? [];
+    }
+
+    /**
+     * Sanitize every key of the video widget.
+     *
+     * @param  array $raw Raw video config.
+     * @return array
+     */
+    private static function presence_video( array $raw ): array {
+        return [
+            'enabled'         => ! empty( $raw['enabled'] ),
+            'source_type'     => self::presence_enum( $raw['source_type'] ?? '', self::PRESENCE_SOURCES, 'upload' ),
+            'video_id'        => absint( $raw['video_id'] ?? 0 ),
+            'video_url'       => sanitize_url( $raw['video_url'] ?? '' ),
+            'show_controls'   => ! empty( $raw['show_controls'] ),
+            'start_muted'     => ! empty( $raw['start_muted'] ),
+            'allow_unmute'    => ! empty( $raw['allow_unmute'] ),
+            'autoplay'        => ! empty( $raw['autoplay'] ),
+            'start_minimized' => ! empty( $raw['start_minimized'] ),
+            'position'        => self::presence_enum( $raw['position'] ?? '', self::PRESENCE_POSITIONS, 'bottom-right' ),
+            'offset_x'        => self::presence_offset( $raw['offset_x'] ?? 24 ),
+            'offset_y'        => self::presence_offset( $raw['offset_y'] ?? 190 ),
+            'display'         => self::presence_enum( $raw['display'] ?? '', self::PRESENCE_DISPLAY, 'all_pages' ),
+            'display_pages'   => self::presence_page_ids( $raw['display_pages'] ?? [] ),
+            'cta_label'       => self::presence_text( $raw['cta_label'] ?? '' ),
+            'cta_link_type'   => self::presence_enum( $raw['cta_link_type'] ?? '', self::PRESENCE_LINK_TYPES, 'page' ),
+            'cta_page_id'     => absint( $raw['cta_page_id'] ?? 0 ),
+            'cta_url'         => sanitize_url( $raw['cta_url'] ?? '' ),
+            'trigger'         => self::presence_enum( $raw['trigger'] ?? '', self::PRESENCE_TRIGGERS, 'load' ),
+            'trigger_delay'   => self::presence_range( $raw['trigger_delay'] ?? 3, 1, 60 ),
+            'trigger_scroll'  => self::presence_range( $raw['trigger_scroll'] ?? 20, 5, 90 ),
+        ];
+    }
+
+    /**
+     * Sanitize every key of the contact card.
+     *
+     * @param  array $raw Raw contact config.
+     * @return array
+     */
+    private static function presence_contact( array $raw ): array {
+        return [
+            'enabled'        => ! empty( $raw['enabled'] ),
+            'title'          => self::presence_text( $raw['title'] ?? '' ),
+            'subtitle'       => self::presence_text( $raw['subtitle'] ?? '' ),
+            'items'          => self::presence_items( $raw['items'] ?? [] ),
+            'primary'        => self::presence_button( $raw['primary'] ?? [] ),
+            'secondary'      => self::presence_button( $raw['secondary'] ?? [] ),
+            'position'       => self::presence_enum( $raw['position'] ?? '', self::PRESENCE_POSITIONS, 'bottom-left' ),
+            'offset_x'       => self::presence_offset( $raw['offset_x'] ?? 24 ),
+            'offset_y'       => self::presence_offset( $raw['offset_y'] ?? 24 ),
+            'display'        => self::presence_enum( $raw['display'] ?? '', self::PRESENCE_DISPLAY, 'all_pages' ),
+            'display_pages'  => self::presence_page_ids( $raw['display_pages'] ?? [] ),
+            'trigger'        => self::presence_enum( $raw['trigger'] ?? '', self::PRESENCE_TRIGGERS, 'load' ),
+            'trigger_delay'  => self::presence_range( $raw['trigger_delay'] ?? 3, 1, 60 ),
+            'trigger_scroll' => self::presence_range( $raw['trigger_scroll'] ?? 20, 5, 90 ),
+            'remember_close' => ! empty( $raw['remember_close'] ),
+        ];
+    }
+
+    /**
+     * Return $value when it is in $allowed, otherwise $fallback.
+     *
+     * @param  mixed  $value    Raw value.
+     * @param  array  $allowed  Allowed values.
+     * @param  string $fallback Value to use when the input is not allowed.
+     * @return string
+     */
+    private static function presence_enum( $value, array $allowed, string $fallback ): string {
+        $value = is_string( $value ) ? $value : '';
+
+        return in_array( $value, $allowed, true ) ? $value : $fallback;
+    }
+
+    /**
+     * Sanitize a short free-text field and cap its length.
+     *
+     * @param  mixed $value Raw text.
+     * @param  int   $max   Characters to keep.
+     * @return string
+     */
+    private static function presence_text( $value, int $max = self::PRESENCE_TEXT_MAX ): string {
+        $text = sanitize_text_field( is_scalar( $value ) ? (string) $value : '' );
+
+        return function_exists( 'mb_substr' ) ? mb_substr( $text, 0, $max ) : substr( $text, 0, $max );
+    }
+
+    /**
+     * Clamp a raw number into an inclusive range.
+     *
+     * (int), not absint: absint( -5 ) is 5, which drops an out-of-range
+     * negative somewhere inside the range instead of at $min.
+     *
+     * @param  mixed $value Raw value.
+     * @param  int   $min   Lowest allowed value.
+     * @param  int   $max   Highest allowed value.
+     * @return int
+     */
+    private static function presence_range( $value, int $min, int $max ): int {
+        return max( $min, min( $max, (int) $value ) );
+    }
+
+    /**
+     * Clamp a pixel nudge to somewhere the owner can still see the widget.
+     *
+     * @param  mixed $value Raw offset.
+     * @return int          0-500.
+     */
+    private static function presence_offset( $value ): int {
+        return self::presence_range( $value, 0, 500 );
+    }
+
+    /**
+     * Sanitize the list of pages a widget is limited to.
+     *
+     * @param  mixed $value Raw page ID list.
+     * @return int[]        Unique positive IDs, capped.
+     */
+    private static function presence_page_ids( $value ): array {
+        if ( ! is_array( $value ) ) {
+            return [];
+        }
+
+        // intval, not absint: absint( -3 ) is 3, which would silently turn a
+        // malformed ID into a different real page.
+        $ids = array_filter(
+            array_map( 'intval', $value ),
+            static function ( $id ) {
+                return $id > 0;
+            }
+        );
+
+        return array_values( array_slice( array_unique( $ids ), 0, self::PRESENCE_MAX_PAGES ) );
+    }
+
+    /**
+     * Sanitize one of the contact card's two buttons.
+     *
+     * @param  mixed $value Raw button.
+     * @return array
+     */
+    private static function presence_button( $value ): array {
+        $value = is_array( $value ) ? $value : [];
+
+        return [
+            'label' => self::presence_text( $value['label'] ?? '' ),
+            'url'   => sanitize_url( $value['url'] ?? '' ),
+        ];
+    }
+
+    /**
+     * Sanitize the contact info rows.
+     *
+     * The card scrolls its own list, so the UI has no row limit. The stored
+     * cap is a different thing: this option is autoloaded on every request,
+     * and 50 rows is already far past any real list.
+     *
+     * @param  mixed $value Raw rows.
+     * @return array
+     */
+    private static function presence_items( $value ): array {
+        if ( ! is_array( $value ) ) {
+            return [];
+        }
+
+        $icons = array_merge( array_keys( wpc_presence_icon_slugs() ), [ 'custom' ] );
+        $rows  = [];
+
+        foreach ( array_slice( $value, 0, self::PRESENCE_MAX_ROWS ) as $row ) {
+            if ( ! is_array( $row ) ) {
+                continue;
+            }
+
+            $rows[] = [
+                'icon'    => self::presence_enum( $row['icon'] ?? '', $icons, 'email' ),
+                'icon_id' => absint( $row['icon_id'] ?? 0 ),
+                'text'    => self::presence_text( $row['text'] ?? '' ),
+                'url'     => sanitize_url( $row['url'] ?? '' ),
+            ];
+        }
+
+        return $rows;
+    }
+
+    /**
+     * Sanitize a schedule array (restaurant_schedule, pickup_schedule, delivery_schedule,
+     * reservation_schedule). Whitelists day keys and status values; sanitizes time slot
+     * strings; validates max_orders.
+     *
+     * Public so other save paths that carry a schedule-shaped value — e.g. the
+     * per-location controller — can reuse the same rules instead of re-implementing them.
      *
      * @param  mixed $schedule Raw schedule value.
-     * @return array           Sanitized schedule.
+     * @return array           Sanitized schedule with status, slots, and max_orders per day.
      */
-    private static function sanitize_schedule( $schedule ): array {
+    public static function sanitize_schedule( $schedule ): array {
         if ( ! is_array( $schedule ) ) {
             return [];
         }
@@ -320,7 +687,22 @@ class Settings {
                 }
             }
 
-            $sanitized[ $day ] = [ 'status' => $status, 'slots' => $slots ];
+            // Empty string / missing / negative all mean "unlimited" (null) —
+            // only an explicit non-negative number sets a real cap, so a bad
+            // input can never silently turn into "accept 0 orders today".
+            // round() rather than an (int) cast: the FE already blocks
+            // fractional input, but a direct API call could still send one
+            // (e.g. 1.5) — round it to the nearest whole order instead of
+            // truncating it down to a smaller cap than what was sent.
+            $max_orders = null;
+            if ( isset( $config['max_orders'] ) && is_numeric( $config['max_orders'] ) ) {
+                $candidate = (int) round( (float) $config['max_orders'] );
+                if ( $candidate >= 0 ) {
+                    $max_orders = $candidate;
+                }
+            }
+
+            $sanitized[ $day ] = [ 'status' => $status, 'slots' => $slots, 'max_orders' => $max_orders ];
         }
 
         return $sanitized;

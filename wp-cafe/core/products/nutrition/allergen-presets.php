@@ -11,6 +11,8 @@
 
 if ( ! defined( 'ABSPATH' ) ) exit;
 
+// phpcs:disable WordPress.NamingConventions.PrefixAllGlobals -- public API since 3.0.11, used by the WCFM addon; renaming breaks it.
+
 if ( ! function_exists( 'wpc_allergen_presets' ) ) {
     /**
      * Return the canonical EU-14 allergen list plus a few common extras.

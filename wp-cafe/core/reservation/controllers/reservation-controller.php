@@ -150,7 +150,7 @@ class Reservation_Controller extends Base_Rest_Controller {
      * @return bool
      */
     private function has_legacy_reservation_access(): bool {
-        return current_user_can( 'manage_options' ) || current_user_can( 'manage_woocommerce' );
+        return current_user_can( 'manage_options' );
     }
 
     /**
@@ -159,9 +159,7 @@ class Reservation_Controller extends Base_Rest_Controller {
      * @return bool
      */
     private function can_view_all_reservations(): bool {
-        return $this->has_legacy_reservation_access()
-            || current_user_can( 'wpcafe_view_all_reservations' )
-            || current_user_can( 'wpcafe_manage_reservations' );
+        return wpc_current_user_can_view_reservations();
     }
 
     /**
@@ -1094,6 +1092,10 @@ class Reservation_Controller extends Base_Rest_Controller {
      * @return float Line total of the reservation food items.
      */
     private function get_reservation_food_cart_subtotal(): float {
+        if ( ! function_exists( 'WC' ) || ! class_exists( 'WooCommerce' ) ) {
+            return 0.0;
+        }
+
         // Make sure addon prices are baked into each line before reading it.
         if ( WC()->cart ) {
             WC()->cart->calculate_totals();

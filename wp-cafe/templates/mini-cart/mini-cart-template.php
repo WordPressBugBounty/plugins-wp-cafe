@@ -194,7 +194,13 @@ $cart_link        = wpc_get_option('mini_cart_empty_button_link', get_permalink(
                                         <?php echo esc_html__( 'Apply', 'wp-cafe' ); ?>
                                     </button>
                                     <?php do_action( 'woocommerce_cart_coupon' ); ?>
-                                    <?php do_action( 'woocommerce_cart_actions' ); ?>
+                                    <?php
+                                    /*
+                                     * `woocommerce_cart_actions` is not fired here on purpose. It is a cart-page
+                                     * hook, so themes hang their checkout button on it (Pizzaro does) and it
+                                     * landed inside this coupon form. Our own button prints further down.
+                                     */
+                                    ?>
                                 </form>
                             </div>
                         <?php endif; ?>

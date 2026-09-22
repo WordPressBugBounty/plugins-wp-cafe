@@ -143,6 +143,15 @@ $wpc_color_style = wpc_color_tokens();
                             data-product_data="<?php echo esc_attr( wp_json_encode( $tab_product_data ) ); ?>">
                             <div class="wpc-paginated-products-body">
                                 <?php
+                                // The shortcode already filters this, but the guard belongs at the sink too:
+                                // caller-side allowlists are exactly what the Elementor widgets slipped past.
+                                // style-3/4/5 belong to wpcafe-pro; the free styles continue at 6.
+                                $free_styles    = ['style-1', 'style-2', 'style-6', 'style-7', 'style-8'];
+                                $allowed_styles = ( function_exists( 'wpcafe_pro' ) || defined( 'WPCAFE_PRO_FILE' ) )
+                                    ? array_merge( $free_styles, ['style-3', 'style-4', 'style-5'] )
+                                    : $free_styles;
+                                $style    = in_array( $style, $allowed_styles, true ) ? $style : 'style-1';
+
                                 $template = trailingslashit( wpcafe()->plugin_directory ) . "/widgets/wpc-food-menu-tab/style/{$style}.php";
                                 if ( ! file_exists( $template ) && ( function_exists( 'wpcafe_pro' ) || defined( 'WPCAFE_PRO_FILE' ) ) ) {
                                     if ( function_exists( 'wpcafe_pro' ) ) {

@@ -727,6 +727,11 @@ if ( ! function_exists('wpcafe_get_extension_list') ) {
 
         $pickup_module_status       = isset( $existing_tools_settings['enable_pickup_module'] ) ? $existing_tools_settings['enable_pickup_module'] : 'on';
 
+        // Opt-in feature, so it stays off until an admin turns it on - but the
+        // card is declared here (not injected by Pro) so it is listed, and
+        // locked, on sites without Pro like every other premium module.
+        $reservation_waitlist_status = isset( $existing_tools_settings['reservation_waitlist'] ) ? $existing_tools_settings['reservation_waitlist'] : 'off';
+
         $extension_list = require wpcafe()->plugin_directory . '/utils/extension-list.php';
 
         return $extension_list;
@@ -1104,6 +1109,77 @@ if ( ! function_exists( 'wpc_current_user_can_view_orders' ) ) {
             || current_user_can( 'edit_shop_orders' )
             || current_user_can( 'wpcafe_view_all_orders' )
             || current_user_can( 'wpcafe_manage_orders' );
+    }
+}
+
+if ( ! function_exists( 'wpc_current_user_can_view_reservations' ) ) {
+    /**
+     * Whether the current user may view all reservations (read tier).
+     * Only admins and the WPCafe roles; a Shop Manager needs a WPCafe role.
+     *
+     * @return bool
+     */
+    function wpc_current_user_can_view_reservations() {
+        return current_user_can( 'manage_options' )
+            || current_user_can( 'wpcafe_view_all_reservations' )
+            || current_user_can( 'wpcafe_manage_reservations' );
+    }
+}
+
+if ( ! function_exists( 'wpc_is_option_on' ) ) {
+    /**
+     * Read an on/off setting. Unlike wpc_get_option(), a saved false stays off.
+     *
+     * @param string $key     Setting key.
+     * @param bool   $default Value when the setting was never saved.
+     * @return bool
+     */
+    function wpc_is_option_on( $key, $default = true ) {
+        $settings = (array) Settings::get();
+
+        if ( ! isset( $settings[ $key ] ) || '' === $settings[ $key ] ) {
+            return (bool) $default;
+        }
+
+        $value = filter_var( $settings[ $key ], FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE );
+
+        return null === $value ? (bool) $default : $value;
+    }
+}
+
+if ( ! function_exists( 'wpc_get_order_online_reservation' ) ) {
+    /**
+     * The pay-online booking a WooCommerce order was placed for, if any.
+     *
+     * Only trusts the `reservation_id` meta for a booking that really went to
+     * checkout: an old booking left in the session can stick its id on a later
+     * food order.
+     *
+     * @param mixed $order Order object.
+     * @return \WpCafe\Models\Reservation_Model|null
+     */
+    function wpc_get_order_online_reservation( $order ) {
+        if ( ! $order instanceof \WC_Order ) {
+            return null;
+        }
+
+        $reservation_id = absint( $order->get_meta( 'reservation_id' ) );
+
+        if ( ! $reservation_id || 'wpc_reservation' !== get_post_type( $reservation_id ) ) {
+            return null;
+        }
+
+        $reservation = \WpCafe\Models\Reservation_Model::find( $reservation_id );
+
+        if ( ! $reservation
+            || 'wc' !== $reservation->payment_method
+            || in_array( 'cancelled', [ $reservation->status, get_post_status( $reservation_id ) ], true )
+            || ! in_array( absint( $reservation->woo_order_id ), [ 0, $order->get_id() ], true )
+        ) {
+            return null;
+        }
+
+        return $reservation;
     }
 }
 
@@ -1884,5 +1960,48 @@ if ( ! function_exists( 'wpc_get_terms_map' ) ) {
         }
 
         return $map;
+    }
+}
+
+if ( ! function_exists( 'wpc_presence_icon_slugs' ) ) {
+    /**
+     * Icon slugs the presence contact card accepts.
+     *
+     * The SVG data lives in wpcafe-pro, but the free plugin sanitizes the
+     * setting, so the slug list has to exist here too. Pro filters this when it
+     * adds icons, which keeps the two in step without the free plugin carrying
+     * path data it never draws.
+     *
+     * @return array<string,bool> Slug keys; values are unused padding.
+     */
+    function wpc_presence_icon_slugs(): array {
+        $slugs = [
+            'email'      => true,
+            'phone'      => true,
+            'sms'        => true,
+            'whatsapp'   => true,
+            'messenger'  => true,
+            'telegram'   => true,
+            'viber'      => true,
+            'wechat'     => true,
+            'line'       => true,
+            'chat'       => true,
+            'location'   => true,
+            'directions' => true,
+            'clock'      => true,
+            'globe'      => true,
+            'calendar'   => true,
+            'facebook'   => true,
+            'instagram'  => true,
+            'tiktok'     => true,
+            'youtube'    => true,
+            'x'          => true,
+        ];
+
+        $filtered = apply_filters( 'wpcafe_presence_icon_slugs', $slugs );
+
+        // Coerced, not trusted: this runs inside the settings sanitizer, and a
+        // third party returning a string here would fatal on save.
+        return is_array( $filtered ) ? $filtered : $slugs;
     }
 }

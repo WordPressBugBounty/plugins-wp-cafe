@@ -3,7 +3,7 @@ Contributors: arraytics, ehsanriyadh
 Tags: restaurant, reservation, booking, food menu, food delivery, table reservation, WooCommerce, food pickup, takeout, online reservations, restaurant management system, online food ordering
 Requires at least: 6.2
 Tested up to: 7.0
-Stable tag: 3.0.19
+Stable tag: 3.0.20
 Requires PHP: 7.4
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
@@ -419,6 +419,15 @@ Please report security bugs found in the source code of the WPCafe plugin throug
 Note: WooCommerce is required for online food ordering functionality. It is free and will be prompted during setup if not already installed.
 
 == Changelog ==
+
+= 3.0.20 ( September 22, 2026 ) =
+Improvement: Security – Security hardening for the food menu templates.
+Improvement: Admin – live order and reservation alerts with sound now show on every admin page.
+Improvement: Addons – installing an addon now installs and activates its required plugin automatically.
+Fix: Reservation – site no longer crashes on the reservation form when WooCommerce is inactive.
+Fix: Reservation – changing a status in the reservation list no longer opens the edit page.
+Fix: Elementor – style controls now apply to the new food menu card styles.
+Fix: Themes – reservation form and mini cart keep their layout on more themes.
 
 = 3.0.19 ( August 31, 2026 ) =
 New: Multivendor – added WCFM Marketplace addon module.

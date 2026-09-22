@@ -378,6 +378,14 @@ class Wpc_Utilities {
 				'viewBox' => array(),
 				'fill'    => array(),
 				'stroke' => array(),
+				// Both are emitted on the root by Presence_Icons::render() and
+				// were being dropped here: without stroke-width every outline
+				// icon fell back to the browser default of 1 instead of 2, and
+				// losing aria-hidden read decorative icons out to a screen
+				// reader. stroke-width is inherited, so the shapes below do not
+				// need to repeat it.
+				'stroke-width' => array(),
+				'aria-hidden'  => array(),
 				'xmlns'   => array(),
 			),
 			'path' => array(
@@ -406,6 +414,26 @@ class Wpc_Utilities {
 				'cx'     => array(),
 				'cy'     => array(),
 				'r'      => array(),
+				'fill'   => array(),
+				'stroke' => array(),
+				'stroke-width' => array(),
+			),
+			// Lucide-derived icons (presence widgets) draw with rect and
+			// polygon as well as path/circle/line; without these two, kses
+			// silently drops half of mail, calendar, instagram and directions.
+			'rect' => array(
+				'x'      => array(),
+				'y'      => array(),
+				'width'  => array(),
+				'height' => array(),
+				'rx'     => array(),
+				'ry'     => array(),
+				'fill'   => array(),
+				'stroke' => array(),
+				'stroke-width' => array(),
+			),
+			'polygon' => array(
+				'points' => array(),
 				'fill'   => array(),
 				'stroke' => array(),
 				'stroke-width' => array(),

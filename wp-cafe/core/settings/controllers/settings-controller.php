@@ -252,6 +252,14 @@ class Settings_Controller extends Base_Rest_Controller {
          */
         unset( $params['default_receipt_layout_id'] );
 
+        /*
+         * Live plugin-activation flags. Default_Settings computes them fresh on
+         * every read, so a stored copy is only a stale lie waiting to be read.
+         */
+        foreach ( [ 'wc_status', 'optiontics_status', 'aisentic_status' ] as $computed ) {
+            unset( $params[ $computed ] );
+        }
+
         Settings::update( $params );
 
         return $this->get_item( $request );
