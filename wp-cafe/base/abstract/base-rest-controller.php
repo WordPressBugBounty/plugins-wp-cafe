@@ -93,4 +93,45 @@ abstract class Base_Rest_Controller extends WP_REST_Controller implements Hookab
 
         return (bool) wp_verify_nonce( $nonce, 'wp_rest' );
     }
+
+    /**
+     * Shared capability gate for read routes.
+     *
+     * The caller passes if it holds any one of $caps. A filter can then adjust
+     * the decision, and its raw value is honored: a WP_Error is returned as-is
+     * and only a strict `true` grants. We must not cast the filter result to
+     * bool first, because WordPress reads any truthy value as "granted", so a
+     * WP_Error (or any object) meant to deny would flip to allow.
+     *
+     * @param string[]         $caps    Capabilities; any one grants.
+     * @param string           $filter  Filter applied to the boolean decision.
+     * @param \WP_REST_Request $request Current request.
+     * @param string           $message Message for the forbidden error.
+     * @return true|WP_Error
+     */
+    protected function check_read_permission( array $caps, string $filter, $request, string $message ) {
+        $can = false;
+        foreach ( $caps as $cap ) {
+            if ( current_user_can( $cap ) ) {
+                $can = true;
+                break;
+            }
+        }
+
+        $result = apply_filters( $filter, $can, $request ); // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.DynamicHooknameFound -- Controllers supply fixed wpcafe-prefixed permission hooks.
+
+        if ( is_wp_error( $result ) ) {
+            return $result;
+        }
+
+        if ( true !== $result ) {
+            return new WP_Error( 'wpcafe_forbidden', $message, [ 'status' => rest_authorization_required_code() ] );
+        }
+
+        if ( ! $this->verify_rest_nonce( $request ) ) {
+            return new WP_Error( 'wpcafe_invalid_nonce', __( 'Invalid nonce.', 'wp-cafe' ), [ 'status' => 403 ] );
+        }
+
+        return true;
+    }
 }

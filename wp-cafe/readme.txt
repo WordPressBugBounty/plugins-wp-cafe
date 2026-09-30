@@ -3,7 +3,7 @@ Contributors: arraytics, ehsanriyadh
 Tags: restaurant, reservation, booking, food menu, food delivery, table reservation, WooCommerce, food pickup, takeout, online reservations, restaurant management system, online food ordering
 Requires at least: 6.2
 Tested up to: 7.0
-Stable tag: 3.0.20
+Stable tag: 3.0.21
 Requires PHP: 7.4
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
@@ -419,6 +419,11 @@ Please report security bugs found in the source code of the WPCafe plugin throug
 Note: WooCommerce is required for online food ordering functionality. It is free and will be prompted during setup if not already installed.
 
 == Changelog ==
+
+= 3.0.21 (September 30, 2026) =
+Tweak: Improved Oxygen Builder compatibility.
+Fix: Improved settings saving reliability.
+Security: Improved protection for product information.
 
 = 3.0.20 ( September 22, 2026 ) =
 Improvement: Security – Security hardening for the food menu templates.

@@ -67,8 +67,16 @@ class Product_Controller extends Base_Rest_Controller {
      * @return WP_HTTP_Response|WP_Error
      */
     public function get_items($request) {
+        // -1 means "all" (the admin picker needs the full list). Any positive
+        // value is clamped so a crafted request can't force an oversized page
+        // even if the schema's maximum is filtered out downstream.
+        $per_page = (int) ( $request->get_param('per_page') ?: -1 );
+        if ($per_page > 100) {
+            $per_page = 100;
+        }
+
         $args = [
-            'limit'   => $request->get_param('per_page') ?: -1,
+            'limit'   => $per_page,
             'page'    => $request->get_param('page') ?: 1,
             'orderby' => $request->get_param('orderby') ?: 'date',
             'order'   => $request->get_param('order') ?: 'DESC',
@@ -143,6 +151,35 @@ class Product_Controller extends Base_Rest_Controller {
     }
 
     /**
+     * Product meta with protected keys removed.
+     *
+     * WooCommerce and other plugins store secrets (cost, supplier, license keys)
+     * in protected `_`-prefixed meta. Those must not ride along in the REST
+     * payload even for staff, so only public custom meta is returned.
+     *
+     * @param WC_Product $product
+     * @return array<int, array<string, mixed>>
+     */
+    private function get_public_meta_data($product) {
+        $public = [];
+
+        foreach ($product->get_meta_data() as $meta) {
+            $meta_array = $meta->get_data();
+
+            if (is_protected_meta($meta_array['key'], 'post')) {
+                continue;
+            }
+
+            $public[] = [
+                'key'   => $meta_array['key'],
+                'value' => $meta_array['value'],
+            ];
+        }
+
+        return $public;
+    }
+
+    /**
      * Prepare product data for response
      *
      * @param WC_Product $product
@@ -209,7 +246,7 @@ class Product_Controller extends Base_Rest_Controller {
             'variations'          => [],
             'grouped_products'    => [],
             'menu_order'          => $product->get_menu_order(),
-            'meta_data'           => $product->get_meta_data(),
+            'meta_data'           => $this->get_public_meta_data($product),
         ];
 
         // Add variations for variable products
@@ -481,22 +518,34 @@ class Product_Controller extends Base_Rest_Controller {
     }
 
     /**
-     * Check if a given request has permission to read products
+     * Check if a given request has permission to read products.
+     *
+     * Staff-only: these routes expose sales counts, stock and product meta.
      *
      * @param WP_REST_Request $request
-     * @return bool|WP_Error
+     * @return true|WP_Error
      */
     public function get_items_permissions_check($request) {
-        return apply_filters('wpcafe_product_read_permission', true, $request);
+        return $this->check_read_permission(
+            [ 'manage_woocommerce', 'edit_products' ],
+            'wpcafe_product_read_permission',
+            $request,
+            __( 'You do not have permission to access products.', 'wp-cafe' )
+        );
     }
 
     /**
-     * Check if a given request has permission to read a product
+     * Check if a given request has permission to read a product.
      *
      * @param WP_REST_Request $request
-     * @return bool|WP_Error
+     * @return true|WP_Error
      */
     public function get_item_permissions_check($request) {
-        return apply_filters('wpcafe_product_item_permission', true, $request);
+        return $this->check_read_permission(
+            [ 'manage_woocommerce', 'edit_products' ],
+            'wpcafe_product_item_permission',
+            $request,
+            __( 'You do not have permission to access this product.', 'wp-cafe' )
+        );
     }
 } 

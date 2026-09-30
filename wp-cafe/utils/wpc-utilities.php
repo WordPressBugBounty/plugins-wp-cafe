@@ -536,7 +536,10 @@ class Wpc_Utilities {
 	}
 
 	/**
-	 * Render html.
+	 * Echo trusted markup as-is. NOT an escaper, despite the name.
+	 *
+	 * Returns $content unchanged. Pass only markup this plugin built, such
+	 * as the mini-cart thumbnail <img>. For text use esc_html().
 	 */
 	public static function wpc_render( $content ) {
 		if ( $content == "" ) {

@@ -278,22 +278,32 @@ class Product_Category_Controller extends Base_Rest_Controller {
     }
 
     /**
-     * Check if a given request has permission to read product categories
+     * Check if a given request has permission to read product categories.
      *
      * @param WP_REST_Request $request
-     * @return bool|WP_Error
+     * @return true|WP_Error
      */
     public function get_items_permissions_check($request) {
-        return apply_filters('wpcafe_product_category_read_permission', true, $request);
+        return $this->check_read_permission(
+            [ 'manage_woocommerce', 'edit_products', 'manage_categories' ],
+            'wpcafe_product_category_read_permission',
+            $request,
+            __( 'You do not have permission to access product categories.', 'wp-cafe' )
+        );
     }
 
     /**
-     * Check if a given request has permission to read a product category
+     * Check if a given request has permission to read a product category.
      *
      * @param WP_REST_Request $request
-     * @return bool|WP_Error
+     * @return true|WP_Error
      */
     public function get_item_permissions_check($request) {
-        return apply_filters('wpcafe_product_category_item_permission', true, $request);
+        return $this->check_read_permission(
+            [ 'manage_woocommerce', 'edit_products', 'manage_categories' ],
+            'wpcafe_product_category_item_permission',
+            $request,
+            __( 'You do not have permission to access this product category.', 'wp-cafe' )
+        );
     }
 } 

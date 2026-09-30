@@ -491,7 +491,9 @@ if ( ! function_exists( 'wpcafe_post_has_frontend_markup' ) ) {
 
         // These builders keep markup (incl. [wpc_...] shortcode text) in their
         // own postmeta instead of post_content, so it needs a separate scan.
-        foreach ( [ '_elementor_data', '_bricks_page_content_2', 'ct_builder_shortcodes', 'breakdance_data' ] as $meta_key ) {
+        // Oxygen 4 saves to the underscored _ct_builder_json/_ct_builder_shortcodes;
+        // ct_builder_shortcodes is the older Oxygen key.
+        foreach ( [ '_elementor_data', '_bricks_page_content_2', '_ct_builder_json', '_ct_builder_shortcodes', 'ct_builder_shortcodes', 'breakdance_data' ] as $meta_key ) {
             $data = get_post_meta( $post_id, $meta_key, true );
             if ( ! is_string( $data ) || '' === $data ) {
                 continue;

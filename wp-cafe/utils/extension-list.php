@@ -430,8 +430,7 @@ return [
         'notice' => '',
         'demo_link' => '',
         'settings_link' => '',
-        'doc_link' => '',
-        'download_url' => 'https://github.com/themewinter/wpcafe-wcfm-public/releases/download/v1.0.0/wpcafe-addon-for-wcfm.zip',
+        'doc_link' => 'https://themewinter.com/docs/plugins/wp-cafe/wpcafe-multivendor-addon-for-wcfm-marketplace-run-a-multi-restaurant-food-marketplace/',
         'icon' => '<svg width="128" height="128" viewBox="0 0 128 128" fill="none" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
   <rect width="128" height="127.957" rx="13.646" fill="url(#a)"/>
   <path d="M76.445 78.197C38 100.006 16.475 62.794 0 73.576v45.14c1.067 7.82 7.111 9.597 12.089 9.242h94.578c-.474-4.147 1.639-67.837-30.222-49.761" fill="url(#b)"/>
