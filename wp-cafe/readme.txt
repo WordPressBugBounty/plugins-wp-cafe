@@ -3,8 +3,8 @@ Contributors: arraytics, ehsanriyadh
 Tags: restaurant, reservation, booking, food menu, food delivery, table reservation, WooCommerce, food pickup, takeout, online reservations, restaurant management system, online food ordering
 Requires at least: 6.2
 Tested up to: 7.0
-Stable tag: 3.0.21
-Requires PHP: 7.4
+Stable tag: 3.0.22
+Requires PHP: 8.0
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -419,6 +419,21 @@ Please report security bugs found in the source code of the WPCafe plugin throug
 Note: WooCommerce is required for online food ordering functionality. It is free and will be prompted during setup if not already installed.
 
 == Changelog ==
+
+= 3.0.22 (October 12, 2026) =
+New: Customer Accounts – optional account creation and automatic sign-in for booking customers.
+New: Pointics – earn loyalty points on table reservations.
+New: Pointics – spend points on reservations paid at the restaurant.
+New: Pointics – reward customers for referring friends who book a table.
+New: Food Menu – optional Pointics rewards badges beneath product prices.
+Improvement: Performance – faster page loads and settings checks.
+Tweak: Compatibility – minimum PHP requirement corrected to 8.0.
+Fix: QR Ordering – table information is saved on orders placed through block checkout.
+Fix: Reservations – pay-at-restaurant bookings no longer add fees to later food orders.
+Fix: Reservations – all selected food items appear in booking details, totals and checkout.
+Fix: Reservations – status emails are sent only when the booking status changes.
+Fix: Settings – reservation schedules save correctly when daily order limits are blank.
+Fix: Settings – booking fees accept zero and retain decimal amounts.
 
 = 3.0.21 (September 30, 2026) =
 Tweak: Improved Oxygen Builder compatibility.

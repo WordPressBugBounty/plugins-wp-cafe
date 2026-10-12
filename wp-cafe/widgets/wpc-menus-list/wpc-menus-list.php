@@ -150,6 +150,20 @@ class Wpc_Menus_List extends Widget_Base {
                 'default'      => 'no',
             ]
         );
+        if ( wpc_pointics_is_active() ) {
+            $this->add_control(
+                'show_points',
+                [
+                    'label'        => esc_html__( 'Show Points', 'wp-cafe' ),
+                    'description'  => esc_html__( 'Show how many points each item earns.', 'wp-cafe' ),
+                    'type'         => \Elementor\Controls_Manager::SWITCHER,
+                    'label_on'     => esc_html__( 'Show', 'wp-cafe' ),
+                    'label_off'    => esc_html__( 'Hide', 'wp-cafe' ),
+                    'return_value' => 'yes',
+                    'default'      => 'yes',
+                ]
+            );
+        }
         $this->add_control(
             'wpc_show_desc',
             [
@@ -941,6 +955,7 @@ class Wpc_Menus_List extends Widget_Base {
         if (!class_exists('Woocommerce')) { return; }
         $settings            = $this->get_settings();
         $unique_id = $this->get_id();
+        $settings['show_points'] = wpc_switcher_show_points( $settings );
 
         // render template
         include wpcafe()->core_dir ."shortcodes/views/food-menu/food-list.php";

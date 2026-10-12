@@ -209,6 +209,26 @@ return [
 </svg>
 ',
     ],
+    'order_limit' => [
+        'name' => 'order_limit',
+        'slug' => 'order_limit',
+        'type' => 'module',
+        'parent' => 'food_ordering',
+        'status' => 'on',
+        'is_pro' => true,
+        'title' => __('Max Orders Per Day', 'wp-cafe'),
+        'description' => __('Cap how many food orders a location accepts each day of the week, based on its Open Hours schedule.', 'wp-cafe'),
+        'notice' => '',
+        'demo_link' => '',
+        'settings_link' => 'admin.php?page=wpcafe#/settings?tab=schedule',
+        'doc_link' => 'https://themewinter.com/docs/plugins/wp-cafe/max-orders-per-day-in-wp-cafe/',
+        'icon' => '<svg width="26" height="26" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+<path d="M6 2L3 6V20C3 21.1046 3.89543 22 5 22H19C20.1046 22 21 21.1046 21 20V6L18 2H6Z" stroke="#525266" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M3 6H21" stroke="#525266" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M16 10C16 12.2091 14.2091 14 12 14C9.79086 14 8 12.2091 8 10" stroke="#525266" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>
+',
+    ],
     'dine_in' => [
         'name' => 'dine_in',
         'slug' => 'dine_in',
@@ -519,6 +539,22 @@ return [
         <path d="M20 4.21c.68 0 1.331.271 1.812.753a2.57 2.57 0 0 1 .241 3.348 2.55 2.55 0 0 1-1.321.921v3.791h7.323a4.4 4.4 0 0 1 3.107 1.291 4.4 4.4 0 0 1 1.287 3.115v.817h.617a2.195 2.195 0 0 1 2.197 2.203v5.14c0 .585-.231 1.145-.643 1.558a2.2 2.2 0 0 1-1.554.646h-.617v3.59a4.4 4.4 0 0 1-1.287 3.116 4.4 4.4 0 0 1-3.107 1.29h-16.11a4.4 4.4 0 0 1-3.107-1.29 4.4 4.4 0 0 1-1.287-3.116v-3.59h-.617a2.2 2.2 0 0 1-1.554-.646 2.2 2.2 0 0 1-.643-1.558v-5.14c0-.585.231-1.145.643-1.558a2.2 2.2 0 0 1 1.554-.645h.617v-.817c0-1.168.464-2.289 1.287-3.115a4.4 4.4 0 0 1 3.107-1.291h7.323V9.232a2.56 2.56 0 0 1-1.831-2.451c0-.682.27-1.336.751-1.818A2.56 2.56 0 0 1 20 4.211m-4.06 23.993a.73.73 0 0 0-.965.328.74.74 0 0 0 .297.978A10.35 10.35 0 0 0 20 30.65c1.646 0 3.282-.394 4.728-1.14a.735.735 0 0 0-.669-1.306 8.96 8.96 0 0 1-8.118 0m-.7-9.305a2.56 2.56 0 0 0-1.812.753 2.575 2.575 0 0 0 0 3.636 2.56 2.56 0 0 0 3.624 0 2.577 2.577 0 0 0 0-3.636 2.56 2.56 0 0 0-1.811-.753m9.52 0a2.56 2.56 0 0 0-2.368 1.587 2.58 2.58 0 0 0 .556 2.802 2.56 2.56 0 0 0 1.811.753 2.56 2.56 0 0 0 1.813-.753 2.577 2.577 0 0 0 0-3.636 2.56 2.56 0 0 0-1.813-.753" fill="#fff"/>
         </svg>
         ',
+    ],
+    'pointics' => [
+        'name' => 'pointics',
+        'slug' => 'pointics',
+        'type' => 'plugin',
+        'status' => 'install',
+        'is_pro' => false,
+        'title' => __('Pointics', 'wp-cafe'),
+        'description' => __('Reward customers with points on food orders and table bookings. They spend points on discounts.', 'wp-cafe'),
+        'notice' => '',
+        'demo_link' => '',
+        // Configure opens this in a new tab (AddonCard.tsx window.open).
+        'settings_link' => 'admin.php?page=pointics#/points-program',
+        'doc_link' => 'https://themewinter.com/docs/plugins/plugin-docs/integrations-2/loyalty-points-for-table-reservations-using-pointics-in-wpcafe/',
+        // No download_url: Pointics installs from wordpress.org like Aisentic.
+        'icon' => '<svg width="40" height="40" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 37.873 36.25"><path fill="#675BFC" d="M37.873 17.854c0 6.574-5.329 11.903-11.903 11.903s-11.903-5.329-11.903-11.903c0-6.573 5.33-11.903 11.903-11.903s11.903 5.33 11.903 11.903"/><path fill="#3277FF" d="M28.649 14.254c2.921 1.72 2.921 6.022 0 7.742L5.256 35.766C2.92 37.142 0 35.421 0 32.67V3.58C0 .83 2.92-.892 5.257.484z"/><path fill="#99D2FF" d="M28.648 14.254c2.922 1.72 2.922 6.022 0 7.742l-9.513 5.6a11.89 11.89 0 0 1-5.068-9.742 11.88 11.88 0 0 1 4.657-9.441z"/><path fill="#FDFDFF" d="M30.84 18.125a4.599 4.599 0 1 1-9.198 0 4.599 4.599 0 0 1 9.198 0"/></svg>',
     ],
     'webhooks' => [
         'name'          => 'webhooks',

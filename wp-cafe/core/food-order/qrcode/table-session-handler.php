@@ -20,6 +20,8 @@ class Table_Session_Handler implements Hookable_Service_Contract {
     public function register() {
         add_action( 'wp_loaded', [ $this, 'capture_table_id_from_url' ] );
         add_action( 'woocommerce_checkout_create_order', [ $this, 'save_table_id_to_order' ], 10, 2 );
+        // Block checkout goes through the Store API and never fires the classic hook above.
+        add_action( 'woocommerce_store_api_checkout_update_order_meta', [ $this, 'save_table_id_to_store_api_order' ] );
 
         // Display table ID column in admin orders list
         add_filter( 'manage_woocommerce_page_wc-orders_columns', [ $this, 'add_table_id_column' ] );
@@ -100,6 +102,25 @@ class Table_Session_Handler implements Hookable_Service_Contract {
         if ( ! empty( $table_id ) ) {
             $order->update_meta_data( 'wpc_table_id', $table_id );
         }
+    }
+
+    /**
+     * Save the table QR id on a block checkout order.
+     *
+     * The Store API hook runs after its own order save, so this one saves too.
+     *
+     * @param \WC_Order $order Order being placed.
+     * @return void
+     */
+    public function save_table_id_to_store_api_order( $order ) {
+        $table_id = wpc_get_table_id_from_session();
+
+        if ( empty( $table_id ) || ! is_object( $order ) ) {
+            return;
+        }
+
+        $order->update_meta_data( 'wpc_table_id', sanitize_text_field( (string) $table_id ) );
+        $order->save();
     }
 
     /**

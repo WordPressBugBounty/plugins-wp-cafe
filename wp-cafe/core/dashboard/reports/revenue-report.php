@@ -157,7 +157,8 @@ class Revenue_Report {
 
         foreach ( $posts as $post_id ) {
             $reservation = new Reservation_Model( $post_id );
-            $total += floatval( $reservation->get_total_price() );
+            // Points spent on a booking are not revenue; a deposit is.
+            $total += $reservation->get_total_after_points();
         }
 
         return $total;

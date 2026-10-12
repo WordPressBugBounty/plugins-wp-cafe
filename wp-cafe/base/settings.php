@@ -54,7 +54,6 @@ class Settings {
         'reservation_minimum_guest',
         'reservation_total_seat_capacity',
         'slot_interval',
-        'reservation_booking_amount',
     ];
 
     /**
@@ -181,6 +180,7 @@ class Settings {
             'pickup_message'                          => 'string',
             'override_pickup_schedule'                => 'string',
             'override_delivery_schedule'              => 'string',
+            'override_reservation_schedule'           => 'string',
             'calendar_language'                       => 'string',
             'reservation_form_button_text'            => 'string',
             'reservation_confirmation_button_text'    => 'string',
@@ -206,8 +206,12 @@ class Settings {
             'reservation_total_seat_capacity'         => 'int',
             'reservation_minimum_guest'               => 'int',
             'default_receipt_layout_id'               => 'int',
-            'reservation_booking_amount'              => 'int',
             'slot_interval'                           => 'int',
+
+            // Money
+            'reservation_booking_amount'              => 'float',
+            'pickup_minimum_order_amount'             => 'float',
+            'delivery_minimum_order_amount'           => 'float',
 
             // Booleans
             'automation_flow_added'                    => 'bool',
@@ -227,6 +231,8 @@ class Settings {
             'reservation_partial_payment'              => 'bool',
             'enable_local_payment'                     => 'bool',
             'enable_woocommerce_payments'              => 'bool',
+            'reservation_create_customer_account'      => 'bool',
+            'reservation_customer_auto_login'          => 'bool',
             'enable_order_notification'                => 'bool',
             'enable_reservation_notification'          => 'bool',
             'enable_order_tip'                         => 'bool',
@@ -248,6 +254,7 @@ class Settings {
             'restaurant_schedule'                      => 'schedule',
             'pickup_schedule'                          => 'schedule',
             'delivery_schedule'                        => 'schedule',
+            'reservation_schedule'                     => 'schedule',
 
             // Complex structures
             'reservation_form_customization'           => 'recursive',
@@ -275,6 +282,10 @@ class Settings {
 
             case 'int':
                 return absint( $value );
+
+            // Amounts keep their decimals, and a negative one is never valid.
+            case 'float':
+                return max( 0.0, (float) $value );
 
             case 'bool':
                 return (bool) $value;

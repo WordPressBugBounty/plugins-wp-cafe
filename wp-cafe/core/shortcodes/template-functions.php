@@ -18,6 +18,7 @@ class Template_Functions {
 			$col                = $args['col'] ?? '';
 			$show_item_status   = $args['show_item_status'] ?? '';
 			$show_item_label    = $args['show_item_label'] ?? 'no';
+			$show_points        = $args['show_points'] ?? '';
 			$wpc_price_show     = $args['wpc_price_show'] ?? '';
 			$wpc_show_vendor    = $args['wpc_show_vendor'] ?? '';
 			$wpc_show_desc      = $args['wpc_show_desc'] ?? '';
@@ -98,6 +99,7 @@ class Template_Functions {
 											}
 											?>
 									</h3>
+									<?php wpc_menu_card_after_price( $product, $show_points ); ?>
 									<?php
 											if(wpcafe_is_multivendor() && !empty( $wpc_show_vendor ) && $wpc_show_vendor == 'yes') {
 													do_action( 'wpcafe_multivendor_seller', $product->get_id());
@@ -151,6 +153,7 @@ class Template_Functions {
 			$class              = $args['class'] ?? '';
 			$show_item_status   = $args['show_item_status'] ?? '';
 			$show_item_label    = $args['show_item_label'] ?? 'no';
+			$show_points        = $args['show_points'] ?? '';
 			$wpc_price_show     = $args['wpc_price_show'] ?? '';
 			$wpc_show_vendor    = $args['wpc_show_vendor'] ?? '';
 			$wpc_show_desc      = $args['wpc_show_desc'] ?? '';
@@ -196,6 +199,10 @@ class Template_Functions {
 															</a>
 
 													</h3>
+													<?php
+													// After the title, not the price: the price sits on the thumbnail, which a menu can hide.
+													wpc_menu_card_after_price( $product, $show_points );
+													?>
 													<?php
 															if(wpcafe_is_multivendor() && !empty( $wpc_show_vendor ) && $wpc_show_vendor == 'yes') {
 																	do_action( 'wpcafe_multivendor_seller', $product->get_id());
@@ -290,6 +297,7 @@ class Template_Functions {
 			$class              = $args['class'] ?? '';
 			$show_item_status   = $args['show_item_status'] ?? '';
 			$show_item_label    = $args['show_item_label'] ?? 'no';
+			$show_points        = $args['show_points'] ?? '';
 			$wpc_price_show     = $args['wpc_price_show'] ?? '';
 			$wpc_show_vendor    = $args['wpc_show_vendor'] ?? '';
 			$wpc_show_desc      = $args['wpc_show_desc'] ?? '';
@@ -336,6 +344,10 @@ class Template_Functions {
 													</a>
 
 											</h3>
+											<?php
+											// After the title, not the price: the price sits on the thumbnail, which a menu can hide.
+											wpc_menu_card_after_price( $product, $show_points );
+											?>
 											<?php
 													if(wpcafe_is_multivendor() && !empty( $wpc_show_vendor ) && $wpc_show_vendor == 'yes') {
 															do_action( 'wpcafe_multivendor_seller', $product->get_id());
@@ -441,6 +453,7 @@ class Template_Functions {
 			'wpc_cart_button'    => $args['wpc_cart_button'] ?? 'yes',
 			'show_item_status'   => $args['show_item_status'] ?? 'yes',
 			'show_item_label'    => $args['show_item_label'] ?? 'no',
+			'show_points'        => $args['show_points'] ?? '',
 			'wpc_show_desc'      => $args['wpc_show_desc'] ?? 'yes',
 			'wpc_desc_limit'     => $args['wpc_desc_limit'] ?? 20,
 			'wpc_show_vendor'    => $args['wpc_show_vendor'] ?? 'no',
@@ -820,6 +833,7 @@ class Template_Functions {
 			$title_link_show  = $args['title_link_show']  ?? 'yes';
 			$show_item_status = $args['show_item_status'] ?? 'yes';
 			$show_item_label  = $args['show_item_label']  ?? 'no';
+			$show_points      = $args['show_points']      ?? '';
 			$wpc_desc_limit   = $args['wpc_desc_limit']   ?? 15;
 			$wpc_show_vendor  = $args['wpc_show_vendor']  ?? 'no';
 			$wpc_menu_col     = $args['wpc_menu_col']     ?? 6;

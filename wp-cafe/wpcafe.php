@@ -3,7 +3,7 @@
  * Plugin Name:        WPCafe - Restaurant Menu, Online Food Ordering & Table Booking System
  * Plugin URI:         https://product.themewinter.com/wpcafe
  * Description:        WordPress Restaurant solution plugin to launch Restaurant Websites.
- * Version:            3.0.21
+ * Version:            3.0.22
  * Author:             Themewinter
  * Author URI:         http://themewinter.com/
  * License:            GPL-2.0+
@@ -11,7 +11,7 @@
  * Text Domain:        wp-cafe
  * Domain Path:       /languages
  * Requires at least: 6.2
- * Requires PHP:      7.4
+ * Requires PHP:      8.0
  */
 
 defined( 'ABSPATH' ) || exit;
@@ -28,7 +28,7 @@ require_once __DIR__ . '/vendor/autoload.php';
 define( 'WPCAFE_PLUGIN_NAME', 'WPCafe' );
 defined( 'WPCAFE_FILE' ) || define( 'WPCAFE_FILE', __FILE__ );
 defined( 'WPCAFE_DIR' ) || define( 'WPCAFE_DIR', __DIR__ );
-defined( 'WPCAFE_VERSION' ) || define( 'WPCAFE_VERSION', '3.0.21' );
+defined( 'WPCAFE_VERSION' ) || define( 'WPCAFE_VERSION', '3.0.22' );
 
 add_action( 'init', [ Compatibility_Handler::class, 'init' ] );
 add_action( 'init', [ Compatibility_Handler::class, 'register_hooks' ] );
@@ -61,6 +61,13 @@ function wpcafe() {
 
 // Kick-off the plugin.
 wpcafe();
+
+/*
+ * Pointics integration. Attached at file load, not inside init: Pointics
+ * fires pointics_booted on plugins_loaded, before any init callback runs.
+ * Nothing in core/integrations/pointics loads unless Pointics boots.
+ */
+add_action( 'pointics_booted', [ \WpCafe\Integrations\Pointics\Pointics_Bridge::class, 'boot' ] );
 
 /**
  * Allow SVG uploads by adding the SVG mime type.

@@ -13,6 +13,7 @@ use WpCafe\Models\Reservation_Item_Model;
 use WpCafe\Scheduler;
 use WpCafe\Models\Location_Model;
 use WpCafe\Session;
+use WpCafe\CustomerAccounts\Booking_Account;
 
 /**
  * Reservation controller
@@ -247,7 +248,7 @@ class Reservation_Controller extends Base_Rest_Controller {
          * moves. Taking it from the request would let a booking point at someone
          * else's WooCommerce order and report that order's payment method.
          */
-        unset( $data['woo_order_id'], $data['payment_intent'] );
+        unset( $data['woo_order_id'], $data['payment_intent'], $data['points_discount'] );
 
         // Price the reservation from trusted server settings, never the client.
         $this->set_server_calculated_total( $data );
@@ -262,11 +263,52 @@ class Reservation_Controller extends Base_Rest_Controller {
 
         $this->apply_partial_payment( $data, $food_subtotal );
 
-        $reservation = Reservation_Model::create( $data );
+        /**
+         * The booking is priced and about to be saved. An integration may lower
+         * what the customer pays (a points discount) or refuse the booking.
+         *
+         * @param array|\WP_Error $data          Booking data, priced on the server.
+         * @param \WP_REST_Request $request       Create request.
+         * @param float            $food_subtotal Food in the cart for this booking.
+         */
+        $data = apply_filters( 'wpcafe_reservation_before_save', $data, $request, $food_subtotal );
 
-        if ( is_wp_error( $reservation ) ) {
-            return $this->error( $reservation->get_error_message() );
+        // A points discount is priced for paying at the restaurant; checkout would charge the full price.
+        if ( is_array( $data ) && 'wc' === ( $data['payment_method'] ?? '' ) && (float) ( $data['points_discount'] ?? 0 ) > 0 ) {
+            $data = new WP_Error( 'wpcafe_points_pay_at_restaurant', __( 'This booking used points and is paid at the restaurant.', 'wp-cafe' ), [ 'status' => 409 ] );
         }
+
+        if ( is_wp_error( $data ) ) {
+            /** The booking was refused after the save filter; an integration undoes what it did there. */
+            do_action( 'wpcafe_reservation_create_failed', $request );
+            return $data;
+        }
+
+        // Integrations may add their own form keys (wpcafe.reservationCreatePayload); only booking fields are saved.
+        $data = array_intersect_key( $data, array_flip( ( new Reservation_Model() )->get_fillable_keys() ) );
+
+        try {
+            $reservation = Reservation_Model::create( $data );
+        } catch ( \Throwable $e ) {
+            // phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log
+            error_log( '[WPCafe] Reservation not saved: ' . $e->getMessage() );
+            $reservation = null;
+        }
+
+        // create() gives null or an id-less model when the insert fails.
+        if ( ! $reservation || (int) $reservation->id <= 0 ) {
+            do_action( 'wpcafe_reservation_create_failed', $request );
+            return $this->error( __( 'The reservation could not be saved. Please try again.', 'wp-cafe' ), 500 );
+        }
+
+        /**
+         * The booking row exists. Fires before anything else in this request can
+         * fail, so an integration can tie what it did in the save filter to it.
+         *
+         * @param Reservation_Model $reservation
+         * @param \WP_REST_Request  $request
+         */
+        do_action( 'wpcafe_reservation_inserted', $reservation, $request );
 
         if ( $this->food_menu_is_visible_in_reservation_form() ) {
             $food_items = $this->create_food_items_from_woocart( $reservation->id );
@@ -293,9 +335,27 @@ class Reservation_Controller extends Base_Rest_Controller {
 
         $response = new Reservation_Resource( $reservation );
 
+        /**
+         * The booking is saved and the original request is still at hand, for
+         * integrations that store extra form choices (e.g. a points code).
+         *
+         * @param Reservation_Model $reservation
+         * @param \WP_REST_Request  $request
+         */
+        do_action( 'wpcafe_reservation_request_saved', $reservation, $request );
+
         do_action( 'wpcafe_after_reservation_create', $reservation );
 
         $payload = array_merge( $response->to_array(), [ 'payment_token' => $payment_token ] );
+
+        /**
+         * What the booking form gets back after a booking is created.
+         *
+         * @param array             $payload     Booking data and payment token.
+         * @param Reservation_Model $reservation Booking.
+         * @param \WP_REST_Request  $request     Create request.
+         */
+        $payload = apply_filters( 'wpcafe_reservation_create_response', $payload, $reservation, $request );
 
         return $this->response( $payload, __( 'Reservation created successfully.', 'wp-cafe' ) );
     }
@@ -410,6 +470,16 @@ class Reservation_Controller extends Base_Rest_Controller {
             if ( ! WC()->session ) {
                 WC()->session = new \WC_Session_Handler();
                 WC()->session->init();
+            }
+
+            /*
+             * Checkout reads this to add the booking fee and link the order, so
+             * only an online-paid booking may sit here. Otherwise the customer's
+             * next food order gets this booking's fee and its order id.
+             */
+            if ( WC()->session && 'wc' !== $reservation->payment_method ) {
+                WC()->session->__unset( 'wpc_reservation_data' );
+                return;
             }
 
             if ( WC()->session ) {
@@ -548,6 +618,13 @@ class Reservation_Controller extends Base_Rest_Controller {
 
         if ( $this->view_own_reservations_only() ) {
             $filter['email'] = wp_get_current_user()->user_email;
+
+            // A booking made this account from a typed email: other bookings with that email wait for a password.
+            $only = Booking_Account::unverified_booking( get_current_user_id() );
+
+            if ( $only ) {
+                $args['post__in'] = [ $only ];
+            }
         }
 
         if ( ! empty( $search ) ) {
@@ -599,8 +676,9 @@ class Reservation_Controller extends Base_Rest_Controller {
         if ( $this->view_own_reservations_only() ) {
             $reservation_email  = (string) get_post_meta( $id, 'email', true );
             $current_user_email = (string) wp_get_current_user()->user_email;
+            $only               = Booking_Account::unverified_booking( get_current_user_id() );
 
-            if ( '' === $current_user_email || strcasecmp( $reservation_email, $current_user_email ) !== 0 ) {
+            if ( '' === $current_user_email || strcasecmp( $reservation_email, $current_user_email ) !== 0 || ( $only && $only !== $id ) ) {
                 return $this->error( __( 'You do not have permission to view this reservation.', 'wp-cafe' ), 403 );
             }
         }

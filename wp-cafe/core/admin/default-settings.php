@@ -32,6 +32,7 @@ class Default_Settings implements Hookable_Service_Contract {
             'wc_status' => wpc_get_plugin_status('woocommerce'),
             'optiontics_status' => wpc_get_plugin_status('optiontics'),
             'aisentic_status'   => wpc_get_plugin_status('aisentic'),
+            'pointics_status'   => wpc_get_plugin_status('pointics'),
             'currency' => function_exists('WC') ? get_woocommerce_currency() : wpc_get_option('currency'),
             'currency_symbol_position' => get_option('woocommerce_currency_pos', 'left'),
             'currency_price_separator' => get_option('woocommerce_price_thousand_sep', ','),

@@ -61,6 +61,10 @@ class FoodTab extends AbstractBlock {
 				'type'    => 'string',
 				'default' => 'no',
 			],
+			'show_points'           => [
+				'type'    => 'string',
+				'default' => '',
+			],
 			'wpc_price_show'        => [
 				'type'    => 'string',
 				'default' => 'yes',
@@ -107,6 +111,7 @@ class FoodTab extends AbstractBlock {
 		$wpc_cart_button      = $attributes['wpc_cart_button'] ?? 'yes';
 		$show_item_status     = $attributes['show_item_status'] ?? 'yes';
 		$show_item_label      = $attributes['show_item_label'] ?? 'no';
+		$show_points          = wpc_sanitize_show_points( $attributes['show_points'] ?? '' );
 		$wpc_price_show       = $attributes['wpc_price_show'] ?? 'yes';
 		$wpc_show_vendor      = $attributes['wpc_show_vendor'] ?? 'yes';
 		$wpc_cat_arr          = $attributes['wpc_food_categories'] ?? [];

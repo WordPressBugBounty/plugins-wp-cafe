@@ -4,7 +4,7 @@
 
 namespace Composer\Autoload;
 
-class ComposerStaticInit302cef4a9e621ce24eab5244bbcfd265
+class ComposerStaticInit34aafd631eb608931e8c5d762b61b934
 {
     public static $files = array (
         '65bd208c04f25e98cf12b5c37b014f1e' => __DIR__ . '/..' . '/themewinter/email-notification-sdk/src/Utils/global-helpers.php',
@@ -116,6 +116,11 @@ class ComposerStaticInit302cef4a9e621ce24eab5244bbcfd265
         'WpCafe\\Core\\Modules\\Reservation\\Hooks' => __DIR__ . '/../..' . '/core/modules/reservation/hooks.php',
         'WpCafe\\Core\\Modules\\Reservation\\Wpc_Reservation_Report' => __DIR__ . '/../..' . '/core/modules/reservation/wpc-reservation-report.php',
         'WpCafe\\Core\\Shortcodes\\Template_Functions' => __DIR__ . '/../..' . '/core/shortcodes/template-functions.php',
+        'WpCafe\\CustomerAccounts\\Booking_Account' => __DIR__ . '/../..' . '/core/customer-accounts/booking-account.php',
+        'WpCafe\\CustomerAccounts\\Customer_Accounts_Service_Provider' => __DIR__ . '/../..' . '/core/customer-accounts/customer-accounts-service-provider.php',
+        'WpCafe\\CustomerAccounts\\Email\\Account_Created_Trigger' => __DIR__ . '/../..' . '/core/customer-accounts/email/account-created-trigger.php',
+        'WpCafe\\CustomerAccounts\\Email\\Account_Email' => __DIR__ . '/../..' . '/core/customer-accounts/email/account-email.php',
+        'WpCafe\\CustomerAccounts\\Email\\Account_Flow_Seeder' => __DIR__ . '/../..' . '/core/customer-accounts/email/account-flow-seeder.php',
         'WpCafe\\Dashboard\\Controllers\\Dashboard_Controller' => __DIR__ . '/../..' . '/core/dashboard/controllers/dashboard-controller.php',
         'WpCafe\\Dashboard\\Dashboard_Service_Provider' => __DIR__ . '/../..' . '/core/dashboard/dashboard-service-provider.php',
         'WpCafe\\Dashboard\\Reports\\Customers_Report' => __DIR__ . '/../..' . '/core/dashboard/reports/customers-report.php',
@@ -147,6 +152,7 @@ class ComposerStaticInit302cef4a9e621ce24eab5244bbcfd265
         'WpCafe\\Extensions\\Controllers\\Integration_Controller' => __DIR__ . '/../..' . '/core/extensions/controllers/integration-controller.php',
         'WpCafe\\Extensions\\Controllers\\Plugin_Controller' => __DIR__ . '/../..' . '/core/extensions/controllers/plugin-controller.php',
         'WpCafe\\Extensions\\Extension_Service_Provider' => __DIR__ . '/../..' . '/core/extensions/extension-service-provider.php',
+        'WpCafe\\Extensions\\Pointics_Activation_Message' => __DIR__ . '/../..' . '/core/extensions/pointics-activation-message.php',
         'WpCafe\\Feedback\\Feedback_Hooks' => __DIR__ . '/../..' . '/core/feedback/feedback-hooks.php',
         'WpCafe\\Feedback\\Feedback_Service_Provider' => __DIR__ . '/../..' . '/core/feedback/feedback-service-provider.php',
         'WpCafe\\FoodOrder\\Controllers\\Food_Order_Controller' => __DIR__ . '/../..' . '/core/food-order/controllers/food-order-controller.php',
@@ -182,6 +188,21 @@ class ComposerStaticInit302cef4a9e621ce24eab5244bbcfd265
         'WpCafe\\Integrations\\Mail_Mint' => __DIR__ . '/../..' . '/core/integrations/mail-mint.php',
         'WpCafe\\Integrations\\Mail_Poet' => __DIR__ . '/../..' . '/core/integrations/mailpoet.php',
         'WpCafe\\Integrations\\Pabbly' => __DIR__ . '/../..' . '/core/integrations/pabbly.php',
+        'WpCafe\\Integrations\\Pointics\\Booking_Discount_Controller' => __DIR__ . '/../..' . '/core/integrations/pointics/rest/booking-discount-controller.php',
+        'WpCafe\\Integrations\\Pointics\\Booking_Order_Points_Line' => __DIR__ . '/../..' . '/core/integrations/pointics/orders/booking-order-points-line.php',
+        'WpCafe\\Integrations\\Pointics\\Booking_Payment_Coupon_Keeper' => __DIR__ . '/../..' . '/core/integrations/pointics/orders/booking-payment-coupon-keeper.php',
+        'WpCafe\\Integrations\\Pointics\\Booking_Points_Discount' => __DIR__ . '/../..' . '/core/integrations/pointics/redeem/booking-points-discount.php',
+        'WpCafe\\Integrations\\Pointics\\Menu_Badge' => __DIR__ . '/../..' . '/core/integrations/pointics/storefront/menu-badge.php',
+        'WpCafe\\Integrations\\Pointics\\Pointics_Assets' => __DIR__ . '/../..' . '/core/integrations/pointics/assets/pointics-assets.php',
+        'WpCafe\\Integrations\\Pointics\\Pointics_Bridge' => __DIR__ . '/../..' . '/core/integrations/pointics/pointics-bridge.php',
+        'WpCafe\\Integrations\\Pointics\\Pointics_Cards' => __DIR__ . '/../..' . '/core/integrations/pointics/cards/pointics-cards.php',
+        'WpCafe\\Integrations\\Pointics\\Reservation_Account_Resolver' => __DIR__ . '/../..' . '/core/integrations/pointics/reservation/reservation-account-resolver.php',
+        'WpCafe\\Integrations\\Pointics\\Reservation_Events_Listener' => __DIR__ . '/../..' . '/core/integrations/pointics/reservation/reservation-events-listener.php',
+        'WpCafe\\Integrations\\Pointics\\Reservation_Points_Admin_Controller' => __DIR__ . '/../..' . '/core/integrations/pointics/rest/reservation-points-admin-controller.php',
+        'WpCafe\\Integrations\\Pointics\\Reservation_Points_Calculator' => __DIR__ . '/../..' . '/core/integrations/pointics/reservation/reservation-points-calculator.php',
+        'WpCafe\\Integrations\\Pointics\\Reservation_Points_Preview_Controller' => __DIR__ . '/../..' . '/core/integrations/pointics/rest/reservation-points-preview-controller.php',
+        'WpCafe\\Integrations\\Pointics\\Reservation_Points_Reconciler' => __DIR__ . '/../..' . '/core/integrations/pointics/reservation/reservation-points-reconciler.php',
+        'WpCafe\\Integrations\\Pointics\\Reservation_Referral' => __DIR__ . '/../..' . '/core/integrations/pointics/referral/reservation-referral.php',
         'WpCafe\\Integrations\\Uncanny_Automator' => __DIR__ . '/../..' . '/core/integrations/uncanny-automator.php',
         'WpCafe\\Integrations\\Zapier' => __DIR__ . '/../..' . '/core/integrations/zapier.php',
         'WpCafe\\Integrations\\Zoho_Flow' => __DIR__ . '/../..' . '/core/integrations/zoho-flow.php',
@@ -296,9 +317,9 @@ class ComposerStaticInit302cef4a9e621ce24eab5244bbcfd265
     public static function getInitializer(ClassLoader $loader)
     {
         return \Closure::bind(function () use ($loader) {
-            $loader->prefixLengthsPsr4 = ComposerStaticInit302cef4a9e621ce24eab5244bbcfd265::$prefixLengthsPsr4;
-            $loader->prefixDirsPsr4 = ComposerStaticInit302cef4a9e621ce24eab5244bbcfd265::$prefixDirsPsr4;
-            $loader->classMap = ComposerStaticInit302cef4a9e621ce24eab5244bbcfd265::$classMap;
+            $loader->prefixLengthsPsr4 = ComposerStaticInit34aafd631eb608931e8c5d762b61b934::$prefixLengthsPsr4;
+            $loader->prefixDirsPsr4 = ComposerStaticInit34aafd631eb608931e8c5d762b61b934::$prefixDirsPsr4;
+            $loader->classMap = ComposerStaticInit34aafd631eb608931e8c5d762b61b934::$classMap;
 
         }, null, ClassLoader::class);
     }

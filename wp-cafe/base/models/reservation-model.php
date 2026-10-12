@@ -51,6 +51,8 @@ class Reservation_Model extends Post_Model {
         'payment_intent'=> '',
         'woo_order_id'  => '',
         'food_order'    => 'no',
+        // Money off paid for with points. Only the server sets it; see create_item().
+        'points_discount' => '',
         'seats'         => '',
         'custom_fields' => [],
     ];
@@ -62,6 +64,21 @@ class Reservation_Model extends Post_Model {
      */
     public function get_post_type() {
         return 'wpc_reservation';
+    }
+
+    /**
+     * Load attributes, taking status from the post itself.
+     *
+     * Status lives in post_status, not post meta; reading meta would see ''
+     * and treat every save as a status change.
+     *
+     * @return void
+     */
+    protected function load_attributes() {
+        parent::load_attributes();
+
+        $this->attributes['status'] = (string) $this->post->post_status;
+        $this->original['status']   = $this->attributes['status'];
     }
 
     /**
@@ -95,21 +112,47 @@ class Reservation_Model extends Post_Model {
     /**
      * Get the total price of the reservation
      *
-     * @return  float   Total price of the reservation
+     * @param array|null $items Food lines already loaded, to skip a second query.
+     * @return float Total price of the reservation
      */
-    public function get_total_price() {
+    public function get_total_price( ?array $items = null ) {
         $total_price = (float) $this->total_price;
-        $items       = $this->get_items();
 
-        if ( ! empty( $items ) ) {
-            foreach ( $items as $item ) {
-                $price    = (float) $item->price;
-                $quantity = (int) $item->quantity;
-                $total_price += $price * $quantity;
-            }
+        foreach ( $items ?? $this->get_items() as $item ) {
+            $total_price += (float) $item->price * (int) $item->quantity;
         }
 
         return $total_price;
+    }
+
+    /**
+     * The booking and its food, less any points discount.
+     *
+     * @param array|null $items Food lines already loaded.
+     * @return float
+     */
+    public function get_total_after_points( ?array $items = null ): float {
+        // Rounded: a float subtraction like 19.99 - 10 would print 9.989999999999998.
+        return round( max( 0.0, $this->get_total_price( $items ) - (float) $this->points_discount ), self::price_decimals() );
+    }
+
+    /**
+     * What the customer still pays: the total after points, less a deposit taken online.
+     *
+     * @param array|null $items Food lines already loaded.
+     * @return float
+     */
+    public function get_amount_due( ?array $items = null ) {
+        $deposit = 'yes' === $this->is_partial_payment ? (float) $this->deposit_value : 0.0;
+
+        return round( max( 0.0, $this->get_total_after_points( $items ) - $deposit ), self::price_decimals() );
+    }
+
+    /**
+     * @return int
+     */
+    private static function price_decimals(): int {
+        return function_exists( 'wc_get_price_decimals' ) ? (int) wc_get_price_decimals() : 2;
     }
 
     /**

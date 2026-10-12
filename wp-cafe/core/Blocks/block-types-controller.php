@@ -55,6 +55,8 @@ class BlockTypesController {
 
 		wp_register_style( 'wpc-block-editor-style-css', $editor_style_url, [ 'wp-edit-blocks' ], wpcafe()->version );
 		wp_register_script( 'wpc-block-js', $editor_script_url, [ 'wp-blocks', 'wp-i18n', 'wp-element', 'wp-compose', 'wp-server-side-render' ], wpcafe()->version, true );
+		// The block editor gets no wpCafe localize; the Show Points toggle only needs this flag.
+		wp_add_inline_script( 'wpc-block-js', 'window.wpCafe = Object.assign( window.wpCafe || {}, ' . wp_json_encode( [ 'pointicsActive' => wpc_pointics_is_active() ] ) . ' );', 'before' );
 
 		// Register frontend styles
 		wp_register_style( 'wpc-block-style-css', wpcafe()->assets_url . '/build/css/gutenberg-blocks.css', [], wpcafe()->version );

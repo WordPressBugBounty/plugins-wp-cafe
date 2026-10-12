@@ -120,6 +120,16 @@ class Reservation_Created_Trigger extends Abstract_Trigger {
 				'type'  => 'string',
 			),
 			array(
+				'label' => __( 'Points Discount', 'wp-cafe' ),
+				'value' => 'reservation_points_discount',
+				'type'  => 'string',
+			),
+			array(
+				'label' => __( 'Amount Due', 'wp-cafe' ),
+				'value' => 'reservation_amount_due',
+				'type'  => 'string',
+			),
+			array(
 				'label' => __( 'Currency', 'wp-cafe' ),
 				'value' => 'reservation_currency',
 				'type'  => 'string',

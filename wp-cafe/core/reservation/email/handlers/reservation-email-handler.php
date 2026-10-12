@@ -442,6 +442,8 @@ class Reservation_Email_Handler implements Hookable_Service_Contract {
 			'reservation_notes'         => $reservation->notes ?? '',
 			'reservation_booking_amount'=> (string) ( $reservation->booking_amount ?? '' ),
 			'reservation_total_price'   => (string) ( $reservation->total_price ?? '' ),
+			'reservation_points_discount'=> $this->points_discount_for_email( $reservation ),
+			'reservation_amount_due'    => $this->amount_due_for_email( $reservation ),
 			'reservation_currency'      => $reservation->currency ?? '',
 			'reservation_payment_method'=> $reservation->payment_method ?? '',
 			'reservation_food_order'    => $reservation->food_order ?? '',
@@ -505,6 +507,8 @@ class Reservation_Email_Handler implements Hookable_Service_Contract {
 			'reservation_notes'         => $reservation->notes ?? '',
 			'reservation_booking_amount'=> (string) ( $reservation->booking_amount ?? '' ),
 			'reservation_total_price'   => (string) ( $reservation->total_price ?? '' ),
+			'reservation_points_discount'=> $this->points_discount_for_email( $reservation ),
+			'reservation_amount_due'    => $this->amount_due_for_email( $reservation ),
 			'reservation_currency'      => $reservation->currency ?? '',
 			'reservation_payment_method'=> $reservation->payment_method ?? '',
 			'reservation_food_order'    => $reservation->food_order ?? '',
@@ -581,6 +585,8 @@ class Reservation_Email_Handler implements Hookable_Service_Contract {
 			'reservation_notes'              => $reservation->notes ?? '',
 			'reservation_booking_amount'     => (string) ( $reservation->booking_amount ?? '' ),
 			'reservation_total_price'        => (string) ( $reservation->total_price ?? '' ),
+			'reservation_points_discount'    => $this->points_discount_for_email( $reservation ),
+			'reservation_amount_due'         => $this->amount_due_for_email( $reservation ),
 			'reservation_currency'           => $reservation->currency ?? '',
 			'reservation_payment_method'     => $reservation->payment_method ?? '',
 			'reservation_food_order'         => $reservation->food_order ?? '',
@@ -643,6 +649,8 @@ class Reservation_Email_Handler implements Hookable_Service_Contract {
 			'reservation_notes'              => $reservation->notes ?? '',
 			'reservation_booking_amount'     => (string) ( $reservation->booking_amount ?? '' ),
 			'reservation_total_price'        => (string) ( $reservation->total_price ?? '' ),
+			'reservation_points_discount'    => $this->points_discount_for_email( $reservation ),
+			'reservation_amount_due'         => $this->amount_due_for_email( $reservation ),
 			'reservation_currency'           => $reservation->currency ?? '',
 			'reservation_payment_method'     => $reservation->payment_method ?? '',
 			'reservation_food_order'         => $reservation->food_order ?? '',
@@ -710,5 +718,29 @@ class Reservation_Email_Handler implements Hookable_Service_Contract {
 		}
 
 		return $custom_field_data;
+	}
+
+	/**
+	 * Points money off the booking, "0" when none was spent.
+	 *
+	 * @param object $reservation Booking.
+	 * @return string
+	 */
+	private function points_discount_for_email( $reservation ) {
+		return (string) (float) ( $reservation->points_discount ?? 0 );
+	}
+
+	/**
+	 * What the customer pays: booking and food, less any points discount.
+	 *
+	 * @param object $reservation Booking.
+	 * @return string
+	 */
+	private function amount_due_for_email( $reservation ) {
+		if ( is_object( $reservation ) && method_exists( $reservation, 'get_amount_due' ) ) {
+			return (string) $reservation->get_amount_due();
+		}
+
+		return (string) ( $reservation->total_price ?? '' );
 	}
 }

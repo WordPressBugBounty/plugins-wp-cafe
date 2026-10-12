@@ -36,6 +36,8 @@ class Localize {
             'has_woo_products'    => (wp_count_posts( 'product' )->publish ?? 0) > 0,
             'deposet'             => wpc_is_deposet_active(),
             'aisentic'            => self::get_aisentic_state(),
+            // Show Points controls in the shortcode builder only appear while Pointics runs.
+            'pointicsActive'      => wpc_pointics_is_active(),
         ];
 
         return apply_filters( 'wpcafe_admin_localize', $data );
@@ -74,6 +76,8 @@ class Localize {
      */
     public static function get_frontend() {
         $data = [
+            // The booking form's "Have one? Sign in" link; the form adds the page to return to.
+            'login_url'           => wp_login_url(),
             'site_url'            => site_url(),
             'admin_url'           => admin_url(),
             'nonce'               => wp_create_nonce( 'wp_rest' ),

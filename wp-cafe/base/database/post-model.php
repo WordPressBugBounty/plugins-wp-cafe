@@ -236,6 +236,8 @@ abstract class Post_Model implements JsonSerializable {
         $args = [
             'post_type'     => ( new static )->get_post_type(),
             'post_status'   => 'publish',
+            // get_posts() returns 5 by default; a booking's food can have more lines.
+            'numberposts'   => -1,
             // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_query -- required for report/filter functionality
             'meta_query'    => [
                 [

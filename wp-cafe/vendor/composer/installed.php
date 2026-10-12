@@ -3,7 +3,7 @@
         'name' => 'themewinter/wp-cafe',
         'pretty_version' => 'dev-develop',
         'version' => 'dev-develop',
-        'reference' => '283584abfda1c40d0f0232c4f4b84228eb164317',
+        'reference' => '5ab6dadab046f364b244bdce5629565c3151b749',
         'type' => 'project',
         'install_path' => __DIR__ . '/../../',
         'aliases' => array(),
@@ -13,7 +13,7 @@
         'arraytics/plugin-notice-sdk' => array(
             'pretty_version' => 'dev-main',
             'version' => 'dev-main',
-            'reference' => 'f93f5aa1b79aee99c8946c87c5058999eab144c3',
+            'reference' => 'af3aab6b7b81f262ffb6e150aaebc4863c80202c',
             'type' => 'library',
             'install_path' => __DIR__ . '/../arraytics/plugin-notice-sdk',
             'aliases' => array(
@@ -57,7 +57,7 @@
         'themewinter/wp-cafe' => array(
             'pretty_version' => 'dev-develop',
             'version' => 'dev-develop',
-            'reference' => '283584abfda1c40d0f0232c4f4b84228eb164317',
+            'reference' => '5ab6dadab046f364b244bdce5629565c3151b749',
             'type' => 'project',
             'install_path' => __DIR__ . '/../../',
             'aliases' => array(),

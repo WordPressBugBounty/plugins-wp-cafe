@@ -153,6 +153,10 @@ class Plugin_Controller extends Base_Rest_Controller {
             );
         }
 
+        if ( 'pointics' === $name && 'activate' === $status && PluginManager::is_activated( $slug ) ) {
+            $response['message'] = \WpCafe\Extensions\Pointics_Activation_Message::for_site();
+        }
+
         /*
          * Registration only runs when the caller sent explicit consent, which
          * today means the onboarding checkbox or the dashboard banner button.

@@ -50,7 +50,8 @@ class Food_Menu_Tab extends Base_Shortcode {
                 'wpc_show_desc'       => 'yes',
                 'title_link_show'     => 'yes',
                 'show_item_status'    => 'yes',
-            'show_item_label'       => 'no',
+                'show_item_label'     => 'no',
+                'show_points'         => '',
                 'product_thumbnail'   => 'yes',
                 'wpc_cart_button'     => 'yes',
                 'wpc_price_show'      => 'yes',
@@ -72,6 +73,7 @@ class Food_Menu_Tab extends Base_Shortcode {
         $title_link_show     = $atts['title_link_show'];
         $show_item_status    = $atts['show_item_status'];
         $show_item_label     = $atts['show_item_label'];
+        $show_points         = wpc_sanitize_show_points( $atts['show_points'] ?? '' );
         $product_thumbnail   = $atts['product_thumbnail'];
         $wpc_cart_button     = $atts['wpc_cart_button'];
         $wpc_price_show      = $atts['wpc_price_show'];
@@ -128,6 +130,7 @@ class Food_Menu_Tab extends Base_Shortcode {
             $settings["wpc_menu_order"]         = $wpc_menu_order;
             $settings["show_item_status"]       = $show_item_status;
             $settings["show_item_label"]        = $show_item_label;
+            $settings["show_points"]            = $show_points;
             $settings["wpc_menu_count"]         = $no_of_product;
             $settings["wpc_show_desc"]          = $wpc_show_desc;
             $settings["wpc_desc_limit"]         = $wpc_desc_limit;

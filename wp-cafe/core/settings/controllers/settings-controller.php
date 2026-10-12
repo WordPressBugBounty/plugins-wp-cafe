@@ -45,6 +45,8 @@ class Settings_Controller extends Base_Rest_Controller {
         'restaurant_schedule',
         'enable_local_payment',
         'enable_woocommerce_payments',
+        // The booking form tells a signed-out customer an account will be made.
+        'reservation_create_customer_account',
 
         // Currency display formatting — non-sensitive; required by the front-end
         // price renderer (reservation form + restaurant-management panel).

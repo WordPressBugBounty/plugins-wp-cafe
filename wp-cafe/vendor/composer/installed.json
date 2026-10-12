@@ -7,15 +7,15 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/themewinter/plugin-notice-sdk.git",
-                "reference": "f93f5aa1b79aee99c8946c87c5058999eab144c3"
+                "reference": "af3aab6b7b81f262ffb6e150aaebc4863c80202c"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/themewinter/plugin-notice-sdk/zipball/f93f5aa1b79aee99c8946c87c5058999eab144c3",
-                "reference": "f93f5aa1b79aee99c8946c87c5058999eab144c3",
+                "url": "https://api.github.com/repos/themewinter/plugin-notice-sdk/zipball/af3aab6b7b81f262ffb6e150aaebc4863c80202c",
+                "reference": "af3aab6b7b81f262ffb6e150aaebc4863c80202c",
                 "shasum": ""
             },
-            "time": "2026-07-27T09:47:13+00:00",
+            "time": "2026-10-08T11:09:04+00:00",
             "default-branch": true,
             "type": "library",
             "installation-source": "dist",

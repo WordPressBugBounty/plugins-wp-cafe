@@ -116,6 +116,7 @@ $wpc_color_style = wpc_color_tokens();
                         'post_cats'         => $value['post_cats'],
                         // Without show_item_label the labels vanish on page two.
                         'show_item_label'   => isset( $show_item_label ) ? $show_item_label : 'no',
+                        'show_points'       => isset( $show_points ) ? $show_points : '',
                         'grid_columns'      => $grid_columns,
                     );
 
@@ -133,6 +134,7 @@ $wpc_color_style = wpc_color_tokens();
                         'title_link_show'   => $title_link_show,
                         'show_item_status'  => $show_item_status,
                         'show_item_label'   => isset( $show_item_label ) ? $show_item_label : 'no',
+                        'show_points'       => isset( $show_points ) ? $show_points : '',
                         'wpc_desc_limit'    => $wpc_desc_limit,
                         'wpc_show_vendor'   => $wpc_show_vendor,
                         'wpc_menu_col'      => 6, // Default column setting for pro styles

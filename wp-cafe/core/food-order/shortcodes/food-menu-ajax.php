@@ -87,6 +87,7 @@ class Food_Menu_Ajax {
         $wpc_price_show     = $settings['wpc_price_show'];
         $show_item_status   = $settings['show_item_status'];
         $show_item_label    = $settings['show_item_label'];
+        $show_points        = $settings['show_points'] ?? '';
         $wpc_show_vendor    = $settings['wpc_show_vendor'];
         $column_desktop     = $settings['wpc_menu_col'];
         $column_tablet      = $settings['wpc_menu_col_tablet'];
@@ -155,6 +156,7 @@ class Food_Menu_Ajax {
         $wpc_price_show     = $settings['wpc_price_show'];
         $show_item_status   = $settings['show_item_status'];
         $show_item_label    = $settings['show_item_label'];
+        $show_points        = $settings['show_points'] ?? '';
         $wpc_show_vendor    = $settings['wpc_show_vendor'] ?? 'no';
         $grid_columns       = $settings['grid_columns'];
         $wpc_menu_count     = max( 1, (int) $settings['no_of_product'] );
@@ -233,6 +235,8 @@ class Food_Menu_Ajax {
         $wpc_desc_limit     = $settings['wpc_desc_limit'];
         $wpc_price_show     = $settings['wpc_price_show'];
         $show_item_status   = $settings['show_item_status'];
+        $show_item_label    = $settings['show_item_label'];
+        $show_points        = $settings['show_points'];
         $wpc_show_vendor    = $settings['wpc_show_vendor'] ?? 'no';
         $unique_id          = md5( md5( microtime() ) );
 
@@ -267,6 +271,7 @@ class Food_Menu_Ajax {
             'show_item_status'     => wpc_sanitize_yes_no( $raw['show_item_status'] ?? '', 'yes' ),
             // Without this the labels disappear on the second page.
             'show_item_label'      => wpc_sanitize_yes_no( $raw['show_item_label'] ?? '', 'no' ),
+            'show_points'          => wpc_sanitize_show_points( $raw['show_points'] ?? '' ),
             'title_link_show'      => wpc_sanitize_yes_no( $raw['title_link_show'] ?? '', 'yes' ),
             'wpc_show_desc'        => wpc_sanitize_yes_no( $raw['wpc_show_desc'] ?? '', 'yes' ),
             'wpc_desc_limit'       => isset( $raw['wpc_desc_limit'] ) ? absint( $raw['wpc_desc_limit'] ) : 20,
@@ -301,6 +306,7 @@ class Food_Menu_Ajax {
             'title_link_show'   => wpc_sanitize_yes_no( $raw['title_link_show'] ?? '', 'yes' ),
             'show_item_status'  => wpc_sanitize_yes_no( $raw['show_item_status'] ?? '', 'yes' ),
             'show_item_label'   => wpc_sanitize_yes_no( $raw['show_item_label'] ?? '', 'no' ),
+            'show_points'       => wpc_sanitize_show_points( $raw['show_points'] ?? '' ),
             'no_of_product'     => isset( $raw['no_of_product'] ) ? max( 1, absint( $raw['no_of_product'] ) ) : 5,
             'wpc_menu_order'    => $this->sanitize_order( $raw['wpc_menu_order'] ?? 'DESC' ),
             'wpc_show_vendor'   => wpc_sanitize_yes_no( $raw['wpc_show_vendor'] ?? '', 'no' ),
@@ -324,6 +330,9 @@ class Food_Menu_Ajax {
             'wpc_desc_limit'         => isset( $raw['wpc_desc_limit'] ) ? absint( $raw['wpc_desc_limit'] ) : 15,
             'wpc_delivery_time_show' => wpc_sanitize_yes_no( $raw['wpc_delivery_time_show'] ?? '', 'no' ),
             'show_item_status'       => wpc_sanitize_yes_no( $raw['show_item_status'] ?? '', 'yes' ),
+            // Carried to every page, or labels and points show on page one only.
+            'show_item_label'        => wpc_sanitize_yes_no( $raw['show_item_label'] ?? '', 'no' ),
+            'show_points'            => wpc_sanitize_show_points( $raw['show_points'] ?? '' ),
             'wpc_menu_order'         => $this->sanitize_order( $raw['wpc_menu_order'] ?? 'DESC' ),
             'wpc_show_vendor'        => wpc_sanitize_yes_no( $raw['wpc_show_vendor'] ?? '', 'no' ),
             'show_pagination'        => wpc_sanitize_yes_no( $raw['show_pagination'] ?? '', 'yes' ),

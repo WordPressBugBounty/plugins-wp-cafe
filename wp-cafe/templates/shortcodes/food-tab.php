@@ -101,6 +101,7 @@ $wpc_color_style = wpc_color_tokens();
                     'show_item_status'  => $show_item_status,
                     // Without this the labels disappear on the second page.
                     'show_item_label'   => $settings['show_item_label'] ?? 'no',
+                    'show_points'       => $settings['show_points'] ?? '',
                     'wpc_desc_limit'    => $wpc_desc_limit,
                     'wpc_show_vendor'   => $wpc_show_vendor ?? 'no',
                     'show_pagination'   => $show_pagination,
@@ -123,6 +124,7 @@ $wpc_color_style = wpc_color_tokens();
                     'title_link_show'  => $title_link_show,
                     'show_item_status' => $show_item_status,
                     'show_item_label'  => isset( $show_item_label ) ? $show_item_label : ( isset( $settings['show_item_label'] ) ? $settings['show_item_label'] : 'no' ),
+                    'show_points'      => isset( $show_points ) ? $show_points : ( isset( $settings['show_points'] ) ? $settings['show_points'] : '' ),
                     'wpc_desc_limit'   => $wpc_desc_limit,
                     'wpc_show_vendor'  => $wpc_show_vendor,
                 ];

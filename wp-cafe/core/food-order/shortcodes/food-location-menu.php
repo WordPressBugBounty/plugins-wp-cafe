@@ -51,6 +51,7 @@ class Food_Location_Menu extends Base_Shortcode {
                 'wpc_delivery_time_show' => 'yes',
                 'show_item_status'       => 'yes',
                 'show_item_label'       => 'no',
+                'show_points'           => '',
                 'wpc_show_vendor'        => 'no',
                 'wpc_menu_order'         => 'DESC',
                 'wpc_nav_position'       => 'top',
@@ -72,6 +73,7 @@ class Food_Location_Menu extends Base_Shortcode {
         $wpc_delivery_time_show = $atts['wpc_delivery_time_show'];
         $show_item_status       = $atts['show_item_status'];
         $show_item_label        = $atts['show_item_label'] ?? 'no';
+        $show_points            = wpc_sanitize_show_points( $atts['show_points'] ?? '' );
         $wpc_menu_order         = $atts['wpc_menu_order'];
         $location_alignment     = $atts['location_alignment'];
         $wpc_show_vendor        = $atts['wpc_show_vendor'] ?? 'no';

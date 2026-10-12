@@ -89,6 +89,13 @@ class Payment_Controller extends Base_Rest_Controller {
             return $this->error( __( 'You do not have permission to pay for this reservation.', 'wp-cafe' ), 403 );
         }
 
+        // Points were spent on a pay-at-restaurant price; checkout would charge the full one.
+        $points_discount = (float) $reservation->points_discount;
+
+        if ( 'wc' === $payment_method && $points_discount > 0 ) {
+            return $this->error( __( 'This booking used points and is paid at the restaurant.', 'wp-cafe' ), 409 );
+        }
+
         $payment_procce = new Payment_Processor( $payment_method );
         $response       = $payment_procce->process_payment( [
             'reservation_id' => $reservation_id,

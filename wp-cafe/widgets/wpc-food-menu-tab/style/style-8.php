@@ -35,6 +35,7 @@ $cart_icon = wpc_get_option( 'cart_icon' );
                 'wpc_cart_button'  => $wpc_cart_button ?? 'yes',
                 'show_item_status' => $show_item_status ?? 'yes',
                 'show_item_label'  => $show_item_label ?? 'no',
+                'show_points'      => $show_points ?? '',
                 'wpc_show_desc'    => $wpc_show_desc ?? 'yes',
                 'wpc_desc_limit'   => $wpc_desc_limit ?? 20,
                 'wpc_show_vendor'  => $wpc_show_vendor ?? 'no',

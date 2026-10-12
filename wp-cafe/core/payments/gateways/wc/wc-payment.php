@@ -61,6 +61,15 @@ class WC_Payment extends Abstract_Payment {
 
         $cart->add_to_cart( $product_id, 1, 0, [], [ 'reservation_id' => $data['reservation_id'] ] );
 
+        /**
+         * The booking cart was emptied and rebuilt. empty_cart() also removed any
+         * applied coupons, so integrations re-apply theirs here.
+         *
+         * @param \WC_Cart          $cart
+         * @param Reservation_Model $reservation
+         */
+        do_action( 'wpcafe_reservation_cart_rebuilt', $cart, $reservation );
+
         // Redirect to checkout
         return new Payment_Response(
             'redirect',

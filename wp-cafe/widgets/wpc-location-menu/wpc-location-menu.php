@@ -135,6 +135,20 @@ class Wpc_Location_Menu extends Widget_Base
                 'default' => 'no',
             ]
         );
+        if ( wpc_pointics_is_active() ) {
+            $this->add_control(
+                'show_points',
+                [
+                    'label'        => esc_html__( 'Show Points', 'wp-cafe' ),
+                    'description'  => esc_html__( 'Show how many points each item earns.', 'wp-cafe' ),
+                    'type'         => \Elementor\Controls_Manager::SWITCHER,
+                    'label_on'     => esc_html__( 'Show', 'wp-cafe' ),
+                    'label_off'    => esc_html__( 'Hide', 'wp-cafe' ),
+                    'return_value' => 'yes',
+                    'default'      => 'yes',
+                ]
+            );
+        }
         $this->add_control(
             'wpc_show_desc',
             [
@@ -903,6 +917,7 @@ class Wpc_Location_Menu extends Widget_Base
 
         $show_item_status      	= $settings["show_item_status"];
         $show_item_label        = isset( $settings["show_item_label"] ) ? $settings["show_item_label"] : 'no';
+        $show_points            = wpc_switcher_show_points( $settings );
         $show_thumbnail      	= $settings["show_thumbnail"];
         $wpc_cart_button        = $settings["wpc_cart_button_show"];
         $wpc_price_show      	= $settings["wpc_price_show"];
@@ -936,6 +951,7 @@ class Wpc_Location_Menu extends Widget_Base
             'wpc_delivery_time_show'=> $wpc_delivery_time_show,
             'show_item_status'      => $show_item_status,
             'show_item_label'       => $show_item_label,
+            'show_points'           => $show_points,
             'wpc_menu_order'        => $wpc_menu_order,
             'unique_id'             => $unique_id,
             'location_alignment'    => $location_alignment,

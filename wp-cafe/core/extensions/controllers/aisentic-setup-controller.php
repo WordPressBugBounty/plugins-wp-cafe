@@ -50,13 +50,7 @@ class Aisentic_Setup_Controller extends Base_Rest_Controller {
     public function register_routes() {
         register_rest_route( $this->namespace, $this->rest_base, [
             [
-                /*
-                 * No `args` schema on purpose. ApiBase::sendRequest() hands apiFetch a
-                 * pre-stringified `body` with no JSON content type, so WP never parses
-                 * it into request params and every registered arg arrives empty. The
-                 * body is decoded in the callback instead — same approach as
-                 * Plugin_Controller, which is why that route works.
-                 */
+                // No `args` schema: the callback decodes the JSON body itself, like Plugin_Controller.
                 'methods'             => WP_REST_Server::CREATABLE,
                 'callback'            => [ $this, 'create_item' ],
                 'permission_callback' => [ $this, 'check_permissions' ],

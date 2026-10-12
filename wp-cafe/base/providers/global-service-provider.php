@@ -22,6 +22,7 @@ use WpCafe\Settings\Settings_Service_Provider;
 use WpCafe\Onboard\Onboard_Service_Provider;
 use WpCafe\Reservation\Reservation_Service_Provider;
 use WpCafe\RestaurantManagement\Restaurant_Management_Service_Provider;
+use WpCafe\CustomerAccounts\Customer_Accounts_Service_Provider;
 use WpCafe\Dashboard\Dashboard_Service_Provider;
 use WpCafe\Payments\Payment_Service_Provider;
 use WpCafe\Integrations\Integration_Service_Provider;
@@ -52,6 +53,7 @@ class Global_Service_Provider implements Provider_Contract {
         'settings'      => Settings_Service_Provider::class,
         'onboard'       => Onboard_Service_Provider::class,
         'reservation'   => Reservation_Service_Provider::class,
+        'customer-accounts' => Customer_Accounts_Service_Provider::class,
         'restaurant-management' => Restaurant_Management_Service_Provider::class,
         'extension'     => Extension_Service_Provider::class,
         'feedback-form' => Feedback_Service_Provider::class,

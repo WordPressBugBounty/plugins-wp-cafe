@@ -3,6 +3,7 @@
     "description": "WordPress Restaurant solution plugin to launch Restaurant Websites.",
     "type": "project",
     "require": {
+        "php": ">=8.0",
         "themewinter/uninstaller_form": "dev-main",
         "arraytics/tools-sdk": "dev-main",
         "arraytics/plugin-notice-sdk": "dev-main",
@@ -59,6 +60,9 @@
     "config": {
         "allow-plugins": {
             "dealerdirect/phpcodesniffer-composer-installer": true
+        },
+        "platform": {
+            "php": "8.0.99"
         }
     }
 }

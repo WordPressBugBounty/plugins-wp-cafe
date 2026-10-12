@@ -59,7 +59,8 @@ class Food_Location_Ajax {
 
             $show_thumbnail         = wpc_sanitize_yes_no( $raw_product_data['show_thumbnail'] ?? '', 'yes' );
             $show_item_status       = wpc_sanitize_yes_no( $raw_product_data['show_item_status'] ?? '', 'yes' );
-            $show_item_label        = $product_data['show_item_label'] ?? 'no';
+            $show_item_label        = wpc_sanitize_yes_no( $raw_product_data['show_item_label'] ?? '', 'no' );
+            $show_points            = wpc_sanitize_show_points( $raw_product_data['show_points'] ?? '' );
             $wpc_cart_button        = wpc_sanitize_yes_no( $raw_product_data['wpc_cart_button'] ?? '', 'yes' );
             $wpc_price_show         = wpc_sanitize_yes_no( $raw_product_data['wpc_price_show'] ?? '', 'yes' );
             $wpc_show_desc          = wpc_sanitize_yes_no( $raw_product_data['wpc_show_desc'] ?? '', 'yes' );

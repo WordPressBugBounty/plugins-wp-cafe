@@ -20,6 +20,7 @@ class Reservation_Resource extends Resource {
         $payment_method = $this->get_payment_method();
         $start_time = $this->data->start_time;
         $end_time   = $this->data->end_time;
+        $items      = $this->data->get_items();
 
         $reservation_data = [
             'id'                => $this->data->id,
@@ -37,6 +38,8 @@ class Reservation_Resource extends Resource {
             'invoice'           => $this->data->invoice,
             'booking_amount'    => $this->data->booking_amount,
             'total_price'       => $this->data->total_price,
+            'points_discount'   => (float) $this->data->points_discount,
+            'amount_due'        => $this->data->get_amount_due( $items ),
             'deposit_value'     => $this->data->deposit_value,
             'remaining_amount'  => $this->data->remaining_amount,
             'is_partial_payment'=> $this->data->is_partial_payment,
@@ -46,7 +49,7 @@ class Reservation_Resource extends Resource {
             'table_name'        => $this->data->table_name,
             'custom_fields'     => $this->data->custom_fields,
             'seats'             => $this->data->seats,
-            'food_items'        => Reservation_Item_Resource::collection( $this->data->get_items() ),
+            'food_items'        => Reservation_Item_Resource::collection( $items ),
         ];
 
         /*

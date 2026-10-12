@@ -60,12 +60,15 @@ class Extension_Controller extends Base_Rest_Controller {
      * Permission check for read endpoint. Allow admins, dokan vendors, and any
      * user with restaurant panel access capabilities (manager, staff, customer).
      *
+     * Other multivendor addons (e.g. WCFM) grant their vendors through the
+     * `wpcafe_extensions_read_permission` filter: their vendor role does not
+     * reliably carry any of the caps below.
+     *
+     * @param \WP_REST_Request|null $request The request object.
      * @return bool
      */
-    public function read_permission_check(): bool {
-        if ( current_user_can( 'manage_options' ) || wpc_user_is_dokan_vendor() ) {
-            return true;
-        }
+    public function read_permission_check( $request = null ): bool {
+        $can_read = current_user_can( 'manage_options' ) || wpc_user_is_dokan_vendor();
 
         $panel_caps = [
             'manage_woocommerce',
@@ -78,12 +81,14 @@ class Extension_Controller extends Base_Rest_Controller {
         ];
 
         foreach ( $panel_caps as $cap ) {
-            if ( current_user_can( $cap ) ) {
-                return true;
+            if ( $can_read ) {
+                break;
             }
+            $can_read = current_user_can( $cap );
         }
 
-        return false;
+        // Cast: a non-WP_Error object returned by a filter would otherwise read as "granted".
+        return (bool) apply_filters( 'wpcafe_extensions_read_permission', $can_read, $request );
     }
 
     /**

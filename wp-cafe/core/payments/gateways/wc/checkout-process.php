@@ -171,17 +171,21 @@ class Checkout_Process implements Hookable_Service_Contract {
     /**
      * Handle actions after WooCommerce payment is complete.
      *
-     * This function is hooked to 'woocommerce_payment_complete' and updates the order status to 'completed'
-     * when payment is successfully processed.
+     * Hooked to 'woocommerce_payment_complete'. Confirms the booking the order
+     * pays for, if any.
      *
      * @param int $order_id The ID of the WooCommerce order.
      * @return void
      */
     public function handle_payment_complete( $order_id ) {
-        $order          = wc_get_order( $order_id );
-        $reservation_id = $order->get_meta( 'reservation_id' );
-        $reservation    = new Reservation_Model( $reservation_id );
-        $reservation->update( [ 'status' => 'confirmed' ] );
+        $reservation_id = $this->reservation_id_for_order( $order_id );
+
+        // Every paid WooCommerce order passes through here, not only bookings.
+        if ( ! $reservation_id ) {
+            return;
+        }
+
+        $this->sync_reservation_status( $reservation_id, 'confirmed', 'payment_complete' );
     }
 
     /**
@@ -266,14 +270,11 @@ class Checkout_Process implements Hookable_Service_Contract {
      * @return void
      */
     public function handle_order_status_changed( $order_id, $old_status, $new_status ) {
-        $order          = wc_get_order( $order_id );
-        $reservation_id = $order->get_meta( 'reservation_id' );
+        $reservation_id = $this->reservation_id_for_order( $order_id );
 
-        if ( empty( $reservation_id ) ) {
+        if ( ! $reservation_id ) {
             return;
         }
-
-        $reservation = new Reservation_Model( $reservation_id );
 
         $status_map = [
             'pending'    => 'pending',
@@ -285,10 +286,8 @@ class Checkout_Process implements Hookable_Service_Contract {
             'failed'     => 'cancelled',
         ];
 
-        $mapped_status = $status_map[ $new_status ] ?? null;
-
-        if ( $mapped_status ) {
-            $reservation->update( [ 'status' => $mapped_status ] );
+        if ( isset( $status_map[ $new_status ] ) ) {
+            $this->sync_reservation_status( $reservation_id, $status_map[ $new_status ], 'order_status' );
         }
 
         if ( 'cancelled' === $new_status ) {
@@ -627,5 +626,54 @@ class Checkout_Process implements Hookable_Service_Contract {
                 $node[ $key ] = $value;
             }
         }
+    }
+
+    /**
+     * The booking an order pays for, or 0.
+     *
+     * @param int $order_id WooCommerce order id.
+     * @return int
+     */
+    private function reservation_id_for_order( $order_id ) {
+        $order = function_exists( 'wc_get_order' ) ? wc_get_order( $order_id ) : null;
+
+        if ( ! $order ) {
+            return 0;
+        }
+
+        $reservation_id = absint( $order->get_meta( 'reservation_id' ) );
+
+        return $reservation_id && 'wpc_reservation' === get_post_type( $reservation_id ) ? $reservation_id : 0;
+    }
+
+    /**
+     * Move a booking to a status and tell listeners, only when it really changed.
+     *
+     * @param int    $reservation_id Reservation id.
+     * @param string $new_status     Target status.
+     * @param string $source         payment_complete or order_status.
+     * @return void
+     */
+    private function sync_reservation_status( $reservation_id, $new_status, $source ) {
+        $old_status = (string) get_post_status( $reservation_id );
+
+        if ( $old_status === $new_status ) {
+            return;
+        }
+
+        ( new Reservation_Model( $reservation_id ) )->update( [ 'status' => $new_status ] );
+
+        /**
+         * A booking's status changed because its WooCommerce order moved.
+         *
+         * Listeners must be idempotent: the check above is not atomic, so a payment
+         * webhook and an order status change landing together can both fire it.
+         *
+         * @param int    $reservation_id
+         * @param string $old_status
+         * @param string $new_status
+         * @param string $source payment_complete or order_status.
+         */
+        do_action( 'wpcafe_reservation_status_synced', $reservation_id, $old_status, $new_status, $source );
     }
 }

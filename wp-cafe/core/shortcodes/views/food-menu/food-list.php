@@ -6,6 +6,7 @@ if ( ! defined( 'ABSPATH' ) ) exit;
     $style               = $settings["food_menu_style"];
     $show_item_status   = $settings["show_item_status"];
     $show_item_label    = isset($settings["show_item_label"]) ? $settings["show_item_label"] : 'no';
+    $show_points        = isset( $settings['show_points'] ) ? $settings['show_points'] : '';
     $show_thumbnail     = $settings["show_thumbnail"];
     $title_link_show    = $settings["title_link_show"];
     $wpc_cart_button    = $settings["wpc_cart_button_show"];

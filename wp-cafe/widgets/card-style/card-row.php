@@ -103,6 +103,7 @@ if ( 'yes' !== $wpc_card['wpc_show_desc'] ) {
 
             </div>
         <?php endif; ?>
+        <?php wpc_menu_card_after_price( $wpcafe_product, $wpc_card['show_points'] ?? '' ); ?>
 
         <?php
         echo wp_kses(

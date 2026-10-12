@@ -44,6 +44,7 @@ class Food_Menu_List extends Base_Shortcode {
                 'wpc_price_show'      => 'yes',
                 'show_item_status'    => 'yes',
                 'show_item_label'       => 'no',
+                'show_points'         => '',
                 'wpc_show_desc'       => 'yes',
                 'title_link_show'     => 'yes',
                 'wpc_desc_limit'      => 20,
@@ -65,6 +66,7 @@ class Food_Menu_List extends Base_Shortcode {
         $wpc_price_show      = $atts['wpc_price_show'];
         $show_item_status    = $atts['show_item_status'];
         $show_item_label     = $atts['show_item_label'];
+        $show_points         = wpc_sanitize_show_points( $atts['show_points'] ?? '' );
         $wpc_show_desc       = $atts['wpc_show_desc'];
         $title_link_show     = $atts['title_link_show'];
         $wpc_desc_limit      = $atts['wpc_desc_limit'];
@@ -95,6 +97,7 @@ class Food_Menu_List extends Base_Shortcode {
             'wpc_cart_button_show' => $wpc_cart_button,
             'show_item_status'     => $show_item_status,
             'show_item_label'      => $show_item_label,
+            'show_points'          => $show_points,
             'title_link_show'      => $title_link_show,
             'wpc_show_desc'        => $wpc_show_desc,
             'wpc_desc_limit'       => $wpc_desc_limit,

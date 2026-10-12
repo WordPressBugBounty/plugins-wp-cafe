@@ -24,7 +24,8 @@ class Tipping_Cleanup {
      * @return void
      */
     public function clear_tip( $order_id ) {
-        if ( ! is_admin() ) {
+        // REST, CLI and webhook orders are created with no cart session.
+        if ( ! is_admin() && WC()->session ) {
             WC()->session->__unset( 'wpc_pro_tip' );
         }
     }
