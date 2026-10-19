@@ -1,0 +1,1 @@
+"use strict";(globalThis.webpackChunkwp_cafe||=[]).push([[697,1173,3078,5459,7840],{80697(s,h,a){const e=(0,a(9407).A)("plus",[["path",{d:"M5 12h14",key:"1ays0h"}],["path",{d:"M12 5v14",key:"s699le"}]]);a.d(h,["A",0,e])}}]);

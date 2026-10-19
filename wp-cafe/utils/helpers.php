@@ -440,6 +440,161 @@ if ( ! function_exists( 'wpc_get_reservation_food_menu_fields' ) ) {
     }
 }
 
+if ( ! function_exists( 'wpc_reservation_skeleton_layout' ) ) {
+    /**
+     * Shape of the reservation form placeholder, read from the same settings the
+     * React form uses, so the placeholder lands close to the real form's height.
+     *
+     * Leaves out what PHP cannot know in advance: pro's visual table (it loads on
+     * its own later), location-specific booking amounts and waitlist mode.
+     *
+     * @param array         $atts            Shortcode attributes: form_display_type, date_selector, reservation_style.
+     * @param callable|null $field_available Decides whether a shown field can render; null = needs pro for
+     *                                       `isPro` fields and an enabled module for fields that name one.
+     * @return array{style:string,calendar:bool,wizard_steps:int,sections:array<int,array{label:bool,fields:string[]}>,payments:bool}
+     */
+    function wpc_reservation_skeleton_layout( array $atts, ?callable $field_available = null ): array {
+        $known           = [ 'text', 'email', 'tel', 'number', 'date', 'time', 'textarea', 'select', 'location', 'radio', 'checkbox', 'food_menu' ];
+        $field_available = $field_available ?? static function ( array $field ): bool {
+            if ( ! empty( $field['isPro'] ) && ! function_exists( 'wpcafe_pro' ) ) {
+                return false;
+            }
+            return empty( $field['module'] ) || wpc_is_module_enable( (string) $field['module'] );
+        };
+        $calendar        = 'calendar' === ( $atts['date_selector'] ?? '' );
+        $steps           = wpc_get_option( 'reservation_form_customization', [] );
+
+        if ( ! is_array( $steps ) || empty( $steps ) ) {
+            // Visible fields of getReservationFormCustomization() in
+            // ReservationFormProvider.tsx, the list React falls back to. Keep in sync.
+            $fallback = [ 'date' => 'date', 'start_time' => 'time', 'end_time' => 'time', 'name' => 'text', 'email' => 'email', 'phone' => 'tel', 'total_guest' => 'number', 'notes' => 'textarea' ];
+            $steps    = [ [ 'fields' => array_map(
+                static fn( $id, $type ) => [ 'id' => $id, 'type' => $type, 'visible' => true ],
+                array_keys( $fallback ),
+                $fallback
+            ) ] ];
+        }
+        $steps = array_values( array_filter( $steps, 'is_array' ) );
+
+        // React reads an empty display type as "wizard", and only shows the wizard with more than one step.
+        $wizard = 'wizard' === ( ( $atts['form_display_type'] ?? '' ) ?: 'wizard' ) && count( $steps ) > 1;
+
+        $sections = [];
+        $has_food = false;
+        foreach ( $wizard ? array_slice( $steps, 0, 1 ) : $steps as $step ) {
+            $fields = [];
+            foreach ( is_array( $step['fields'] ?? null ) ? $step['fields'] : [] as $field ) {
+                $type = is_array( $field ) ? (string) ( $field['type'] ?? '' ) : '';
+                if ( empty( $field['visible'] ) || ! in_array( $type, $known, true ) || ! $field_available( $field ) ) {
+                    continue;
+                }
+                // The calendar panel replaces the date field.
+                if ( $calendar && 'date' === ( $field['id'] ?? '' ) ) {
+                    continue;
+                }
+                $has_food = $has_food || 'food_menu' === $type;
+                $fields[] = $type;
+            }
+            if ( $fields ) {
+                $sections[] = [ 'label' => ! $wizard && count( $steps ) > 1, 'fields' => $fields ];
+            }
+        }
+
+        return [
+            'style'        => 'style-2' === ( $atts['reservation_style'] ?? '' ) ? 'style-2' : 'style-1',
+            'calendar'     => $calendar,
+            'wizard_steps' => $wizard ? count( $steps ) : 0,
+            'sections'     => $sections,
+            // Same rule as usePaymentApi: a booking fee, or a food menu that can take a deposit.
+            'payments'     => ! $wizard && ( (float) wpc_get_option( 'reservation_booking_amount', 0 ) > 0 || $has_food ),
+        ];
+    }
+}
+
+if ( ! function_exists( 'wpc_reservation_form_skeleton_css' ) ) {
+    /**
+     * Styles for the reservation form placeholder. Printed inline before the
+     * mount box because classic themes load frontend.css in the footer, after it.
+     *
+     * A constant with no "<", so it can never close its style tag.
+     *
+     * @return string Plain CSS.
+     */
+    function wpc_reservation_form_skeleton_css(): string {
+        return '.wpc-rfs{display:block;width:100%;--wpc-rfs-bar:rgba(128,128,128,.18);--wpc-rfs-line:rgba(128,128,128,.25)}'
+            . '.wpc-rfs *{box-sizing:border-box}'
+            . '.wpc-rfs-sr{position:absolute;width:1px;height:1px;margin:-1px;padding:0;border:0;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}'
+            . '.wpc-rfs-card{border:1px solid var(--wpc-rfs-line);border-radius:12px;padding:24px}'
+            . '.wpc-rfs-bar{display:block;background:var(--wpc-rfs-bar);border-radius:6px}'
+            . '.wpc-rfs-pulse .wpc-rfs-bar{animation:wpc-rfs-pulse 1.5s ease-in-out infinite}'
+            . '@keyframes wpc-rfs-pulse{50%{opacity:.5}}'
+            . '@media (prefers-reduced-motion:reduce){.wpc-rfs-pulse .wpc-rfs-bar{animation:none}}'
+            . '.wpc-rfs-layout{display:grid;gap:20px}'
+            . '@media (min-width:1024px){.wpc-rfs-layout--calendar{grid-template-columns:1fr 1fr;align-items:start}}'
+            . '.wpc-rfs-calendar{height:360px}'
+            . '.wpc-rfs-steps{height:92px;margin-bottom:32px}'
+            . '.wpc-rfs-section{display:flex;flex-direction:column;gap:20px}'
+            . '.wpc-rfs-section + .wpc-rfs-section{margin-top:24px}'
+            . '.wpc-rfs-style-2{flex-direction:row;flex-wrap:wrap}'
+            . '.wpc-rfs-style-2 .wpc-rfs-field{flex:1 1 0;min-width:210px}'
+            . '.wpc-rfs-style-2 .wpc-rfs-heading,.wpc-rfs-style-2 .wpc-rfs-field--textarea,.wpc-rfs-style-2 .wpc-rfs-field--food_menu{flex:0 0 100%}'
+            . '.wpc-rfs-heading{height:24px;width:40%}'
+            . '.wpc-rfs-label{height:14px;width:35%;margin:3px 0 10px}'
+            . '.wpc-rfs-input{height:44px}'
+            . '.wpc-rfs-field--textarea .wpc-rfs-input{height:96px}'
+            . '.wpc-rfs-field--food_menu .wpc-rfs-input{height:500px}'
+            . '.wpc-rfs-payments{height:175px;margin-top:20px}'
+            . '.wpc-rfs-actions{display:flex;flex-wrap:wrap;justify-content:space-between;gap:16px;margin-top:80px}'
+            . '.wpc-rfs-actions .wpc-rfs-bar{height:44px;width:210px}';
+    }
+}
+
+if ( ! function_exists( 'wpc_print_reservation_form_skeleton_styles' ) ) {
+    /**
+     * Prints the placeholder styles, at most once per request: wp_print_styles()
+     * skips a handle it already printed, so two forms on a page share one block.
+     * Call it right before the mount box, never inside it (React empties the box).
+     *
+     * @return void
+     */
+    function wpc_print_reservation_form_skeleton_styles(): void {
+        if ( ! wp_style_is( 'wpc-rfs', 'registered' ) ) {
+            wp_register_style( 'wpc-rfs', false, [], WPCAFE_VERSION );
+            wp_add_inline_style( 'wpc-rfs', wpc_reservation_form_skeleton_css() );
+        }
+        wp_print_styles( 'wpc-rfs' );
+    }
+}
+
+if ( ! function_exists( 'wpc_reservation_form_skeleton' ) ) {
+    /**
+     * Placeholder markup for one reservation form, shaped from the form settings.
+     * Call wpc_print_reservation_form_skeleton_styles() before the mount box too.
+     *
+     * @param array $atts Shortcode attributes, see wpc_reservation_skeleton_layout().
+     * @return string Markup, already passed through wp_kses. Empty if the template is missing.
+     */
+    function wpc_reservation_form_skeleton( array $atts ): string {
+        $template = WPCAFE_DIR . '/templates/reservation/form-skeleton.php';
+        if ( ! file_exists( $template ) ) {
+            return '';
+        }
+
+        $layout = wpc_reservation_skeleton_layout( $atts );
+
+        ob_start();
+        include $template;
+
+        return wp_kses(
+            (string) ob_get_clean(),
+            [
+                'div'  => [ 'class' => true, 'aria-hidden' => true ],
+                'span' => [ 'class' => true, 'role' => true ],
+            ]
+        );
+    }
+}
+
 if ( ! function_exists( 'wpcafe_frontend_shortcode_tags' ) ) {
     /**
      * Allowlist of shortcode tags whose presence on a page requires WP Cafe's

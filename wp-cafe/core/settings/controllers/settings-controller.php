@@ -71,6 +71,10 @@ class Settings_Controller extends Base_Rest_Controller {
         'mailmint_webhook_url',
         'zoho_flow_webhook_url',
         'flowmattic_webhook_url',
+        'pabbly_webhook_url',
+        'zapier_webhook_url',
+        'funnelkit_webhook_url',
+        'uncanny_automator_webhook_url',
     ];
 
     /**

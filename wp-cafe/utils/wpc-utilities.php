@@ -683,6 +683,23 @@ class Wpc_Utilities {
 		return self::run_product_query( $params );
 	}
 
+	/**
+	 * Count the products product_query() would return, without building them.
+	 *
+	 * Same params and the same `wpc_product_query_args` filter as the list, so
+	 * the total always matches what the menu can show. Page and page size are
+	 * ignored. A search needs the caller's `posts_where` filter, as with the list.
+	 *
+	 * @param array $params Same params as product_query().
+	 * @return int
+	 */
+	public static function count_products( $params ) {
+		// total_count would skip the search branch, so count through the normal one.
+		$params['total_count'] = false;
+		$params['count_only']  = true;
+		return self::run_product_query( $params )['total_products'];
+	}
+
 	private static function run_product_query( $params ){
 		$defaults = array(
 			'post_type'     => 'product',
@@ -696,6 +713,7 @@ class Wpc_Utilities {
 			'wpc_location'  => null,
 			'paginate'      => false,
 			'suppress_filter' => false,
+			'count_only'    => false,
 		);
 
 		$parsed = wp_parse_args( $params, $defaults );
@@ -795,9 +813,40 @@ class Wpc_Utilities {
 		// Let WCML scope the query to the current language.
 		$args['suppress_filters'] = false;
 
+		if ( $parsed['count_only'] ) {
+			// One ID plus SQL_CALC_FOUND_ROWS gives the total; no product is built.
+			$args['posts_per_page'] = 1;
+			$args['no_found_rows']  = false;
+			unset( $args['paged'] );
+			$query = new \WP_Query( $args );
+
+			return [
+				'products'       => [],
+				'total_pages'    => 0,
+				'current_page'   => 0,
+				'total_products' => (int) $query->found_posts,
+			];
+		}
+
 		$query    = new \WP_Query( $args );
-		$ids      = $query->posts;
-		$products = $ids ? array_filter( array_map( 'wc_get_product', $ids ) ) : [];
+		$ids      = array_values( array_filter( array_map( 'absint', $query->posts ) ) );
+		$products = [];
+
+		if ( $ids ) {
+			/*
+			 * 'fields' => 'ids' skips WP_Query's cache priming, so each product (and
+			 * each card image) would load its row, meta and terms in separate queries.
+			 * Load them in batches; IDs already in the object cache are skipped.
+			 */
+			_prime_post_caches( $ids, true, true );
+			$products = array_filter( array_map( 'wc_get_product', $ids ) );
+
+			// Ask the products, not the post meta, so WooCommerce image filters apply.
+			$image_ids = array_unique( array_filter( array_map( static fn( $product ) => absint( $product->get_image_id() ), $products ) ) );
+			if ( $image_ids ) {
+				_prime_post_caches( $image_ids, false, true );
+			}
+		}
 
 		return [
 			'products'     => $products,

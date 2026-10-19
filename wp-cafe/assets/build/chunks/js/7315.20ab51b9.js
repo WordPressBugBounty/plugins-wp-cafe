@@ -1,0 +1,1 @@
+"use strict";(globalThis.webpackChunkwp_cafe||=[]).push([[4934,7315,9696],{29696(c,e,h){const a=(0,h(9407).A)("shopping-cart",[["circle",{cx:"8",cy:"21",r:"1",key:"jimo8o"}],["circle",{cx:"19",cy:"21",r:"1",key:"13723u"}],["path",{d:"M2.05 2.05h2l2.66 12.42a2 2 0 0 0 2 1.58h9.78a2 2 0 0 0 1.95-1.57l1.65-7.43H5.12",key:"9zh506"}]]);h.d(e,["A",0,a])}}]);

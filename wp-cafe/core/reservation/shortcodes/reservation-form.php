@@ -56,13 +56,14 @@ class Reservation_Form extends Base_Shortcode {
 
         ob_start();
 
+        wpc_print_reservation_form_skeleton_styles();
         ?>
 <div class="wpc-reservation-form-root" data-component="wpc-reservation-form"
     data-date-selector="<?php echo esc_attr( $atts['date_selector'] ); ?>"
     data-reservation-style="<?php echo esc_attr( $atts['reservation_style'] ); ?>"
     data-form-display-type="<?php echo esc_attr( $atts['form_display_type'] ); ?>"
     data-image-link="<?php echo esc_url( $atts['image_link'] ); ?>">
-    
+    <?php echo wpc_reservation_form_skeleton( $atts ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- runs wp_kses internally. ?>
 </div>
 <?php
         return ob_get_clean();

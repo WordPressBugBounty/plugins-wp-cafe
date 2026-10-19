@@ -4,7 +4,6 @@ namespace WpCafe\Assets;
 if ( ! defined( 'ABSPATH' ) ) exit;
 
 use WpCafe\Session;
-use WpCafe\Settings;
 
 /**
  * Manage all frontend scripts and styles
@@ -60,6 +59,11 @@ class Frontend_Assets extends Base_Assets {
         // the page-type gate below.
         $this->enqueue_i18n_loader();
 
+        // Same reason: a form placed in a theme template (FSE) or pulled in by
+        // Pro still loads its scripts when the gate below says no, and needs
+        // this data with them.
+        $this->register_frontend_data();
+
         // BE1/FE1/FE2: only load the (historically sitewide) card/grid CSS, the
         // jQuery public bundle and the forced WC scripts where WP Cafe actually
         // renders. Registration stays unconditional in register_styles_scripts(),
@@ -106,8 +110,52 @@ class Frontend_Assets extends Base_Assets {
         }
 
 
+        wp_localize_script( 'wpc-location-selector', 'wpcLocation', [
+            'ajaxUrl'          => admin_url('admin-ajax.php'),
+            'nonce'            => wp_create_nonce( 'wpc_location_nonce' ),
+            'selectedLocation' => Session::get('selected_location'),
+            'wc_cart_url'      => function_exists( 'wc_get_cart_url' ) ? wc_get_cart_url() : '',
+            'require_location'          => wpc_get_option('require_location'),
+            'location_selector'         => wpc_get_option('display_location_selector', 'dont_show'),
+            'location_selector_pages'   => wpc_get_option('location_selector_pages'),
+            'current_page_id'           => get_the_ID(),
+            'wc_cart_empty'             => function_exists( 'WC' ) && WC()->cart ? WC()->cart->is_empty() : true,
+        ] );
+    }
+
+    /**
+     * Register the data our frontend bundles read (window.wpCafe,
+     * window.wpc_form_client_data) on a file-less handle they all depend on.
+     *
+     * WordPress prints a dependency's data whenever a script that needs it
+     * prints, so the data follows the scripts onto any page, once. Without it
+     * the reservation form fell back to guesses (24h time shown as "7:00 PM",
+     * "$" for every currency) or crashed on pages the gate skips.
+     *
+     * @return void
+     */
+    private function register_frontend_data() {
+        wp_register_script( 'wpcafe-frontend-data', false, [], WPCAFE_VERSION, true );
+        wp_localize_script( 'wpcafe-frontend-data', 'wpc_form_client_data', $this->get_form_client_data() );
+        wp_localize_script( 'wpcafe-frontend-data', 'wpCafe', Localize::get_frontend() );
+
+        wp_set_script_translations(
+            'wpcafe-frontend-scripts',
+            'wp-cafe' // text domain
+        );
+    }
+
+    /**
+     * Data for the jQuery public bundle (window.wpc_form_client_data).
+     *
+     * Printed in the page source for every visitor, so never put the settings
+     * blob here: it holds API tokens and webhook URLs. The bundle only reads
+     * the AJAX URL and nonces.
+     *
+     * @return array
+     */
+    private function get_form_client_data() {
         $form_data                        = [];
-        $form_data['settings']            = Settings::get();
         $form_data['wpc_ajax_url']        = admin_url( 'admin-ajax.php' );
         $form_data['wpc_validation_message'] = [
             'error_text'    => esc_html__('Please fill the field', 'wp-cafe'),
@@ -133,25 +181,8 @@ class Frontend_Assets extends Base_Assets {
             'wpc_seat_capacity_nonce'           => wp_create_nonce('wpc_seat_capacity_nonce'),
             'wpc_food_menu_paginate_nonce'      => wp_create_nonce('wpc_food_menu_paginate_nonce'),
         ];
-        wp_localize_script( 'wpc-public', 'wpc_form_client_data', $form_data );
-        wp_localize_script( 'wpc-public', 'wpCafe',  Localize::get_frontend() );
 
-        wp_localize_script( 'wpc-location-selector', 'wpcLocation', [
-            'ajaxUrl'          => admin_url('admin-ajax.php'),
-            'nonce'            => wp_create_nonce( 'wpc_location_nonce' ),
-            'selectedLocation' => Session::get('selected_location'),
-            'wc_cart_url'      => function_exists( 'wc_get_cart_url' ) ? wc_get_cart_url() : '',
-            'require_location'          => wpc_get_option('require_location'),
-            'location_selector'         => wpc_get_option('display_location_selector', 'dont_show'),
-            'location_selector_pages'   => wpc_get_option('location_selector_pages'),
-            'current_page_id'           => get_the_ID(),
-            'wc_cart_empty'             => function_exists( 'WC' ) && WC()->cart ? WC()->cart->is_empty() : true,
-        ] );
-
-        wp_set_script_translations(
-            'wpcafe-frontend-scripts',
-            'wp-cafe' // text domain
-        );
+        return $form_data;
     }
 
     /**
@@ -170,12 +201,12 @@ class Frontend_Assets extends Base_Assets {
                 'src'       => wpcafe()->assets_url . '/build/js/frontend.js',
                 // wpcafe-vendor-forms: bundle externalizes rhf/zod/resolvers to
                 // the shared global, so the provider must print first.
-                'deps'      => ['wp-i18n', 'wp-data','wp-api-fetch', 'wpcafe-vendor-forms'],
+                'deps'      => ['wp-i18n', 'wp-data','wp-api-fetch', 'wpcafe-vendor-forms', 'wpcafe-frontend-data'],
                 'in_footer' => true,
             ],
             'wpcafe-restaurant-management-scripts' => [
                 'src'       => wpcafe()->assets_url . '/build/js/restaurant-management.js',
-                'deps'      => ['wp-i18n', 'wp-element', 'wp-api-fetch', 'wpcafe-vendor-forms'],
+                'deps'      => ['wp-i18n', 'wp-element', 'wp-api-fetch', 'wpcafe-vendor-forms', 'wpcafe-frontend-data'],
                 'in_footer' => true,
             ],
             'wpc-flatpicker'     => [
@@ -185,7 +216,7 @@ class Frontend_Assets extends Base_Assets {
             ],
             'wpc-public'    => [
                 'src'       => wpcafe()->assets_url . '/build/js/wpc-public.js',
-                'deps'      => ['jquery'],
+                'deps'      => ['jquery', 'wpcafe-frontend-data'],
                 'in_footer' => true,
             ],
             // Popup behaviour (FE2). Split out of wpc-public.js — opener +

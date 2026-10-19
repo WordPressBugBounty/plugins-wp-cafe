@@ -3,7 +3,7 @@
         'name' => 'themewinter/wp-cafe',
         'pretty_version' => 'dev-develop',
         'version' => 'dev-develop',
-        'reference' => '5ab6dadab046f364b244bdce5629565c3151b749',
+        'reference' => 'c058182e4b010c387b45ee67bce1113e215b4854',
         'type' => 'project',
         'install_path' => __DIR__ . '/../../',
         'aliases' => array(),
@@ -57,7 +57,7 @@
         'themewinter/wp-cafe' => array(
             'pretty_version' => 'dev-develop',
             'version' => 'dev-develop',
-            'reference' => '5ab6dadab046f364b244bdce5629565c3151b749',
+            'reference' => 'c058182e4b010c387b45ee67bce1113e215b4854',
             'type' => 'project',
             'install_path' => __DIR__ . '/../../',
             'aliases' => array(),

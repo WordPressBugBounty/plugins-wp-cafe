@@ -1,0 +1,1 @@
+"use strict";(globalThis.webpackChunkwp_cafe||=[]).push([[63],{8723(c,e,a){const r=(0,a(9407).A)("loader-circle",[["path",{d:"M21 12a9 9 0 1 1-6.219-8.56",key:"13zald"}]]);a.d(e,["A",0,r])},98445(c,e,a){const r=(0,a(9407).A)("search",[["path",{d:"m21 21-4.34-4.34",key:"14j7rj"}],["circle",{cx:"11",cy:"11",r:"8",key:"4ej97u"}]]);a.d(e,["A",0,r])}}]);

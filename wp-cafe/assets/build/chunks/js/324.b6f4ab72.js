@@ -1,0 +1,1 @@
+"use strict";(globalThis.webpackChunkwp_cafe||=[]).push([[324],{80324(e,t,a){a.r(t);var o=a(70331),s=a(31456),n=a(51584),c=a(18106),i=a(94223);const r={code:"en-GB",formatDistance:o.B,formatLong:i.s,formatRelative:s.o,localize:n.k,match:c.Y,options:{weekStartsOn:1,firstWeekContainsDate:4}},f=r;a.d(t,["default",0,f,"enGB",0,r])}}]);
