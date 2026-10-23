@@ -1,1 +1,0 @@
-!function(n,o){"use strict";var e={init:function(){var t={"wpc-menu-tab.default":e.wpc_menu_tab,"wpc-location-menu.default":e.wpc_location_menu};n.each(t,function(n,e){o.hooks.addAction("frontend/element_ready/"+n,e)})},wpc_location_menu:function(o){wpc_widgets_popup(n,n(".food_location_wrapper"))}};n(window).on("elementor/frontend/init",e.init)}(jQuery,window.elementorFrontend);

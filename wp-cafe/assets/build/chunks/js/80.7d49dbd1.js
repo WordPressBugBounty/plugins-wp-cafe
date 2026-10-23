@@ -1,1 +1,0 @@
-"use strict";(globalThis.webpackChunkwp_cafe=globalThis.webpackChunkwp_cafe||[]).push([[80],{50080(a,c,e){e.r(c),e(12234),e(92266),e(18750)}}]);
